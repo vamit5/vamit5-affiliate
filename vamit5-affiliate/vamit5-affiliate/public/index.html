@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>VAMIT-5 Athletes · Postani deo elite</title>
+<meta name="description" content="VAMIT-5 Athlete Affiliate Program — 4 nivoa, do 50% provizije, gamifikacija koja ne staje. Prijavi se danas." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#05060a;--bg-1:#0a0c14;--bg-2:#0f1220;
+  --text:#e9ecff;--dim:#9aa0c4;--mute:#626890;
+  --brand:#00f0ff;--brand-2:#7a5bff;--brand-3:#ff3b9a;
+  --gold:#ffc24b;--lime:#a6ff3b;--red:#ff4d5e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,sans-serif;background:var(--bg-0);color:var(--text);
+  min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1200px 700px at 10% -10%, rgba(122,91,255,0.4), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(0,240,255,0.25), transparent 60%),
+    radial-gradient(800px 400px at 50% 110%, rgba(255,59,154,0.22), transparent 60%);
+  animation:aurora 18s ease-in-out infinite alternate;
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
+  background-size:64px 64px;mask-image:radial-gradient(ellipse at 50% 0%,black 0%,transparent 70%);
+}
+@keyframes aurora{0%{filter:hue-rotate(0deg) saturate(1)}100%{filter:hue-rotate(25deg) saturate(1.15)}}
+
+.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:24px}
+
+/* Nav */
+nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:0.02em;font-size:18px}
+.logo .mark{
+  width:36px;height:36px;border-radius:10px;
+  background:conic-gradient(from 180deg,var(--brand),var(--brand-2),var(--brand-3),var(--brand));
+  position:relative;display:grid;place-items:center;
+  box-shadow:0 8px 24px -6px rgba(122,91,255,0.7);
+}
+.logo .mark::after{content:"";position:absolute;inset:3px;border-radius:8px;background:#0a0c14}
+.logo .mark span{position:relative;z-index:1;font-size:14px;font-weight:900;color:#fff}
+.logo small{color:var(--dim);font-weight:500;font-size:11px;letter-spacing:0.18em;margin-left:4px;text-transform:uppercase}
+nav .actions{display:flex;gap:10px;align-items:center}
+.btn{
+  padding:10px 18px;border-radius:10px;border:none;cursor:pointer;
+  font-family:inherit;font-weight:700;font-size:13px;letter-spacing:0.01em;
+  text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s ease;
+}
+.btn.ghost{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+.btn.ghost:hover{background:rgba(255,255,255,0.1)}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;box-shadow:0 8px 24px -8px rgba(0,240,255,0.6)}
+.btn.primary:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(0,240,255,0.8)}
+
+/* Hero */
+.hero{padding:80px 0 60px;text-align:center}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:999px;
+  background:rgba(255,194,75,0.1);border:1px solid rgba(255,194,75,0.35);
+  color:var(--gold);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
+  margin-bottom:24px;
+}
+.eyebrow .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.4;transform:scale(1.5)}}
+h1{
+  font-size:clamp(44px,7vw,84px);font-weight:900;line-height:1.05;letter-spacing:-0.04em;
+  background:linear-gradient(180deg,#fff,#9aa0c4);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  margin-bottom:20px;
+}
+h1 .grad{
+  background:linear-gradient(135deg,var(--brand),var(--brand-3) 70%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-style:italic;
+}
+.lede{font-size:clamp(16px,1.4vw,20px);color:var(--dim);max-width:640px;margin:0 auto 36px;line-height:1.5}
+.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn.big{padding:16px 28px;font-size:15px;border-radius:14px}
+
+/* Stats strip */
+.stats-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin:60px 0 80px;
+  background:rgba(255,255,255,0.06);border-radius:20px;overflow:hidden;
+  border:1px solid rgba(255,255,255,0.08);
+}
+@media(max-width:780px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
+.stat-item{
+  background:rgba(10,12,20,0.7);backdrop-filter:blur(14px);
+  padding:30px;text-align:center;
+}
+.stat-item .num{
+  font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:900;
+  background:linear-gradient(180deg,#fff,#7fd9ff);-webkit-background-clip:text;background-clip:text;color:transparent;
+  letter-spacing:-0.03em;
+}
+.stat-item .lbl{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-top:6px}
+
+/* Tier cards */
+section{padding:60px 0}
+.section-eyebrow{font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:0.25em;font-weight:800;text-align:center;margin-bottom:12px}
+h2{font-size:clamp(32px,4vw,48px);font-weight:900;text-align:center;letter-spacing:-0.03em;margin-bottom:14px}
+h2 .grad{background:linear-gradient(135deg,var(--brand),var(--brand-3));-webkit-background-clip:text;background-clip:text;color:transparent}
+.section-sub{color:var(--dim);text-align:center;max-width:600px;margin:0 auto 50px;font-size:15px;line-height:1.5}
+
+.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:980px){.tier-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.tier-grid{grid-template-columns:1fr}}
+
+.t-card{
+  position:relative;padding:28px 22px;border-radius:22px;
+  background:linear-gradient(180deg,rgba(20,24,42,0.85),rgba(10,12,20,0.95));
+  border:1px solid rgba(255,255,255,0.08);
+  transition:all .3s ease;
+  overflow:hidden;
+}
+.t-card::before{
+  content:"";position:absolute;inset:-1px;border-radius:inherit;z-index:-1;
+  background:var(--gl,linear-gradient(135deg,var(--brand-2),var(--brand)));
+  opacity:0;transition:opacity .3s ease;
+  filter:blur(16px);
+}
+.t-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.18)}
+.t-card:hover::before{opacity:.4}
+.t-card .stars{font-size:14px;letter-spacing:6px;color:var(--c,var(--brand));margin-bottom:10px}
+.t-card .nm{font-size:22px;font-weight:900;letter-spacing:-0.02em}
+.t-card .pct{
+  font-family:'Space Grotesk',sans-serif;font-size:48px;font-weight:900;margin-top:14px;letter-spacing:-0.03em;
+  color:var(--c,var(--text));
+}
+.t-card .pct small{font-size:14px;color:var(--mute);font-weight:600;margin-left:4px;letter-spacing:0}
+.t-card ul{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:9px}
+.t-card li{font-size:13px;color:var(--dim);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.t-card li::before{content:"→";color:var(--c,var(--brand));font-weight:800;flex-shrink:0;margin-top:1px}
+
+.t-card.recruit{--c:#a6ff3b;--gl:linear-gradient(135deg,#7a5bff,#a6ff3b)}
+.t-card.pro{--c:#00f0ff;--gl:linear-gradient(135deg,#00f0ff,#7a5bff)}
+.t-card.commando{--c:#ffc24b;--gl:linear-gradient(135deg,#ffc24b,#ff3b9a)}
+.t-card.elite{--c:#ff3b9a;--gl:linear-gradient(135deg,#ff3b9a,#7a5bff)}
+.t-card.elite{border-color:rgba(255,59,154,0.4)}
+.t-card.elite .featured{
+  position:absolute;top:14px;right:14px;
+  font-size:9px;letter-spacing:0.2em;font-weight:900;
+  padding:4px 10px;border-radius:6px;
+  background:linear-gradient(135deg,var(--brand-3),var(--brand-2));color:#fff;
+}
+
+/* Why join section */
+.why{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media(max-width:880px){.why{grid-template-columns:1fr}}
+.why-card{
+  padding:28px;border-radius:20px;
+  background:rgba(20,24,42,0.6);border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(14px);
+}
+.why-card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(122,91,255,0.15));border:1px solid rgba(0,240,255,0.3);margin-bottom:18px}
+.why-card h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.why-card p{font-size:13.5px;color:var(--dim);line-height:1.6}
+
+/* Apply form */
+.apply-card{
+  max-width:680px;margin:0 auto;
+  padding:40px;border-radius:24px;
+  background:
+    radial-gradient(600px 300px at 0% 0%,rgba(122,91,255,0.15),transparent 70%),
+    radial-gradient(600px 300px at 100% 100%,rgba(0,240,255,0.15),transparent 70%),
+    linear-gradient(180deg,rgba(20,24,42,0.85),rgba(10,12,20,0.9));
+  border:1px solid rgba(0,240,255,0.25);
+  backdrop-filter:blur(20px);
+}
+.apply-card h3{font-size:24px;font-weight:800;margin-bottom:6px}
+.apply-card .form-sub{color:var(--dim);font-size:14px;margin-bottom:28px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
+.field label{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.12em}
+.field input,.field textarea,.field select{
+  padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);
+  background:rgba(255,255,255,0.03);color:var(--text);
+  font-family:inherit;font-size:14px;outline:none;transition:all .2s ease;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:var(--brand);box-shadow:0 0 0 4px rgba(0,240,255,0.12);
+  background:rgba(255,255,255,0.05);
+}
+.field textarea{min-height:90px;resize:vertical;font-family:inherit}
+.field .hint{font-size:12px;color:var(--mute);margin-top:4px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:540px){.row{grid-template-columns:1fr}}
+
+.upload-box{
+  padding:30px 18px;border-radius:14px;text-align:center;
+  border:2px dashed rgba(0,240,255,0.35);background:rgba(0,240,255,0.04);
+  cursor:pointer;transition:all .2s ease;
+}
+.upload-box:hover{background:rgba(0,240,255,0.08);border-color:var(--brand)}
+.upload-box .ico{font-size:36px;margin-bottom:8px}
+.upload-box .t{font-weight:700;font-size:14px}
+.upload-box .s{font-size:12px;color:var(--mute);margin-top:4px}
+.upload-box.has-file{border-style:solid;border-color:var(--lime);background:rgba(166,255,59,0.06)}
+.upload-box.has-file .ico::before{content:"✅"}
+
+.consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--dim);margin:10px 0 24px;line-height:1.5}
+.consent input{margin-top:3px;flex-shrink:0;accent-color:var(--brand)}
+.consent a{color:var(--brand);text-decoration:none}
+
+.success-box{
+  padding:30px;border-radius:18px;text-align:center;
+  background:linear-gradient(135deg,rgba(166,255,59,0.15),rgba(0,240,255,0.1));
+  border:1px solid rgba(166,255,59,0.4);
+  display:none;
+}
+.success-box.show{display:block;animation:fadeUp .5s cubic-bezier(.2,.8,.2,1)}
+.success-box .big-ico{font-size:54px;margin-bottom:12px}
+.success-box h4{font-size:22px;font-weight:800;margin-bottom:8px}
+.success-box p{color:var(--dim);font-size:14px;line-height:1.6}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Footer */
+footer{
+  padding:40px 0 30px;border-top:1px solid rgba(255,255,255,0.06);margin-top:80px;
+  text-align:center;color:var(--mute);font-size:12px;
+}
+footer a{color:var(--brand);text-decoration:none;margin:0 8px}
+
+/* Loading */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <nav>
+    <div class="logo">
+      <div class="mark"><span>V5</span></div>
+      <span>VAMIT-5</span>
+      <small>Athletes</small>
+    </div>
+    <div class="actions">
+      <a href="/dashboard.html" class="btn ghost">Login</a>
+      <a href="#apply" class="btn primary">Prijavi se</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="eyebrow"><span class="dot"></span>Aktivne prijave · Aprilska klasa otvorena</div>
+    <h1>Prodaj VAMIT-5,<br/>zaradi <span class="grad">do 50%</span><br/>po svakoj prodaji.</h1>
+    <p class="lede">Jedini affiliate program u regionu sa stvarnom gejmifikacijom: nivoi, streak, leaderboard, automatske isplate. Sve sto dovoditi kupce — placamo. Sve sto pomeras tier — cuvas dozivotno.</p>
+    <div class="cta-row">
+      <a href="#apply" class="btn primary big">Prijavi se → Audicija</a>
+      <a href="#tiers" class="btn ghost big">Vidi nivoe i provizije</a>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-strip">
+    <div class="stat-item"><div class="num">50%</div><div class="lbl">max provizija</div></div>
+    <div class="stat-item"><div class="num">€240</div><div class="lbl">paket maks.</div></div>
+    <div class="stat-item"><div class="num">90d</div><div class="lbl">cookie window</div></div>
+    <div class="stat-item"><div class="num">20.</div><div class="lbl">isplata svakog meseca</div></div>
+  </div>
+
+  <!-- TIERS -->
+  <section id="tiers">
+    <div class="section-eyebrow">4 nivoa programa</div>
+    <h2>Od <span class="grad">REGRUTA</span> do ELITE</h2>
+    <p class="section-sub">Tier ne kupujes — zaradjujes. Sto duze ides i sto vise gradnje, to viša provizija. Trajno.</p>
+
+    <div class="tier-grid">
+      <div class="t-card recruit">
+        <div class="stars">⭐</div>
+        <div class="nm">REGRUT</div>
+        <div class="pct">35%<small>/ prodaja</small></div>
+        <ul>
+          <li>Prijavi se preko formulara</li>
+          <li>Snimi & posalji video sa KB + BW vežbama</li>
+          <li>Posle odobrenja — krećes odmah</li>
+          <li>Welcome bonus + materijali</li>
+        </ul>
+      </div>
+      <div class="t-card pro">
+        <div class="stars">⭐⭐</div>
+        <div class="nm">PRO ATHLETE</div>
+        <div class="pct">40%<small>/ prodaja</small></div>
+        <ul>
+          <li>Min. 2 meseca kao REGRUT</li>
+          <li>Min. 1 Reel dnevno + 4 Story dnevno</li>
+          <li>Min. 10 prodaja</li>
+          <li>Sertifikat + veci bonusi</li>
+        </ul>
+      </div>
+      <div class="t-card commando">
+        <div class="stars">⭐⭐⭐</div>
+        <div class="nm">COMMANDO</div>
+        <div class="pct">45%<small>/ prodaja</small></div>
+        <ul>
+          <li>Min. 3 meseca kao PRO</li>
+          <li>Min. 2 Reels dnevno + 5–10 Story</li>
+          <li>Min. 20 dodatnih prodaja</li>
+          <li>Mentor 1:1, oprema, event</li>
+        </ul>
+      </div>
+      <div class="t-card elite">
+        <div class="featured">TOP TIER</div>
+        <div class="stars">⭐⭐⭐⭐</div>
+        <div class="nm">ELITE ATHLETE</div>
+        <div class="pct">50%<small>/ prodaja</small></div>
+        <ul>
+          <li>Min. 3 meseca kao COMMANDO</li>
+          <li>10–20 Reels + 10–20 Story dnevno</li>
+          <li>Min. 15 prodaja / 30 dana</li>
+          <li>Maksimalni status i benefiti</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section>
+    <div class="section-eyebrow">Zasto baš ovaj program</div>
+    <h2>Sve što gradi <span class="grad">stvarnu motivaciju</span></h2>
+    <p class="section-sub">Nije "podeli i nadaj se". Ovo je sportski sistem koji svaki dan placa rezultate.</p>
+
+    <div class="why">
+      <div class="why-card">
+        <div class="ico">🔥</div>
+        <h3>Streak koji ne sme da pukne</h3>
+        <p>Sto duze postavljas i prodajes — to vise dnevnih, nedeljnih i mesecnih bonusa. Streak od 100 dana = 15.000 XP + ekskluzivna oprema.</p>
+      </div>
+      <div class="why-card">
+        <div class="ico">📊</div>
+        <h3>Live leaderboard</h3>
+        <p>Vidis svoje mesto u realnom vremenu. Top 3 svake nedelje dobija dodatne procente. Top 10 — feature u VAMIT-5 kanalima.</p>
+      </div>
+      <div class="why-card">
+        <div class="ico">🏆</div>
+        <h3>32 bedza za otkljucati</h3>
+        <p>Common, Rare, Epic, Legendary — i 7 skrivenih koje cak ni mi necemo da otkrijemo. Kolekcionarski hard mode.</p>
+      </div>
+      <div class="why-card">
+        <div class="ico">📱</div>
+        <h3>Auto IG tracking</h3>
+        <p>Povezi Instagram Business jednom — sistem automatski broji Reels i Story-je za napredovanje. Bez screenshot-a, bez manuelnog prijavljivanja.</p>
+      </div>
+      <div class="why-card">
+        <div class="ico">💰</div>
+        <h3>Auto isplate svakog 20.</h3>
+        <p>Stripe Connect Express. Upises IBAN jednom, pare ti dolaze direktno na racun. Nema "jurnjanja za novcem".</p>
+      </div>
+      <div class="why-card">
+        <div class="ico">🎯</div>
+        <h3>Dnevni izazovi</h3>
+        <p>Svako jutro 3–5 novih izazova. Brza pobeda, brz XP, brz dopamin. Najjaci atlete navlacenju ekipu na ovo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPLY -->
+  <section id="apply">
+    <div class="section-eyebrow">Ulazak u program</div>
+    <h2>Audicija. <span class="grad">Bez kompromisa.</span></h2>
+    <p class="section-sub">Ne uzimamo svakog. Cuvamo standard. Popuni formular, posalji video — odgovor u roku od 48h.</p>
+
+    <div class="apply-card">
+      <div id="formBox">
+        <h3>Prijavi se za REGRUT poziciju</h3>
+        <p class="form-sub">Sve polja su obavezna osim onih oznacenih (opciono).</p>
+
+        <form id="applyForm">
+          <div class="row">
+            <div class="field">
+              <label for="full_name">Ime i prezime</label>
+              <input id="full_name" name="full_name" required placeholder="npr. Marko Nikolic" />
+            </div>
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" required placeholder="ti@gmail.com" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="phone">Broj telefona</label>
+              <input id="phone" name="phone" type="tel" required placeholder="+381 64 123 4567" />
+            </div>
+            <div class="field">
+              <label for="country">Drzava</label>
+              <select id="country" name="country" required>
+                <option value="">Izaberi...</option>
+                <option value="RS">Srbija</option>
+                <option value="ME">Crna Gora</option>
+                <option value="HR">Hrvatska</option>
+                <option value="BA">BiH</option>
+                <option value="SI">Slovenija</option>
+                <option value="MK">Severna Makedonija</option>
+                <option value="DE">Nemacka</option>
+                <option value="AT">Austrija</option>
+                <option value="CH">Svajcarska</option>
+                <option value="OTHER">Drugo</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="instagram">Instagram handle (bez @)</label>
+            <input id="instagram" name="instagram_handle" required placeholder="marko_nikolic" />
+            <div class="hint">Mora biti Business ili Creator nalog. Konvertuje se u IG Settings za 30 sec, besplatno.</div>
+          </div>
+
+          <div class="field">
+            <label for="why">Zasto želiš biti VAMIT-5 atleta?</label>
+            <textarea id="why" name="why_join" required placeholder="2–3 recenice — ko si, sta radis, sta hoces da postignes."></textarea>
+          </div>
+
+          <div class="field">
+            <label>Audition video — Kettlebell + bodyweight kombinacija (max 60s)</label>
+            <label class="upload-box" for="video" id="uploadBox">
+              <div class="ico">🎥</div>
+              <div class="t" id="uploadTitle">Kliknite da odaberete video</div>
+              <div class="s" id="uploadSub">MP4, MOV — max 100 MB</div>
+            </label>
+            <input id="video" name="video" type="file" accept="video/mp4,video/quicktime" required style="display:none" />
+            <div class="hint">Tip: 30 sec dovoljno. Nakacite na Google Drive/WeTransfer ako vam je vise.</div>
+          </div>
+
+          <div class="consent">
+            <input type="checkbox" id="consent" required />
+            <label for="consent">Saglasan sam sa <a href="#">Pravilima programa</a> i <a href="#">Politikom privatnosti</a>. Razumem da je VAMIT-5 partnerski program a ne radni odnos, i da mi je odgovornost prijava prihoda u svojoj drzavi.</label>
+          </div>
+
+          <button type="submit" class="btn primary big" id="submitBtn" style="width:100%">
+            <span id="btnText">Posalji prijavu →</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="success-box" id="successBox">
+        <div class="big-ico">✅</div>
+        <h4>Prijava primljena!</h4>
+        <p>Pregledamo prijave 7 dana u nedelji. Odgovor stiže na tvoj email u roku od <b style="color:var(--text)">48h</b>. Ako budeš odobren — dobijas link za login i krećes odmah.</p>
+        <p style="margin-top:14px"><b style="color:var(--lime)">Dok cekas:</b> Pridruži se Telegram grupi VAMIT-5 atletа i upoznaj druge.</p>
+        <a href="https://t.me/vamit5athletes" class="btn primary" style="margin-top:16px">Pridruzi se Telegram grupi</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>VAMIT-5 · Athlete Affiliate Program · 2026</div>
+    <div style="margin-top:8px">
+      <a href="#">Pravila programa</a>·
+      <a href="#">Politika privatnosti</a>·
+      <a href="#">Kontakt</a>·
+      <a href="https://t.me/vamit5athletes">Telegram</a>
+    </div>
+  </footer>
+</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Video upload handling
+const videoInput = document.getElementById('video');
+const uploadBox = document.getElementById('uploadBox');
+const uploadTitle = document.getElementById('uploadTitle');
+const uploadSub = document.getElementById('uploadSub');
+videoInput.addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  if(!f) return;
+  if(f.size > 100 * 1024 * 1024){
+    alert('Video mora biti manji od 100 MB. Probaj kompresovan ili pošalji link.');
+    videoInput.value = '';
+    return;
+  }
+  uploadBox.classList.add('has-file');
+  uploadTitle.textContent = f.name;
+  uploadSub.textContent = (f.size/1024/1024).toFixed(1) + ' MB · spreman';
+});
+
+// Form submit
+document.getElementById('applyForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const txt = document.getElementById('btnText');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner"></span>Slanje...';
+
+  const fd = new FormData(e.target);
+  const payload = {
+    full_name: fd.get('full_name'),
+    email: fd.get('email'),
+    phone: fd.get('phone'),
+    country: fd.get('country'),
+    instagram_handle: fd.get('instagram_handle').replace(/^@/, ''),
+    why_join: fd.get('why_join'),
+  };
+
+  try {
+    // 1. Upload video
+    const file = videoInput.files[0];
+    const ext = file.name.split('.').pop();
+    const filename = `${Date.now()}-${payload.email.replace(/[^a-z0-9]/gi,'_')}.${ext}`;
+    const { error: upErr } = await supabase.storage
+      .from('application-videos')
+      .upload(filename, file, { contentType: file.type });
+    if(upErr) throw upErr;
+
+    // Get a signed URL (private bucket, 7 days)
+    const { data: signed } = await supabase.storage
+      .from('application-videos')
+      .createSignedUrl(filename, 60*60*24*7);
+    payload.video_url = signed?.signedUrl || filename;
+
+    // 2. Insert application
+    const { error: insErr } = await supabase.from('applications').insert(payload);
+    if(insErr) throw insErr;
+
+    // 3. Show success
+    document.getElementById('formBox').style.display = 'none';
+    document.getElementById('successBox').classList.add('show');
+    document.getElementById('successBox').scrollIntoView({ behavior:'smooth', block:'center' });
+  } catch(err) {
+    alert('Greska pri slanju: ' + err.message + '\n\nPokušaj ponovo ili pošalji email na athletes@vamit5.app');
+    btn.disabled = false;
+    txt.textContent = 'Posalji prijavu →';
+  }
+});
+</script>
+</body>
+</html>

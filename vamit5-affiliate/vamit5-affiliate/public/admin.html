@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>VAMIT-5 · Admin Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#05060a;--bg-1:#0a0c14;--bg-2:#0f1220;
+  --surface:rgba(20,24,42,0.72);--border:rgba(255,255,255,0.06);
+  --text:#e9ecff;--dim:#9aa0c4;--mute:#626890;
+  --brand:#00f0ff;--brand-2:#7a5bff;--brand-3:#ff3b9a;
+  --gold:#ffc24b;--lime:#a6ff3b;--red:#ff4d5e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg-0);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 20% 0%,rgba(122,91,255,0.2),transparent 60%),radial-gradient(700px 400px at 80% 100%,rgba(0,240,255,0.15),transparent 60%)}
+
+.app{position:relative;z-index:1;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+
+aside{position:sticky;top:0;height:100vh;padding:22px 14px;border-right:1px solid var(--border);background:rgba(10,12,20,0.7);backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:18px}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 14px;border-bottom:1px solid var(--border)}
+.brand .mark{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--brand-3),var(--brand-2));display:grid;place-items:center;font-weight:900;font-size:11px}
+.brand .text{display:flex;flex-direction:column;line-height:1}
+.brand .text b{font-size:12px;font-weight:800}
+.brand .text span{font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em;margin-top:2px}
+
+nav{display:flex;flex-direction:column;gap:3px}
+nav button{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  background:none;border:none;color:var(--dim);text-align:left;
+  border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;
+  transition:all .2s ease;
+}
+nav button:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+nav button.active{background:linear-gradient(90deg,rgba(255,59,154,0.15),rgba(122,91,255,0.08));color:var(--text)}
+nav button .badge{margin-left:auto;background:var(--brand-3);color:#fff;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:800}
+
+.logout-btn{margin-top:auto;padding:10px 12px;border-radius:10px;background:rgba(255,77,94,0.06);border:1px solid rgba(255,77,94,0.2);color:#ffb0b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+
+main{padding:0;overflow-x:auto}
+.topbar{display:flex;align-items:center;gap:14px;padding:18px 28px;border-bottom:1px solid var(--border);background:rgba(10,12,20,0.5);backdrop-filter:blur(18px);position:sticky;top:0;z-index:30}
+.topbar h1{font-size:18px;font-weight:800;letter-spacing:-0.02em}
+.topbar .meta{color:var(--mute);font-size:12px;margin-left:auto;font-family:'JetBrains Mono',monospace}
+
+.content{padding:24px 28px 60px;display:flex;flex-direction:column;gap:20px}
+
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+.kpi .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.13em;font-weight:700}
+.kpi .v{font-size:28px;font-weight:800;margin-top:8px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:14px;color:var(--mute);font-weight:600}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;backdrop-filter:blur(18px)}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.card-head h2{font-size:16px;font-weight:700}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--mute);font-weight:700;border-bottom:1px solid var(--border)}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+tr:hover{background:rgba(255,255,255,0.02)}
+.tag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase}
+.tag.recruit{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.pro{background:rgba(0,240,255,0.12);color:var(--brand)}
+.tag.commando{background:rgba(255,194,75,0.12);color:var(--gold)}
+.tag.elite{background:rgba(255,59,154,0.12);color:var(--brand-3)}
+.tag.pending{background:rgba(255,194,75,0.12);color:var(--gold)}
+.tag.approved{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.rejected{background:rgba(255,77,94,0.12);color:var(--red)}
+.tag.confirmed{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.refunded{background:rgba(255,77,94,0.12);color:var(--red)}
+.tag.paid{background:rgba(0,240,255,0.12);color:var(--brand)}
+
+.btn{padding:7px 12px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:11.5px;display:inline-flex;align-items:center;gap:6px}
+.btn.green{background:linear-gradient(135deg,var(--lime),#7cc94b);color:#0a0c14}
+.btn.red{background:rgba(255,77,94,0.1);color:#ffb0b8;border:1px solid rgba(255,77,94,0.3)}
+.btn.blue{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14}
+.btn.ghost{background:rgba(255,255,255,0.04);color:var(--text);border:1px solid rgba(255,255,255,0.12)}
+.btn:hover{transform:translateY(-1px)}
+.actions{display:flex;gap:6px}
+
+.search{flex:1;max-width:300px;padding:8px 12px;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:inherit;font-size:13px;outline:none}
+.search:focus{border-color:var(--brand)}
+
+.section{display:none}
+.section.active{display:flex;flex-direction:column;gap:20px}
+
+.detail-modal{position:fixed;inset:0;background:rgba(5,6,10,0.85);backdrop-filter:blur(20px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.detail-modal.show{display:flex}
+.detail-box{max-width:600px;width:100%;background:rgba(20,24,42,0.95);border:1px solid var(--border);border-radius:18px;padding:28px;max-height:90vh;overflow-y:auto}
+.detail-box h3{font-size:20px;font-weight:800;margin-bottom:18px}
+.detail-box .field{margin-bottom:14px}
+.detail-box .field label{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;display:block;margin-bottom:4px}
+.detail-box .field .val{font-size:14px;color:var(--text)}
+.detail-box .field .val a{color:var(--brand)}
+.detail-box video{width:100%;max-height:300px;border-radius:10px;background:#000}
+.detail-box .footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:18px;border-top:1px solid var(--border)}
+.detail-box .footer .btn{padding:10px 18px;font-size:13px}
+
+.empty{padding:40px;text-align:center;color:var(--mute);font-size:13px}
+.loading-screen{position:fixed;inset:0;background:var(--bg-0);display:grid;place-items:center;z-index:1000}
+.loading-screen .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-screen.hidden{display:none}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:13px 22px;border-radius:11px;background:linear-gradient(135deg,var(--lime),#7cc94b);color:#0a0c14;font-weight:800;font-size:13px;z-index:300;transition:transform .4s}
+.toast.show{transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading"><div class="spinner"></div></div>
+
+<div class="app" id="app" style="display:none">
+  <aside>
+    <div class="brand">
+      <div class="mark">A</div>
+      <div class="text"><b>VAMIT-5</b><span>Admin Console</span></div>
+    </div>
+    <nav>
+      <button class="active" data-section="overview">📊 Overview</button>
+      <button data-section="applications">📝 Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
+      <button data-section="athletes">👥 Atlete</button>
+      <button data-section="sales">💰 Prodaje</button>
+      <button data-section="payouts">💸 Isplate</button>
+      <button data-section="challenges">🎯 Izazovi</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">↩ Logout</button>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <h1 id="sectionTitle">📊 Overview</h1>
+      <div class="meta" id="topMeta">…</div>
+    </div>
+
+    <div class="content">
+      <!-- OVERVIEW -->
+      <div class="section active" id="sec-overview">
+        <div class="kpi-row">
+          <div class="kpi"><div class="l">Aktivni atlete</div><div class="v" id="ovActiveAthletes">0</div></div>
+          <div class="kpi"><div class="l">Ovaj mesec prodaja</div><div class="v" id="ovSalesMonth">0</div></div>
+          <div class="kpi"><div class="l">Provizije ovaj mesec</div><div class="v">€<span id="ovCommissionMonth">0</span></div></div>
+          <div class="kpi"><div class="l">Pending aplikacije</div><div class="v" id="ovPendingApps">0</div></div>
+          <div class="kpi"><div class="l">Sledeca isplata</div><div class="v" id="ovNextPayout">€0</div></div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Top 10 atleta ovog meseca</h2></div>
+          <table>
+            <thead><tr><th>#</th><th>Atleta</th><th>Tier</th><th>Prodaje</th><th>Provizija</th><th>Akcije</th></tr></thead>
+            <tbody id="ovTopAthletes"></tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Najnovija aktivnost</h2></div>
+          <table>
+            <thead><tr><th>Vreme</th><th>Tip</th><th>Opis</th></tr></thead>
+            <tbody id="ovRecentActivity"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- APPLICATIONS -->
+      <div class="section" id="sec-applications">
+        <div class="card">
+          <div class="card-head">
+            <h2>Aplikacije</h2>
+            <input class="search" id="appSearch" placeholder="Pretrazi po imenu, emailu, IG..." />
+          </div>
+          <table>
+            <thead><tr><th>Datum</th><th>Ime</th><th>Email</th><th>IG</th><th>Drzava</th><th>Status</th><th>Akcije</th></tr></thead>
+            <tbody id="appsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ATHLETES -->
+      <div class="section" id="sec-athletes">
+        <div class="card">
+          <div class="card-head">
+            <h2>Atlete</h2>
+            <input class="search" id="athSearch" placeholder="Pretrazi atlete..." />
+          </div>
+          <table>
+            <thead><tr><th>Atleta</th><th>Tier</th><th>XP</th><th>Streak</th><th>Prodaje</th><th>Provizija (sve vreme)</th><th>IG</th><th>Stripe</th><th>Akcije</th></tr></thead>
+            <tbody id="athBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SALES -->
+      <div class="section" id="sec-sales">
+        <div class="card">
+          <div class="card-head">
+            <h2>Prodaje</h2>
+            <button class="btn ghost" onclick="exportSalesCSV()">⬇ Export CSV</button>
+          </div>
+          <table>
+            <thead><tr><th>Vreme</th><th>Atleta</th><th>Paket</th><th>Iznos</th><th>Provizija</th><th>Status</th><th>Stripe</th></tr></thead>
+            <tbody id="salesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAYOUTS -->
+      <div class="section" id="sec-payouts">
+        <div class="card">
+          <div class="card-head">
+            <h2>Isplate</h2>
+            <button class="btn blue" onclick="triggerMonthlyPayouts()">⚡ Pokreni mesecne isplate</button>
+          </div>
+          <table>
+            <thead><tr><th>Period</th><th>Atleta</th><th>Iznos</th><th>Status</th><th>Datum</th><th>Stripe Transfer</th></tr></thead>
+            <tbody id="payoutsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CHALLENGES -->
+      <div class="section" id="sec-challenges">
+        <div class="card">
+          <div class="card-head">
+            <h2>Dnevni izazovi</h2>
+            <button class="btn blue" onclick="generateDailyChallenges()">🎲 Generisi za danas</button>
+          </div>
+          <table>
+            <thead><tr><th>Datum</th><th>Tip</th><th>Naslov</th><th>Cilj</th><th>XP</th><th>Akcije</th></tr></thead>
+            <tbody id="chalBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Application detail modal -->
+<div class="detail-modal" id="appModal">
+  <div class="detail-box" id="appModalContent"></div>
+</div>
+
+<div class="toast" id="toast">✅ Uradjeno</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Auth check + admin verify
+const { data: { session } } = await supabase.auth.getSession();
+if(!session){ location.href = '/login.html'; throw new Error('No session'); }
+const { data: admin } = await supabase.from('admins').select('*').eq('id', session.user.id).maybeSingle();
+if(!admin){ alert('Pristup zabranjen — nisi admin.'); location.href = '/dashboard.html'; throw new Error('Not admin'); }
+
+document.getElementById('topMeta').textContent = admin.email;
+
+// Section switching
+document.querySelectorAll('nav button[data-section]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav button[data-section]').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('sec-' + btn.dataset.section).classList.add('active');
+    document.getElementById('sectionTitle').textContent = btn.textContent.trim().replace(/\d+$/,'').trim();
+    loadSection(btn.dataset.section);
+  });
+});
+
+// ---- TOAST ----
+const toast = (msg) => {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+};
+
+// ---- HELPERS ----
+const fmt = (cents) => (cents/100).toLocaleString('sr-RS', { minimumFractionDigits:2, maximumFractionDigits:2 });
+const fmtDate = (d) => new Date(d).toLocaleString('sr-RS', { dateStyle:'short', timeStyle:'short' });
+const tierName = { recruit:'REGRUT', pro:'PRO', commando:'COMMANDO', elite:'ELITE' };
+
+// ---- LOAD OVERVIEW ----
+async function loadOverview(){
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+
+  const [athCount, sales, pending, lb, activity] = await Promise.all([
+    supabase.from('athletes').select('id', { count:'exact', head:true }).eq('is_active', true).eq('banned', false),
+    supabase.from('sales').select('commission_cents').in('status',['confirmed','pending']).gte('created_at', startOfMonth),
+    supabase.from('applications').select('id', { count:'exact', head:true }).eq('status','pending'),
+    supabase.from('leaderboard').select('*').order('total_commission_cents', { ascending: false }).limit(10),
+    supabase.from('activity').select('*').order('created_at', { ascending: false }).limit(10)
+  ]);
+
+  document.getElementById('ovActiveAthletes').textContent = athCount.count || 0;
+  document.getElementById('ovSalesMonth').textContent = sales.data?.length || 0;
+  const totalCom = (sales.data || []).reduce((a,s)=>a+s.commission_cents, 0);
+  document.getElementById('ovCommissionMonth').textContent = fmt(totalCom);
+  document.getElementById('ovPendingApps').textContent = pending.count || 0;
+  document.getElementById('ovNextPayout').textContent = '€' + fmt(totalCom);
+
+  if(pending.count > 0){
+    const b = document.getElementById('appBadge');
+    b.style.display = 'inline-block';
+    b.textContent = pending.count;
+  }
+
+  const top = document.getElementById('ovTopAthletes');
+  top.innerHTML = '';
+  (lb.data || []).forEach((a, i) => {
+    top.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td>#${i+1}</td>
+        <td><b>${a.full_name || a.username}</b><br><small style="color:var(--mute)">${a.username}</small></td>
+        <td><span class="tag ${a.tier}">${tierName[a.tier]}</span></td>
+        <td>${a.total_sales||0}</td>
+        <td>€${fmt(a.total_commission_cents||0)}</td>
+        <td><button class="btn ghost" onclick="viewAthlete('${a.id}')">Vidi</button></td>
+      </tr>
+    `);
+  });
+
+  const ra = document.getElementById('ovRecentActivity');
+  ra.innerHTML = '';
+  (activity.data || []).forEach(a => {
+    ra.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><small style="color:var(--mute)">${fmtDate(a.created_at)}</small></td>
+        <td><span class="tag pro">${a.type}</span></td>
+        <td>${a.title}</td>
+      </tr>
+    `);
+  });
+}
+
+// ---- LOAD APPLICATIONS ----
+async function loadApplications(){
+  const { data } = await supabase.from('applications').select('*').order('created_at', { ascending: false });
+  const body = document.getElementById('appsBody');
+  body.innerHTML = '';
+  if(!data?.length){ body.innerHTML = '<tr><td colspan="7" class="empty">Jos nema aplikacija.</td></tr>'; return; }
+  data.forEach(a => {
+    body.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><small>${fmtDate(a.created_at)}</small></td>
+        <td><b>${a.full_name}</b></td>
+        <td>${a.email}</td>
+        <td>@${a.instagram_handle}</td>
+        <td>${a.country}</td>
+        <td><span class="tag ${a.status}">${a.status}</span></td>
+        <td><div class="actions">
+          <button class="btn ghost" onclick="openApp('${a.id}')">Otvori</button>
+          ${a.status === 'pending' ? `
+            <button class="btn green" onclick="approveApp('${a.id}','${a.email}','${a.full_name.replace(/'/g,"\\'")}')">✓ Odobri</button>
+            <button class="btn red" onclick="rejectApp('${a.id}')">✗ Odbij</button>
+          ` : ''}
+        </div></td>
+      </tr>
+    `);
+  });
+}
+
+// ---- LOAD ATHLETES ----
+async function loadAthletes(){
+  const { data } = await supabase
+    .from('athletes')
+    .select(`*, sales(commission_cents,status)`)
+    .order('xp', { ascending: false });
+  const body = document.getElementById('athBody');
+  body.innerHTML = '';
+  if(!data?.length){ body.innerHTML = '<tr><td colspan="9" class="empty">Jos nema atleta.</td></tr>'; return; }
+  data.forEach(a => {
+    const totalSales = (a.sales || []).filter(s => ['confirmed','pending'].includes(s.status)).length;
+    const totalCom = (a.sales || []).filter(s => ['confirmed','pending'].includes(s.status)).reduce((acc,s)=>acc+s.commission_cents, 0);
+    body.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><b>${a.full_name}</b><br><small style="color:var(--mute)">${a.email}</small></td>
+        <td><span class="tag ${a.tier}">${tierName[a.tier]}</span></td>
+        <td>${a.xp.toLocaleString('sr-RS')}</td>
+        <td>🔥 ${a.current_streak}</td>
+        <td>${totalSales}</td>
+        <td>€${fmt(totalCom)}</td>
+        <td>${a.instagram_user_id ? `<span style="color:var(--lime)">✓ @${a.instagram_username}</span>` : '<span style="color:var(--mute)">—</span>'}</td>
+        <td>${a.stripe_connect_onboarded ? '<span style="color:var(--lime)">✓</span>' : '<span style="color:var(--mute)">—</span>'}</td>
+        <td><div class="actions">
+          <button class="btn ghost" onclick="promoteAthlete('${a.id}')">⬆ Promote</button>
+          ${a.banned ? '<button class="btn green" onclick="unbanAthlete(\''+a.id+'\')">Unban</button>' : '<button class="btn red" onclick="banAthlete(\''+a.id+'\')">Ban</button>'}
+        </div></td>
+      </tr>
+    `);
+  });
+}
+
+// ---- LOAD SALES ----
+async function loadSales(){
+  const { data } = await supabase
+    .from('sales')
+    .select(`*, athletes(full_name,username), products(name)`)
+    .order('created_at', { ascending: false })
+    .limit(200);
+  const body = document.getElementById('salesBody');
+  body.innerHTML = '';
+  if(!data?.length){ body.innerHTML = '<tr><td colspan="7" class="empty">Jos nema prodaja.</td></tr>'; return; }
+  data.forEach(s => {
+    body.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td><small>${fmtDate(s.created_at)}</small></td>
+        <td><b>${s.athletes?.full_name || '—'}</b></td>
+        <td>${s.products?.name || '—'}</td>
+        <td>€${fmt(s.gross_amount_cents)}</td>
+        <td><b style="color:var(--lime)">€${fmt(s.commission_cents)}</b> <small style="color:var(--mute)">(${(s.commission_rate*100).toFixed(0)}%)</small></td>
+        <td><span class="tag ${s.status}">${s.status}</span></td>
+        <td><small style="color:var(--mute);font-family:monospace">${s.stripe_session_id?.slice(0,15) || '—'}</small></td>
+      </tr>
+    `);
+  });
+}
+
+// ---- LOAD PAYOUTS ----
+async function loadPayouts(){
+  const { data } = await supabase.from('payouts').select(`*, athletes(full_name,email)`).order('created_at', { ascending: false });
+  const body = document.getElementById('payoutsBody');
+  body.innerHTML = '';
+  if(!data?.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema isplata.</td></tr>'; return; }
+  data.forEach(p => {
+    body.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td>${p.period_start} → ${p.period_end}</td>
+        <td><b>${p.athletes?.full_name || '—'}</b></td>
+        <td><b>€${fmt(p.total_cents)}</b> <small style="color:var(--mute)">(${p.sales_count} prodaja)</small></td>
+        <td><span class="tag ${p.status}">${p.status}</span></td>
+        <td>${p.paid_at ? fmtDate(p.paid_at) : '—'}</td>
+        <td><small style="color:var(--mute);font-family:monospace">${p.stripe_transfer_id?.slice(0,15) || '—'}</small></td>
+      </tr>
+    `);
+  });
+}
+
+// ---- LOAD CHALLENGES ----
+async function loadChallenges(){
+  const { data } = await supabase.from('challenges').select('*').order('challenge_date', { ascending: false }).limit(30);
+  const body = document.getElementById('chalBody');
+  body.innerHTML = '';
+  if(!data?.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema izazova - klikni "Generisi za danas".</td></tr>'; return; }
+  data.forEach(c => {
+    body.insertAdjacentHTML('beforeend', `
+      <tr>
+        <td>${c.challenge_date}</td>
+        <td>${c.type}</td>
+        <td>${c.emoji} <b>${c.title}</b><br><small style="color:var(--mute)">${c.description||''}</small></td>
+        <td>${c.target}</td>
+        <td><b style="color:var(--gold)">+${c.xp_reward} XP</b></td>
+        <td><button class="btn red" onclick="deleteChallenge('${c.id}')">🗑</button></td>
+      </tr>
+    `);
+  });
+}
+
+// ---- ACTIONS ----
+window.openApp = async (id) => {
+  const { data } = await supabase.from('applications').select('*').eq('id', id).single();
+  document.getElementById('appModalContent').innerHTML = `
+    <h3>${data.full_name}</h3>
+    <div class="field"><label>Email</label><div class="val">${data.email}</div></div>
+    <div class="field"><label>Telefon</label><div class="val">${data.phone || '—'}</div></div>
+    <div class="field"><label>Drzava</label><div class="val">${data.country}</div></div>
+    <div class="field"><label>Instagram</label><div class="val"><a href="https://instagram.com/${data.instagram_handle}" target="_blank">@${data.instagram_handle}</a></div></div>
+    <div class="field"><label>Zasto se prijavio</label><div class="val">${data.why_join}</div></div>
+    <div class="field"><label>Audition video</label><div class="val">
+      ${data.video_url ? `<video controls src="${data.video_url}"></video>` : '<span style="color:var(--mute)">Nema videa</span>'}
+    </div></div>
+    <div class="footer">
+      <button class="btn ghost" onclick="document.getElementById('appModal').classList.remove('show')">Zatvori</button>
+      ${data.status === 'pending' ? `
+        <button class="btn red" onclick="rejectApp('${data.id}'); document.getElementById('appModal').classList.remove('show')">✗ Odbij</button>
+        <button class="btn green" onclick="approveApp('${data.id}','${data.email}','${data.full_name.replace(/'/g,"\\'")}'); document.getElementById('appModal').classList.remove('show')">✓ Odobri & posalji magic link</button>
+      ` : `<span class="tag ${data.status}">${data.status}</span>`}
+    </div>
+  `;
+  document.getElementById('appModal').classList.add('show');
+};
+
+window.approveApp = async (id, email, fullName) => {
+  if(!confirm(`Odobri ${fullName} (${email})?\n\nKreirace se atleta nalog i poslace mu se magic link za login.`)) return;
+  // Generate username from full name
+  const username = fullName.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
+  // Edge function will handle: create auth user (passwordless), insert into athletes, update application, send magic link
+  const { error } = await supabase.functions.invoke('approve-application', {
+    body: { application_id: id, username }
+  });
+  if(error){ alert('Greska: ' + error.message); return; }
+  toast('✅ Atleta odobren — magic link poslat!');
+  loadApplications();
+  loadOverview();
+};
+
+window.rejectApp = async (id) => {
+  const reason = prompt('Razlog odbijanja (videće se u email-u):');
+  if(reason === null) return;
+  await supabase.from('applications').update({ status:'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() }).eq('id', id);
+  // TODO: trigger email via edge function
+  toast('Aplikacija odbijena.');
+  loadApplications();
+};
+
+window.banAthlete = async (id) => {
+  const reason = prompt('Razlog:');
+  if(reason === null) return;
+  await supabase.from('athletes').update({ banned: true, ban_reason: reason }).eq('id', id);
+  toast('Atleta banovan.');
+  loadAthletes();
+};
+
+window.unbanAthlete = async (id) => {
+  await supabase.from('athletes').update({ banned: false, ban_reason: null }).eq('id', id);
+  toast('Ban uklonjen.');
+  loadAthletes();
+};
+
+window.promoteAthlete = async (id) => {
+  const tier = prompt('Novi tier (recruit/pro/commando/elite):');
+  if(!['recruit','pro','commando','elite'].includes(tier)) return alert('Nevazeci tier.');
+  await supabase.from('athletes').update({ tier, tier_started_at: new Date().toISOString() }).eq('id', id);
+  toast(`Promovisan u ${tier.toUpperCase()}.`);
+  loadAthletes();
+};
+
+window.viewAthlete = (id) => { window.open('/dashboard.html?as=' + id, '_blank'); };
+
+window.triggerMonthlyPayouts = async () => {
+  if(!confirm('Pokrenuti mesecne isplate?\n\nObracunava se prosli mesec, sve sale-ove sa statusom "confirmed". Stripe Connect transfer ide na sve atlete koji su povezani.')) return;
+  const { data, error } = await supabase.functions.invoke('monthly-payouts');
+  if(error){ alert('Greska: ' + error.message); return; }
+  toast(`Isplate pokrenute: ${data?.processed || 0} atleta.`);
+  loadPayouts();
+};
+
+window.generateDailyChallenges = async () => {
+  const { error } = await supabase.functions.invoke('generate-challenges');
+  if(error){ alert('Greska: ' + error.message); return; }
+  toast('Izazovi generisani.');
+  loadChallenges();
+};
+
+window.deleteChallenge = async (id) => {
+  if(!confirm('Obrisati izazov?')) return;
+  await supabase.from('challenges').delete().eq('id', id);
+  loadChallenges();
+};
+
+window.exportSalesCSV = async () => {
+  const { data } = await supabase.from('sales').select(`*, athletes(full_name,email,username), products(name)`).order('created_at', { ascending: false });
+  const rows = [['Datum','Atleta','Email','Paket','Iznos (€)','Provizija (€)','Procenat','Status','Stripe ID']];
+  (data || []).forEach(s => rows.push([
+    new Date(s.created_at).toISOString(),
+    s.athletes?.full_name||'',
+    s.athletes?.email||'',
+    s.products?.name||'',
+    (s.gross_amount_cents/100).toFixed(2),
+    (s.commission_cents/100).toFixed(2),
+    (s.commission_rate*100).toFixed(0)+'%',
+    s.status,
+    s.stripe_session_id||''
+  ]));
+  const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type:'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `vamit5-sales-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV preuzet.');
+};
+
+window.logout = async () => { await supabase.auth.signOut(); location.href = '/login.html'; };
+
+// Section loader
+function loadSection(s){
+  if(s === 'overview') loadOverview();
+  else if(s === 'applications') loadApplications();
+  else if(s === 'athletes') loadAthletes();
+  else if(s === 'sales') loadSales();
+  else if(s === 'payouts') loadPayouts();
+  else if(s === 'challenges') loadChallenges();
+}
+
+// Initial load
+await loadOverview();
+loadApplications(); // for badge count
+
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('app').style.display = 'grid';
+</script>
+</body>
+</html>

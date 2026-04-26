@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>VAMIT-5 Athletes · Dashboard</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00f0ff">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg-0:#05060a;--bg-1:#0a0c14;--bg-2:#0f1220;
+  --surface:rgba(20,24,42,0.72);--surface-2:rgba(28,33,58,0.65);
+  --border:rgba(255,255,255,0.06);--border-strong:rgba(255,255,255,0.12);
+  --text:#e9ecff;--dim:#9aa0c4;--mute:#626890;
+  --brand:#00f0ff;--brand-2:#7a5bff;--brand-3:#ff3b9a;
+  --gold:#ffc24b;--lime:#a6ff3b;--red:#ff4d5e;
+  --t-recruit:#a6ff3b;--t-pro:#00f0ff;--t-commando:#ffc24b;--t-elite:#ff3b9a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,sans-serif;background:var(--bg-0);color:var(--text);
+  min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(122,91,255,0.35), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(0,240,255,0.22), transparent 60%),
+    radial-gradient(800px 400px at 50% 110%, rgba(255,59,154,0.20), transparent 60%);
+  animation:aurora 18s ease-in-out infinite alternate;
+}
+@keyframes aurora{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(25deg) saturate(1.15)}}
+
+.app{position:relative;z-index:1;display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+
+/* Sidebar */
+aside{
+  position:sticky;top:0;height:100vh;padding:24px 16px;
+  border-right:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(10,12,20,0.85),rgba(10,12,20,0.5));
+  backdrop-filter:blur(20px);display:flex;flex-direction:column;gap:20px;
+}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px}
+.brand .mark{width:36px;height:36px;border-radius:10px;background:conic-gradient(from 180deg,var(--brand),var(--brand-2),var(--brand-3),var(--brand));position:relative;display:grid;place-items:center}
+.brand .mark::after{content:"";position:absolute;inset:3px;border-radius:8px;background:#0a0c14}
+.brand .mark span{position:relative;z-index:1;font-weight:900;font-size:12px}
+.brand .text{display:flex;flex-direction:column;line-height:1}
+.brand .text .name{font-weight:800;font-size:13px}
+.brand .text .sub{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em;margin-top:2px}
+
+nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+nav a{
+  display:flex;align-items:center;gap:11px;padding:10px 12px;
+  color:var(--dim);text-decoration:none;border-radius:10px;font-size:13px;font-weight:500;
+  transition:all .2s ease;
+}
+nav a:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+nav a.active{background:linear-gradient(90deg,rgba(122,91,255,0.2),rgba(0,240,255,0.08));color:var(--text)}
+nav a svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.nav-label{font-size:9px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em;padding:10px 12px 4px;font-weight:700}
+.sidebar-foot{margin-top:auto;display:flex;flex-direction:column;gap:10px}
+.logout-btn{
+  padding:10px 12px;border-radius:10px;background:rgba(255,77,94,0.06);
+  border:1px solid rgba(255,77,94,0.2);color:#ffb0b8;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;text-align:left;
+}
+.logout-btn:hover{background:rgba(255,77,94,0.12)}
+
+/* Main */
+main{padding:0}
+.topbar{
+  display:flex;align-items:center;gap:14px;padding:16px 28px;
+  border-bottom:1px solid var(--border);background:rgba(10,12,20,0.5);
+  backdrop-filter:blur(18px);position:sticky;top:0;z-index:30;
+}
+.streak-pill{
+  display:flex;align-items:center;gap:7px;padding:7px 12px;
+  background:linear-gradient(135deg,rgba(255,59,154,0.18),rgba(255,194,75,0.15));
+  border:1px solid rgba(255,59,154,0.35);border-radius:999px;
+  font-size:12px;font-weight:700;
+}
+.streak-pill .flame{font-size:16px;animation:flame 1.4s ease-in-out infinite}
+@keyframes flame{50%{transform:scale(1.15) rotate(2deg)}}
+.icon-btn{
+  width:36px;height:36px;display:grid;place-items:center;
+  border-radius:10px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.03);color:var(--dim);cursor:pointer;
+  position:relative;transition:all .2s ease;
+}
+.icon-btn:hover{background:rgba(255,255,255,0.06);color:var(--text)}
+.icon-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8}
+.icon-btn .dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--brand-3);box-shadow:0 0 8px var(--brand-3)}
+.user-chip{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.03);margin-left:auto}
+.user-chip .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--brand-2),var(--brand-3));display:grid;place-items:center;font-weight:800;font-size:11px}
+.user-chip .meta{display:flex;flex-direction:column;line-height:1}
+.user-chip .meta .name{font-size:12px;font-weight:600}
+.user-chip .meta .sub{font-size:10px;color:var(--mute);margin-top:2px;letter-spacing:0.08em;text-transform:uppercase}
+
+.content{padding:24px 28px 80px;display:flex;flex-direction:column;gap:22px}
+
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  padding:20px;backdrop-filter:blur(18px);position:relative;overflow:hidden;
+}
+
+/* Page head */
+.page-head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px}
+.page-head h1{font-size:28px;font-weight:800;letter-spacing:-0.03em;line-height:1.1;background:linear-gradient(180deg,#fff,#a9b1e0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.page-head .sub{color:var(--dim);margin-top:6px;font-size:13px}
+
+/* Banner — IG connect / Stripe onboarding */
+.action-banner{
+  padding:16px 20px;border-radius:14px;display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(255,194,75,0.12),rgba(255,59,154,0.08));
+  border:1px solid rgba(255,194,75,0.3);
+}
+.action-banner .ic{font-size:28px}
+.action-banner .text{flex:1}
+.action-banner .text b{font-size:14px;display:block;margin-bottom:2px}
+.action-banner .text span{font-size:12.5px;color:var(--dim)}
+.action-banner.success{background:rgba(166,255,59,0.06);border-color:rgba(166,255,59,0.3)}
+
+.btn{
+  padding:10px 16px;border-radius:10px;border:none;cursor:pointer;font-family:inherit;
+  font-weight:700;font-size:12.5px;display:inline-flex;align-items:center;gap:8px;transition:all .2s ease;
+}
+.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;box-shadow:0 8px 20px -8px rgba(0,240,255,0.6)}
+.btn.primary:hover{transform:translateY(-1px)}
+.btn.ghost{background:rgba(255,255,255,0.04);color:var(--text);border:1px solid var(--border-strong)}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Hero row: Tier + Earnings */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+@media(max-width:1100px){.hero{grid-template-columns:1fr}}
+
+.tier-card{
+  padding:0;
+  background:
+    radial-gradient(500px 250px at 10% 0%, var(--tg-glow,rgba(255,194,75,0.18)), transparent 70%),
+    linear-gradient(180deg,rgba(22,18,44,0.85),rgba(10,12,20,0.9));
+  border-color:var(--tg-border,rgba(255,194,75,0.22));
+}
+.tier-head{display:flex;justify-content:space-between;padding:22px 22px 0;gap:14px}
+.tier-info{display:flex;flex-direction:column}
+.tier-info .eyebrow{font-size:10px;letter-spacing:0.25em;text-transform:uppercase;color:var(--tg-color,var(--gold));font-weight:700}
+.tier-info h2{font-size:32px;font-weight:900;letter-spacing:-0.02em;margin-top:4px;background:linear-gradient(135deg,var(--tg-color,var(--gold)),var(--brand-3) 80%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tier-info .meta{font-size:12.5px;color:var(--dim);margin-top:4px}
+.medal{width:80px;height:80px;position:relative;flex-shrink:0}
+.medal .ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from -90deg,var(--brand-2),var(--brand),var(--gold),var(--brand-3),var(--brand-2));animation:spin 14s linear infinite}
+.medal .inner{position:absolute;inset:5px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#2a2550,#0a0a1a);display:grid;place-items:center;font-size:34px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+.progress-section{padding:18px 22px 0}
+.progress-section .lbl{font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-bottom:10px;display:flex;justify-content:space-between}
+.progress-section .lbl span{color:var(--brand);font-family:'JetBrains Mono',monospace}
+.progress-bar{height:10px;background:rgba(255,255,255,0.05);border-radius:999px;overflow:hidden;position:relative;margin-bottom:8px}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--brand-2),var(--brand),var(--gold));border-radius:999px;transition:width 1s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px rgba(0,240,255,0.5);position:relative;overflow:hidden}
+.progress-bar .fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:shine 2.4s linear infinite}
+@keyframes shine{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
+.progress-section .info{font-size:11.5px;color:var(--dim);font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between}
+
+.tier-criteria{padding:18px 22px 22px;display:flex;flex-direction:column;gap:8px}
+.criterion{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:12.5px}
+.criterion .check{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;flex-shrink:0;background:rgba(255,255,255,0.05);color:var(--mute)}
+.criterion.done{background:rgba(166,255,59,0.06);border-color:rgba(166,255,59,0.25)}
+.criterion.done .check{background:var(--lime);color:#0a0c14;font-weight:900}
+.criterion .text{flex:1}
+.criterion .val{font-family:'JetBrains Mono',monospace;color:var(--dim);font-weight:700}
+.criterion.done .val{color:var(--lime)}
+
+/* Earnings */
+.earnings{
+  background:
+    radial-gradient(500px 240px at 100% 0%,rgba(0,240,255,0.22),transparent 70%),
+    linear-gradient(180deg,rgba(14,18,36,0.9),rgba(10,12,20,0.95));
+  border-color:rgba(0,240,255,0.22);
+  display:flex;flex-direction:column;
+}
+.earnings-head{display:flex;justify-content:space-between;align-items:center}
+.eyebrow-sm{font-size:10.5px;text-transform:uppercase;letter-spacing:0.22em;color:var(--mute);font-weight:700}
+.live-dot{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:rgba(166,255,59,0.1);border:1px solid rgba(166,255,59,0.3);color:var(--lime);font-size:10px;font-weight:700;letter-spacing:0.12em}
+.live-dot::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--lime);box-shadow:0 0 8px var(--lime);animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.4;transform:scale(1.4)}}
+
+.big-num{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:64px;letter-spacing:-0.04em;line-height:1;margin-top:14px;background:linear-gradient(180deg,#fff,#7fd9ff);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.big-num .cur{font-size:28px;color:var(--brand);margin-right:4px;-webkit-text-fill-color:var(--brand)}
+.delta{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:5px 11px;border-radius:999px;background:rgba(166,255,59,0.08);color:var(--lime);border:1px solid rgba(166,255,59,0.25);font-size:12px;font-weight:700}
+
+.earnings-sub{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:auto;padding-top:20px}
+.sub-stat{padding:12px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border)}
+.sub-stat .l{font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:600}
+.sub-stat .v{font-size:16px;font-weight:800;margin-top:4px;font-variant-numeric:tabular-nums}
+.sub-stat .t{font-size:10.5px;color:var(--lime);margin-top:3px;font-weight:700}
+
+/* KPIs */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1100px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+.kpi{padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;transition:all .3s ease}
+.kpi:hover{transform:translateY(-2px);border-color:var(--border-strong)}
+.kpi .ic{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--bg,rgba(122,91,255,0.14));color:var(--c,var(--brand-2))}
+.kpi .ic svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+.kpi .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.13em;font-weight:700;margin-top:14px}
+.kpi .v{font-size:24px;font-weight:800;margin-top:5px;letter-spacing:-0.02em;font-variant-numeric:tabular-nums}
+.kpi .f{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:11px;color:var(--dim)}
+.kpi .f .up{color:var(--lime);font-weight:700}
+
+/* Referral links */
+.ref-section{display:flex;flex-direction:column;gap:14px}
+.ref-section h3{font-size:15px;font-weight:700}
+.ref-section .desc{font-size:12.5px;color:var(--dim);margin-top:2px}
+
+.link-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+@media(max-width:780px){.link-grid{grid-template-columns:1fr}}
+.link-item{
+  padding:14px;border-radius:13px;border:1px solid var(--border);
+  background:rgba(255,255,255,0.02);
+  display:flex;flex-direction:column;gap:10px;
+}
+.link-item:hover{border-color:var(--border-strong)}
+.link-item .pkg-head{display:flex;justify-content:space-between;align-items:center}
+.link-item .pkg-name{font-size:13px;font-weight:700}
+.link-item .pkg-price{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:800;color:var(--brand)}
+.link-item .commission{font-size:11px;color:var(--gold);font-weight:600}
+.link-item .url-row{
+  display:flex;align-items:center;gap:8px;padding:9px 12px;
+  background:rgba(0,240,255,0.05);border:1px solid rgba(0,240,255,0.18);
+  border-radius:9px;
+}
+.link-item .url-row code{flex:1;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.link-item .copy-btn{padding:5px 10px;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;border:none;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer;letter-spacing:0.05em}
+.link-item .stats{display:flex;gap:14px;font-size:11px;color:var(--mute)}
+.link-item .stats b{color:var(--text);font-family:'JetBrains Mono',monospace}
+
+/* Split: chart + challenges */
+.split{display:grid;grid-template-columns:2fr 1.1fr;gap:18px}
+@media(max-width:1180px){.split{grid-template-columns:1fr}}
+
+/* Challenges */
+.challenges{display:flex;flex-direction:column;gap:10px}
+.chal{display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);transition:all .25s ease}
+.chal:hover{border-color:var(--border-strong)}
+.chal .em{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-size:18px;background:linear-gradient(135deg,rgba(122,91,255,0.18),rgba(0,240,255,0.1));border:1px solid rgba(122,91,255,0.25);flex-shrink:0}
+.chal .c{flex:1;min-width:0}
+.chal .t{font-size:13px;font-weight:700}
+.chal .d{font-size:11.5px;color:var(--dim);margin-top:2px}
+.chal .pm{height:5px;border-radius:5px;margin-top:7px;background:rgba(255,255,255,0.05);overflow:hidden;position:relative}
+.chal .pm .pf{position:absolute;top:0;left:0;bottom:0;background:linear-gradient(90deg,var(--brand-2),var(--brand));border-radius:5px}
+.chal .rw{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gold);font-weight:800;padding:5px 9px;border-radius:7px;background:rgba(255,194,75,0.1);border:1px solid rgba(255,194,75,0.3)}
+.chal.done{opacity:.55}
+
+/* Leaderboard */
+.lb-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.lb-head h3{font-size:15px;font-weight:700}
+.podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;align-items:end;margin-bottom:12px}
+.pod{position:relative;text-align:center;padding:12px 8px 10px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid var(--border)}
+.pod .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--c1,var(--brand-2)),var(--c2,var(--brand)));display:grid;place-items:center;font-weight:800;font-size:12px;margin:0 auto 6px;color:#0a0c14}
+.pod .nm{font-size:11.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pod .am{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--brand);margin-top:3px;font-weight:700}
+.pod .crown{position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:18px}
+.pod.gold{border-color:rgba(255,194,75,0.45);box-shadow:0 0 24px -10px rgba(255,194,75,0.5)}
+.pod.silver{border-color:rgba(200,208,224,0.3)}
+.pod.bronze{border-color:rgba(198,131,70,0.35)}
+.lb-list{display:flex;flex-direction:column;gap:5px}
+.lb-row{display:grid;grid-template-columns:28px 1fr auto auto;gap:10px;align-items:center;padding:9px 11px;border-radius:11px;border:1px solid transparent;transition:all .2s ease}
+.lb-row:hover{background:rgba(255,255,255,0.03);border-color:var(--border)}
+.lb-row.me{background:linear-gradient(90deg,rgba(122,91,255,0.15),rgba(0,240,255,0.08));border-color:rgba(122,91,255,0.35)}
+.lb-row .rk{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--mute);font-weight:700;text-align:center}
+.lb-row.me .rk{color:var(--brand)}
+.lb-row .who{display:flex;align-items:center;gap:9px;min-width:0}
+.lb-row .who .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--c1,#444),var(--c2,#222));display:grid;place-items:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.lb-row .who .nm{font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-row .tier-tag{font-size:9px;font-weight:800;letter-spacing:0.08em;padding:2px 7px;border-radius:5px;text-transform:uppercase}
+.lb-row .tier-tag.recruit{background:rgba(166,255,59,0.12);color:var(--lime)}
+.lb-row .tier-tag.pro{background:rgba(0,240,255,0.12);color:var(--brand)}
+.lb-row .tier-tag.commando{background:rgba(255,194,75,0.12);color:var(--gold)}
+.lb-row .tier-tag.elite{background:rgba(255,59,154,0.12);color:var(--brand-3)}
+.lb-row .am{font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:700;min-width:80px;text-align:right;font-variant-numeric:tabular-nums}
+
+/* Activity */
+.feed{display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;padding-right:4px}
+.feed::-webkit-scrollbar{width:5px}
+.feed::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:3px}
+.feed-item{display:flex;align-items:center;gap:11px;padding:10px;border-radius:10px;border-bottom:1px solid rgba(255,255,255,0.03)}
+.feed-item:hover{background:rgba(255,255,255,0.03)}
+.feed-item .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.25);flex-shrink:0}
+.feed-item.sale .ic{background:rgba(166,255,59,0.1);border-color:rgba(166,255,59,0.3)}
+.feed-item.levelup .ic{background:rgba(255,59,154,0.1);border-color:rgba(255,59,154,0.3)}
+.feed-item.badge .ic{background:rgba(255,194,75,0.1);border-color:rgba(255,194,75,0.3)}
+.feed-item .text{flex:1;font-size:12px;line-height:1.4}
+.feed-item .text b{color:var(--text)}
+.feed-item .text span{color:var(--dim)}
+.feed-item .am{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--lime)}
+.feed-item .when{font-size:10px;color:var(--mute);font-family:'JetBrains Mono',monospace;white-space:nowrap}
+
+/* Achievements */
+.ach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:10px}
+.ach{position:relative;aspect-ratio:1;border-radius:14px;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,0.08),transparent 60%),linear-gradient(180deg,rgba(30,35,60,0.85),rgba(10,12,20,0.8));border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:8px;text-align:center;transition:all .25s ease;cursor:pointer}
+.ach:hover{transform:translateY(-3px);border-color:var(--border-strong)}
+.ach .em{font-size:30px;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.6))}
+.ach.locked .em{filter:grayscale(1) opacity(0.3)}
+.ach .nm{font-size:10px;font-weight:700;line-height:1.2}
+.ach.locked .nm{color:var(--mute)}
+.ach .rar{position:absolute;top:5px;right:5px;font-size:7px;padding:2px 5px;border-radius:3px;background:rgba(0,0,0,0.45);font-weight:800;letter-spacing:0.08em}
+.ach.locked .rar{display:none}
+.ach.locked .lk{position:absolute;top:6px;right:6px;font-size:9px;color:var(--mute)}
+.ach.unlocked{border-color:rgba(255,194,75,0.4)}
+
+/* IG Connect */
+.ig-card{padding:18px;background:var(--surface);border:1px solid var(--border);border-radius:16px;display:flex;align-items:center;gap:14px}
+.ig-card .ico{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#833AB4,#FD1D1D,#FCAF45);display:grid;place-items:center;font-size:22px;flex-shrink:0}
+.ig-card .info{flex:1}
+.ig-card .info .t{font-size:14px;font-weight:700}
+.ig-card .info .s{font-size:12px;color:var(--dim);margin-top:2px}
+.ig-card .stat{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;text-align:center;font-size:12px;min-width:140px}
+.ig-card .stat .v{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:800;color:var(--brand)}
+.ig-card .stat .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;margin-top:2px}
+.ig-card .stat .quota{color:var(--dim);font-size:10px;margin-top:1px}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:13px 22px;border-radius:11px;background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#0a0c14;font-weight:800;font-size:13px;box-shadow:0 16px 32px -10px rgba(0,240,255,0.5);z-index:100;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media(max-width:980px){
+  .app{grid-template-columns:1fr}
+  aside{display:none}
+}
+
+.loading-screen{position:fixed;inset:0;background:var(--bg-0);display:grid;place-items:center;z-index:1000}
+.loading-screen .spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin 0.6s linear infinite}
+.loading-screen.hidden{display:none}
+.error-screen{position:fixed;inset:0;background:var(--bg-0);display:grid;place-items:center;z-index:1000;padding:20px}
+.error-screen .box{max-width:400px;text-align:center;padding:30px;background:var(--surface);border:1px solid rgba(255,77,94,0.3);border-radius:16px}
+.error-screen .box h3{font-size:18px;margin-bottom:8px}
+.error-screen .box p{color:var(--dim);font-size:13px;margin-bottom:18px;line-height:1.5}
+.error-screen.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<div class="error-screen hidden" id="errorScreen">
+  <div class="box">
+    <div style="font-size:48px;margin-bottom:14px">🚫</div>
+    <h3 id="errorTitle">Greska</h3>
+    <p id="errorMsg">Ucitavanje neuspesno</p>
+    <button class="btn primary" onclick="location.reload()">Pokušaj ponovo</button>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
+  <aside>
+    <div class="brand">
+      <div class="mark"><span>V5</span></div>
+      <div class="text">
+        <span class="name">VAMIT-5</span>
+        <span class="sub">Athletes</span>
+      </div>
+    </div>
+    <nav>
+      <div class="nav-label">Glavno</div>
+      <a href="#" class="active">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10"/></svg>
+        Dashboard
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg>
+        Achievements
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 3v18h18M7 14l4-4 4 4 5-5"/></svg>
+        Statistika
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 2a10 10 0 100 20 10 10 0 000-20M2 12h20"/></svg>
+        Leaderboard
+      </a>
+      <div class="nav-label">Novac</div>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M2 7h20v10H2zM2 11h20"/></svg>
+        Zarada
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 2v20M17 6H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        Isplate
+      </a>
+      <div class="nav-label">Toolkit</div>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/><path stroke-linecap="round" d="M9 9h6v6H9z"/></svg>
+        Materijali
+      </a>
+      <a href="#">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        Podrska
+      </a>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="logout-btn" onclick="logout()">↩ Logout</button>
+    </div>
+  </aside>
+
+  <main>
+    <div class="topbar">
+      <div class="streak-pill"><span class="flame">🔥</span> <b id="streakDays">0</b> dana</div>
+      <div class="icon-btn"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot"></span></div>
+      <div class="user-chip">
+        <div class="avatar" id="topAvatar">??</div>
+        <div class="meta">
+          <span class="name" id="topName">…</span>
+          <span class="sub" id="topTier">…</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- PAGE HEAD -->
+      <div class="page-head">
+        <div>
+          <h1 id="greeting">Zdravo!</h1>
+          <p class="sub" id="greetingSub">Gradimo dan po dan.</p>
+        </div>
+      </div>
+
+      <!-- ACTION BANNERS (IG / Stripe) -->
+      <div id="banners"></div>
+
+      <!-- HERO: Tier + Earnings -->
+      <div class="hero">
+        <div class="card tier-card" id="tierCard">
+          <div class="tier-head">
+            <div class="tier-info">
+              <span class="eyebrow" id="tierEyebrow">REGRUT · LV 1</span>
+              <h2 id="tierName">REGRUT</h2>
+              <div class="meta" id="tierSub">35% provizija · Sledeci: PRO ATHLETE</div>
+            </div>
+            <div class="medal"><div class="ring"></div><div class="inner" id="tierEmoji">⭐</div></div>
+          </div>
+          <div class="progress-section">
+            <div class="lbl">Napredak ka sledecem nivou <span id="progressPct">0%</span></div>
+            <div class="progress-bar"><div class="fill" id="progressFill" style="width:0%"></div></div>
+            <div class="info"><span id="progressLabel">XP: 0 / 0</span><span id="timeInTier">0 dana u tier-u</span></div>
+          </div>
+          <div class="tier-criteria" id="tierCriteria">
+            <!-- Filled by JS -->
+          </div>
+        </div>
+
+        <div class="card earnings">
+          <div class="earnings-head">
+            <span class="eyebrow-sm">Zarada · ovaj mesec</span>
+            <span class="live-dot">LIVE</span>
+          </div>
+          <div class="big-num"><span class="cur">€</span><span id="bigEarn">0</span></div>
+          <div class="delta" id="earnDelta">↑ 0% vs prosli mesec</div>
+          <div class="earnings-sub">
+            <div class="sub-stat"><div class="l">Danas</div><div class="v">€<span id="earnToday">0</span></div><div class="t" id="salesToday">0 prodaja</div></div>
+            <div class="sub-stat"><div class="l">Ova nedelja</div><div class="v">€<span id="earnWeek">0</span></div><div class="t" id="salesWeek">0 prodaja</div></div>
+            <div class="sub-stat"><div class="l">Za isplatu</div><div class="v">€<span id="earnPayout">0</span></div><div class="t">20. u mesecu</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI ROW -->
+      <div class="kpi-row">
+        <div class="kpi" style="--bg:rgba(0,240,255,0.14);--c:var(--brand)">
+          <div class="ic"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 3h2l3 12h12l2-8H6"/></svg></div>
+          <div class="l">Ukupno prodaja</div>
+          <div class="v" id="kpiSales">0</div>
+          <div class="f"><span class="up" id="kpiSalesDelta">+0</span>ovog meseca</div>
+        </div>
+        <div class="kpi" style="--bg:rgba(122,91,255,0.14);--c:var(--brand-2)">
+          <div class="ic"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M9 17l-5-5 5-5M14 7l5 5-5 5M3 12h18"/></svg></div>
+          <div class="l">Klikova (30d)</div>
+          <div class="v" id="kpiClicks">0</div>
+          <div class="f"><span class="up" id="kpiCtr">0%</span>konverzija</div>
+        </div>
+        <div class="kpi" style="--bg:rgba(255,194,75,0.14);--c:var(--gold)">
+          <div class="ic"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+          <div class="l">XP</div>
+          <div class="v" id="kpiXp">0</div>
+          <div class="f"><span class="up" id="kpiXpDelta">+0</span>danas</div>
+        </div>
+        <div class="kpi" style="--bg:rgba(255,59,154,0.14);--c:var(--brand-3)">
+          <div class="ic"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 2l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-7.5L2 9h7z"/></svg></div>
+          <div class="l">Bedzevi</div>
+          <div class="v"><span id="kpiBadges">0</span><span style="font-size:14px;color:var(--mute)">/32</span></div>
+          <div class="f"><span class="up" id="kpiBadgesNew">0</span>nedavno</div>
+        </div>
+      </div>
+
+      <!-- IG CONNECT STATUS -->
+      <div class="ig-card" id="igCard">
+        <div class="ico">📷</div>
+        <div class="info">
+          <div class="t" id="igTitle">Instagram nije povezan</div>
+          <div class="s" id="igSub">Poveži IG Business nalog za auto tracking Reels-a i Story-ja.</div>
+        </div>
+        <div class="stat" id="igStats" style="display:none">
+          <div><div class="v" id="igReels">0</div><div class="l">Reels</div><div class="quota">danas</div></div>
+          <div><div class="v" id="igStories">0</div><div class="l">Stories</div><div class="quota">danas</div></div>
+        </div>
+        <button class="btn primary" id="igBtn" onclick="connectInstagram()">Connect Instagram</button>
+      </div>
+
+      <!-- REFERRAL LINKS -->
+      <div class="card ref-section">
+        <div>
+          <h3>Tvoji affiliate linkovi</h3>
+          <p class="desc">Koristi razlicite za razlicite kanale. Svaki click se prati 90 dana.</p>
+        </div>
+        <div class="link-grid" id="linkGrid"></div>
+      </div>
+
+      <!-- SPLIT: Challenges + Leaderboard -->
+      <div class="split">
+        <div class="card">
+          <div class="lb-head">
+            <h3>Dnevni izazovi</h3>
+            <span class="live-dot">+ XP</span>
+          </div>
+          <div class="challenges" id="challengesList"></div>
+        </div>
+
+        <div class="card">
+          <div class="lb-head">
+            <h3>Leaderboard ovog meseca</h3>
+          </div>
+          <div class="podium" id="podium"></div>
+          <div class="lb-list" id="lbList"></div>
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS + ACTIVITY -->
+      <div class="split">
+        <div class="card">
+          <div class="lb-head">
+            <h3>Achievement Wall</h3>
+            <span style="font-size:11px;color:var(--mute);font-family:'JetBrains Mono',monospace"><span id="badgesUnlocked">0</span> / 32 otkljucano</span>
+          </div>
+          <div class="ach-grid" id="achGrid"></div>
+        </div>
+
+        <div class="card">
+          <div class="lb-head">
+            <h3>Aktivnost uzivo</h3>
+            <span class="live-dot">LIVE</span>
+          </div>
+          <div class="feed" id="feed"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">✅ Link kopiran</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+
+const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
+const SITE_URL = window.SITE_URL || window.location.origin;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ============ TIER CONFIG ============
+const TIER = {
+  recruit:  { lvl:1, name:'REGRUT',        emoji:'⭐',     pct:0.35, color:'var(--t-recruit)',  glow:'rgba(166,255,59,0.18)',  border:'rgba(166,255,59,0.22)', next:'pro' },
+  pro:      { lvl:2, name:'PRO ATHLETE',   emoji:'⭐⭐',   pct:0.40, color:'var(--t-pro)',      glow:'rgba(0,240,255,0.18)',   border:'rgba(0,240,255,0.22)',  next:'commando' },
+  commando: { lvl:3, name:'COMMANDO',      emoji:'⭐⭐⭐', pct:0.45, color:'var(--t-commando)', glow:'rgba(255,194,75,0.18)',  border:'rgba(255,194,75,0.22)', next:'elite' },
+  elite:    { lvl:4, name:'ELITE ATHLETE', emoji:'⭐⭐⭐⭐', pct:0.50, color:'var(--t-elite)',  glow:'rgba(255,59,154,0.18)',  border:'rgba(255,59,154,0.22)', next:null }
+};
+
+// Detaljni kriterijumi sa apsolutnim brojevima (target_total = target_per_day * 30)
+const PROMOTION_CRITERIA = {
+  recruit: [
+    { key:'months',  label:'2 meseca kao REGRUT',           target:2,    unit:'meseca' },
+    { key:'sales',   label:'10 prodaja ukupno',             target:10,   unit:'prodaja' },
+    { key:'reels',   label:'1 Reel dnevno (30/30 dana)',    target:30,   targetPerDay:1, unit:'Reels' },
+    { key:'stories', label:'4 Story-ja dnevno (120/30 dana)', target:120, targetPerDay:4, unit:'Stories' }
+  ],
+  pro: [
+    { key:'months',  label:'3 meseca kao PRO',              target:3,    unit:'meseca' },
+    { key:'sales',   label:'30 prodaja ukupno',             target:30,   unit:'prodaja' },
+    { key:'reels',   label:'2 Reels dnevno (60/30 dana)',   target:60,   targetPerDay:2, unit:'Reels' },
+    { key:'stories', label:'5 Story-ja dnevno (150/30 dana)', target:150, targetPerDay:5, unit:'Stories' }
+  ],
+  commando: [
+    { key:'months',  label:'3 meseca kao COMMANDO',         target:3,    unit:'meseca' },
+    { key:'sales',   label:'15 prodaja / 30 dana',          target:15,   unit:'prodaja' },
+    { key:'reels',   label:'10 Reels dnevno (300/30 dana)', target:300,  targetPerDay:10, unit:'Reels' },
+    { key:'stories', label:'10 Story dnevno (300/30 dana)', target:300,  targetPerDay:10, unit:'Stories' }
+  ]
+};
+
+// ============ AUTH CHECK ============
+const { data: { session } } = await supabase.auth.getSession();
+if(!session){ location.href = '/login.html'; throw new Error('No session'); }
+
+// Load athlete profile
+let { data: athlete, error: athErr } = await supabase
+  .from('athletes')
+  .select('*')
+  .eq('id', session.user.id)
+  .maybeSingle();
+
+if(athErr) { showFatal('Greska baze', athErr.message); throw athErr; }
+if(!athlete){
+  showFatal('Nalog nije aktiviran', 'Tvoja prijava je primljena ali jos nije odobrena. Proveri email za update.');
+  throw new Error('No athlete row');
+}
+
+// ============ RENDER ============
+const tier = TIER[athlete.tier];
+
+// Topbar
+document.getElementById('topName').textContent = athlete.full_name;
+document.getElementById('topTier').textContent = tier.name + ' · LV ' + tier.lvl;
+document.getElementById('topAvatar').textContent = (athlete.full_name || '??').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+document.getElementById('streakDays').textContent = athlete.current_streak;
+
+// Greeting
+const firstName = (athlete.full_name||'').split(' ')[0];
+document.getElementById('greeting').innerHTML = `Zdravo ${firstName}, <span style="color:var(--brand)">danas igras za ${tier.next ? TIER[tier.next].name : 'maximum'}.</span>`;
+
+// Tier card styling
+const tCard = document.getElementById('tierCard');
+tCard.style.setProperty('--tg-glow', tier.glow);
+tCard.style.setProperty('--tg-border', tier.border);
+tCard.style.setProperty('--tg-color', tier.color);
+document.getElementById('tierEyebrow').textContent = `${tier.name} · LV ${tier.lvl}`;
+document.getElementById('tierName').textContent = tier.name;
+document.getElementById('tierSub').textContent = tier.next
+  ? `${(tier.pct*100).toFixed(0)}% provizija · Sledeci: ${TIER[tier.next].name}`
+  : `${(tier.pct*100).toFixed(0)}% provizija · Najvisi nivo dostignut 👑`;
+document.getElementById('tierEmoji').textContent = tier.emoji;
+
+// ============ AGGREGATE STATS (parallel queries) ============
+const now = new Date();
+const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+const startOfWeek = new Date(now.getTime() - 7*24*3600*1000).toISOString();
+const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+const since30d = new Date(now.getTime() - 30*24*3600*1000).toISOString();
+
+const [salesAll, salesMonth, salesWeek, salesToday, salesPrevMonth, clicks30d, badges, products, leaderboard, activity, dailyPosts] = await Promise.all([
+  supabase.from('sales').select('id,commission_cents,gross_amount_cents,status,created_at').eq('athlete_id', athlete.id),
+  supabase.from('sales').select('id,commission_cents').eq('athlete_id', athlete.id).in('status', ['confirmed','pending']).gte('created_at', startOfMonth),
+  supabase.from('sales').select('id,commission_cents').eq('athlete_id', athlete.id).in('status', ['confirmed','pending']).gte('created_at', startOfWeek),
+  supabase.from('sales').select('id,commission_cents').eq('athlete_id', athlete.id).in('status', ['confirmed','pending']).gte('created_at', startOfDay),
+  supabase.from('sales').select('commission_cents').eq('athlete_id', athlete.id).in('status', ['confirmed','pending']).gte('created_at', new Date(now.getFullYear(), now.getMonth()-1, 1).toISOString()).lt('created_at', startOfMonth),
+  supabase.from('clicks').select('id,converted').eq('athlete_id', athlete.id).gte('created_at', since30d),
+  supabase.from('athlete_badges').select('badge_id,unlocked_at,badges(code,name,emoji,rarity,description,is_secret)').eq('athlete_id', athlete.id),
+  supabase.from('products').select('*').eq('is_active', true).order('duration_months'),
+  supabase.from('leaderboard').select('*').order('total_commission_cents', { ascending: false }).limit(10),
+  supabase.from('activity').select('*').order('created_at', { ascending: false }).limit(15),
+  supabase.from('daily_post_counts').select('*').eq('athlete_id', athlete.id).gte('post_date', since30d.split('T')[0])
+]);
+
+const sumCents = (rows) => (rows.data || []).reduce((a,r)=>a + (r.commission_cents||0), 0);
+const fmt = (cents) => (cents/100).toLocaleString('sr-RS', { minimumFractionDigits:2, maximumFractionDigits:2 });
+
+// Earnings
+const monthCents = sumCents(salesMonth);
+const weekCents = sumCents(salesWeek);
+const todayCents = sumCents(salesToday);
+const prevMonthCents = sumCents(salesPrevMonth);
+const allCents = sumCents(salesAll);
+
+document.getElementById('bigEarn').textContent = fmt(monthCents);
+document.getElementById('earnToday').textContent = fmt(todayCents);
+document.getElementById('earnWeek').textContent = fmt(weekCents);
+
+// Available for payout = confirmed (after refund window ended)
+const payoutCents = (salesAll.data || []).filter(s => s.status === 'confirmed').reduce((a,s)=>a+s.commission_cents, 0);
+document.getElementById('earnPayout').textContent = fmt(payoutCents);
+
+document.getElementById('salesToday').textContent = (salesToday.data?.length||0) + ' prodaja';
+document.getElementById('salesWeek').textContent = (salesWeek.data?.length||0) + ' prodaja';
+
+// Delta vs prev month
+const delta = prevMonthCents > 0 ? ((monthCents - prevMonthCents) / prevMonthCents * 100).toFixed(1) : (monthCents > 0 ? 100 : 0);
+document.getElementById('earnDelta').textContent = (delta >= 0 ? '↑ +' : '↓ ') + Math.abs(delta) + '% vs prosli mesec';
+
+// KPIs
+document.getElementById('kpiSales').textContent = (salesAll.data?.length||0).toLocaleString('sr-RS');
+document.getElementById('kpiSalesDelta').textContent = '+' + (salesMonth.data?.length||0);
+const totalClicks = clicks30d.data?.length || 0;
+const conv = clicks30d.data?.filter(c=>c.converted).length || 0;
+document.getElementById('kpiClicks').textContent = totalClicks.toLocaleString('sr-RS');
+document.getElementById('kpiCtr').textContent = totalClicks ? (conv/totalClicks*100).toFixed(1)+'%' : '0%';
+document.getElementById('kpiXp').textContent = athlete.xp.toLocaleString('sr-RS');
+document.getElementById('kpiXpDelta').textContent = '+' + (todayCents > 0 ? Math.round(todayCents/100)*3 : 0);
+document.getElementById('kpiBadges').textContent = badges.data?.length || 0;
+document.getElementById('badgesUnlocked').textContent = badges.data?.length || 0;
+document.getElementById('kpiBadgesNew').textContent = badges.data?.filter(b => new Date(b.unlocked_at) > new Date(Date.now() - 7*24*3600*1000)).length || 0;
+
+// ============ TIER CRITERIA ============
+const monthsInTier = (Date.now() - new Date(athlete.tier_started_at).getTime()) / (1000*60*60*24*30);
+document.getElementById('timeInTier').textContent = `${monthsInTier.toFixed(1)} meseci u tier-u`;
+
+const recentSalesCount = (salesAll.data || []).filter(s => new Date(s.created_at) > new Date(Date.now() - 30*24*3600*1000) && ['confirmed','pending'].includes(s.status)).length;
+const totalSalesCount = (salesAll.data || []).filter(s => ['confirmed','pending'].includes(s.status)).length;
+const last30dPosts = dailyPosts.data || [];
+// Apsolutni brojevi za poslednjih 30 dana (ne avg)
+const totalReels30d = last30dPosts.reduce((a,p)=>a+(p.reels_count||0),0);
+const totalStories30d = last30dPosts.reduce((a,p)=>a+(p.stories_count||0),0);
+
+const criteria = PROMOTION_CRITERIA[athlete.tier] || [];
+const critContainer = document.getElementById('tierCriteria');
+let progressDone = 0, progressTotal = 0;
+
+criteria.forEach(c => {
+  let actual = 0;
+  if(c.key === 'months') actual = monthsInTier;
+  else if(c.key === 'sales') actual = athlete.tier === 'commando' ? recentSalesCount : totalSalesCount;
+  else if(c.key === 'reels') actual = totalReels30d;
+  else if(c.key === 'stories') actual = totalStories30d;
+  const done = actual >= c.target;
+  if(done) progressDone++;
+  progressTotal++;
+  const pct = Math.min(100, (actual/c.target*100));
+  const remaining = Math.max(0, c.target - actual);
+
+  // Format display: "23 / 30 (jos 7)" ili "5 / 5 ✓"
+  let displayVal;
+  if (done) {
+    displayVal = `${actual.toFixed(actual<10?1:0)} / ${c.target} ${c.unit} ✓`;
+  } else if (c.key === 'months') {
+    displayVal = `${actual.toFixed(1)} / ${c.target} ${c.unit} (još ${remaining.toFixed(1)})`;
+  } else {
+    displayVal = `${Math.floor(actual)} / ${c.target} ${c.unit} <span style="color:var(--brand-3)">(još ${Math.ceil(remaining)})</span>`;
+  }
+
+  // Detail subtitle: avg per day + days left
+  let subDetail = '';
+  if (c.targetPerDay) {
+    const daysActive = Math.max(1, last30dPosts.length || 1);
+    const avgPerDay = (actual / 30).toFixed(1);
+    subDetail = `<div style="font-size:11px;color:var(--mute);margin-top:3px;font-family:'JetBrains Mono',monospace">${avgPerDay}/dan · cilj ${c.targetPerDay}/dan · ${pct.toFixed(0)}%</div>`;
+  } else if (c.key === 'months') {
+    const daysLeft = Math.max(0, Math.ceil(remaining * 30));
+    subDetail = daysLeft ? `<div style="font-size:11px;color:var(--mute);margin-top:3px;font-family:'JetBrains Mono',monospace">još ~${daysLeft} dana</div>` : '';
+  }
+
+  critContainer.insertAdjacentHTML('beforeend', `
+    <div class="criterion ${done?'done':''}">
+      <div class="check">${done?'✓':''}</div>
+      <div class="text">${c.label}${subDetail}</div>
+      <div class="val">${displayVal}</div>
+    </div>
+  `);
+});
+
+// Tier progress bar
+if(tier.next){
+  const pct = Math.round((progressDone/progressTotal)*100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressLabel').textContent = `${progressDone} / ${progressTotal} kriterijuma`;
+} else {
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressPct').textContent = 'MAX';
+  document.getElementById('progressLabel').textContent = 'Najvisi nivo';
+}
+
+// ============ ACTION BANNERS ============
+const banners = document.getElementById('banners');
+if(!athlete.instagram_user_id){
+  banners.insertAdjacentHTML('beforeend', `
+    <div class="action-banner">
+      <div class="ic">📷</div>
+      <div class="text"><b>Poveži Instagram Business</b><span>Sistem ce auto brojati Reels i Story-je za napredovanje.</span></div>
+      <button class="btn primary" onclick="connectInstagram()">Connect now</button>
+    </div>
+  `);
+}
+if(!athlete.stripe_connect_onboarded){
+  banners.insertAdjacentHTML('beforeend', `
+    <div class="action-banner">
+      <div class="ic">💳</div>
+      <div class="text"><b>Postavi Stripe Connect za isplate</b><span>Bez ovog ne mozemo da ti uplatimo proviziju 20. u mesecu.</span></div>
+      <button class="btn primary" onclick="setupStripe()">Setup payouts</button>
+    </div>
+  `);
+}
+if(!athlete.telegram_chat_id){
+  banners.insertAdjacentHTML('beforeend', `
+    <div class="action-banner" style="background:linear-gradient(135deg,rgba(34,158,217,0.12),rgba(122,91,255,0.08));border-color:rgba(34,158,217,0.3)">
+      <div class="ic">💬</div>
+      <div class="text"><b>Poveži Telegram za notifikacije</b><span>Brže od email-a. Dobijaš obaveštenja o prodajama, streak-u, izazovima — direktno u Telegram.</span></div>
+      <button class="btn primary" onclick="connectTelegram()">Connect Telegram</button>
+    </div>
+  `);
+}
+
+// ============ INSTAGRAM CARD ============
+const igCard = document.getElementById('igCard');
+if(athlete.instagram_user_id){
+  document.getElementById('igTitle').textContent = '@' + athlete.instagram_username;
+  document.getElementById('igSub').textContent = 'Auto tracking aktivan';
+  document.getElementById('igStats').style.display = 'grid';
+  document.getElementById('igBtn').textContent = 'Disconnect';
+  document.getElementById('igBtn').className = 'btn ghost';
+
+  // Today's post counts
+  const today = new Date().toISOString().split('T')[0];
+  const todayPosts = (dailyPosts.data || []).find(p => p.post_date === today);
+  document.getElementById('igReels').textContent = todayPosts?.reels_count || 0;
+  document.getElementById('igStories').textContent = todayPosts?.stories_count || 0;
+}
+
+// ============ REFERRAL LINKS ============
+const linkGrid = document.getElementById('linkGrid');
+(products.data || []).forEach(p => {
+  // Clean URL using slug: /r/marko-nikolic/12mo
+  const url = `${SITE_URL}/r/${athlete.username}/${p.slug}`;
+  const pkgClicks = (clicks30d.data || []).filter(c => c.product_id === p.id).length;
+  const pkgSales = (salesMonth.data || []).filter(s => s.product_id === p.id).length;
+  linkGrid.insertAdjacentHTML('beforeend', `
+    <div class="link-item">
+      <div class="pkg-head">
+        <div>
+          <div class="pkg-name">${p.name}</div>
+          <div class="commission">Tvoja provizija: €${(p.price_eur*tier.pct).toFixed(2)} (${(tier.pct*100).toFixed(0)}%)</div>
+        </div>
+        <div class="pkg-price">€${p.price_eur}</div>
+      </div>
+      <div class="url-row">
+        <code>${url}</code>
+        <button class="copy-btn" onclick="copy('${url}')">COPY</button>
+      </div>
+      <div class="stats">
+        <span>Klikova 30d: <b>${pkgClicks}</b></span>
+        <span>Prodaja ovaj mesec: <b>${pkgSales}</b></span>
+        <a href="${url}?utm_source=ig" onclick="copy('${url}?utm_source=ig');event.preventDefault();" style="color:var(--brand);text-decoration:none;font-size:11px">📷 IG link</a>
+        <a href="${url}?utm_source=tt" onclick="copy('${url}?utm_source=tt');event.preventDefault();" style="color:var(--brand);text-decoration:none;font-size:11px">🎵 TT link</a>
+      </div>
+    </div>
+  `);
+});
+
+// ============ CHALLENGES (today's) ============
+const todayDate = new Date().toISOString().split('T')[0];
+const { data: todayChallenges } = await supabase
+  .from('challenges')
+  .select('*, challenge_progress(progress, completed)')
+  .eq('challenge_date', todayDate);
+
+const chList = document.getElementById('challengesList');
+if(!todayChallenges?.length){
+  chList.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);font-size:13px">Novi izazovi krecu sutra ujutru ⏰</div>';
+} else {
+  todayChallenges.forEach(ch => {
+    const prog = ch.challenge_progress?.[0];
+    const done = prog?.completed;
+    const progress = prog?.progress || 0;
+    const pct = Math.min(100, (progress/ch.target*100));
+    chList.insertAdjacentHTML('beforeend', `
+      <div class="chal ${done?'done':''}">
+        <div class="em">${ch.emoji}</div>
+        <div class="c">
+          <div class="t">${ch.title}</div>
+          <div class="d">${ch.description||''}</div>
+          <div class="pm"><div class="pf" style="width:${pct}%"></div></div>
+        </div>
+        <div class="rw">${done?'✓':progress+'/'+ch.target}</div>
+      </div>
+    `);
+  });
+}
+
+// ============ LEADERBOARD ============
+const lbData = leaderboard.data || [];
+const podium = document.getElementById('podium');
+const lbList = document.getElementById('lbList');
+
+const top3 = lbData.slice(0, 3);
+const podOrder = [top3[1], top3[0], top3[2]].filter(Boolean); // silver, gold, bronze
+const podClasses = ['silver', 'gold', 'bronze'];
+const podCrowns = ['🥈', '👑', '🥉'];
+podOrder.forEach((p, i) => {
+  if(!p) return;
+  const init = (p.full_name || p.username).split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+  podium.insertAdjacentHTML('beforeend', `
+    <div class="pod ${podClasses[i]}">
+      <div class="crown">${podCrowns[i]}</div>
+      <div class="av">${init}</div>
+      <div class="nm">${p.full_name || p.username}</div>
+      <div class="am">€${fmt(p.total_commission_cents||0)}</div>
+    </div>
+  `);
+});
+
+lbData.slice(3, 10).forEach((p, idx) => {
+  const init = (p.full_name || p.username).split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+  const isMe = p.id === athlete.id;
+  lbList.insertAdjacentHTML('beforeend', `
+    <div class="lb-row ${isMe?'me':''}">
+      <div class="rk">#${idx+4}</div>
+      <div class="who">
+        <div class="av">${init}</div>
+        <div class="nm">${p.full_name || p.username}${isMe?' <b style="color:var(--brand)">(TI)</b>':''}</div>
+      </div>
+      <div class="tier-tag ${p.tier}">${TIER[p.tier].name}</div>
+      <div class="am">€${fmt(p.total_commission_cents||0)}</div>
+    </div>
+  `);
+});
+
+// If user is not in top 10, show their rank separately
+const myRank = (lbData.findIndex(p => p.id === athlete.id) + 1);
+if(myRank === 0){
+  lbList.insertAdjacentHTML('beforeend', `
+    <div style="margin-top:10px;padding-top:10px;border-top:1px dashed rgba(255,255,255,0.1);text-align:center;color:var(--dim);font-size:12px">
+      Tvoja pozicija: <b style="color:var(--brand);font-family:'JetBrains Mono',monospace">izvan TOP 10</b> · gradi vise!
+    </div>
+  `);
+}
+
+// ============ ACHIEVEMENTS ============
+const { data: allBadges } = await supabase.from('badges').select('*').order('rarity');
+const unlockedIds = new Set((badges.data || []).map(b => b.badge_id));
+const achGrid = document.getElementById('achGrid');
+(allBadges || []).slice(0, 18).forEach(b => {
+  const unlocked = unlockedIds.has(b.id);
+  achGrid.insertAdjacentHTML('beforeend', `
+    <div class="ach ${unlocked?'unlocked':'locked'}" title="${unlocked?b.description:'???'}">
+      <div class="em">${b.is_secret && !unlocked ? '❓' : b.emoji}</div>
+      <div class="nm">${b.is_secret && !unlocked ? '???' : b.name}</div>
+      ${unlocked ? `<div class="rar">${b.rarity.toUpperCase()}</div>` : '<div class="lk">🔒</div>'}
+    </div>
+  `);
+});
+
+// ============ ACTIVITY FEED ============
+const feed = document.getElementById('feed');
+const iconFor = (t)=>({sale:'💸', levelup:'🎉', badge:'🏅', streak:'🔥', challenge_done:'⚡'}[t] || '⚡');
+(activity.data || []).forEach(item => {
+  const time = new Date(item.created_at);
+  const ago = timeAgo(time);
+  feed.insertAdjacentHTML('beforeend', `
+    <div class="feed-item ${item.type}">
+      <div class="ic">${iconFor(item.type)}</div>
+      <div class="text">${item.title}</div>
+      ${item.meta?.amount_cents ? `<div class="am">+€${fmt(item.meta.amount_cents)}</div>` : ''}
+      <div class="when">${ago}</div>
+    </div>
+  `);
+});
+if(!activity.data?.length){
+  feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);font-size:13px">Pocn
