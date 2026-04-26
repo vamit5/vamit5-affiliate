@@ -135,7 +135,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   if(session){
     // Check if admin or athlete
     const { data: admin } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle();
-    location.href = admin ? '/admin.html' : '/dashboard.html';
+    location.href = admin ? '/admin.html' : '/login.html';
   }
 })();
 
@@ -159,7 +159,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
+    options: { emailRedirectTo: window.location.origin + '/login.html' }
   });
 
   if(error){
@@ -176,7 +176,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
 document.getElementById('googleBtn').addEventListener('click', async ()=>{
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/dashboard.html' }
+    options: { redirectTo: window.location.origin + '/login.html' }
   });
   if(error) showError(error.message);
 });
