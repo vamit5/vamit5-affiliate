@@ -1,26 +1,14 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": null,
-  "outputDirectory": "public",
-  "framework": null,
-  "rewrites": [
-    {
-      "source": "/r/:username",
-      "destination": "https://bauuhowpbrqqmojqnqbr.supabase.co/functions/v1/redirect"
-    },
-    {
-      "source": "/r/:username/:slug",
-      "destination": "https://bauuhowpbrqqmojqnqbr.supabase.co/functions/v1/redirect"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
-      ]
-    }
-  ],
-  "cleanUrls"
+    "outputDirectory": "public",
+    "rewrites": [
+          {
+                  "source": "/r/:username",
+                  "destination": "https://bauuhowpbrqqmojqnqbr.supabase.co/functions/v1/redirect"
+          },
+          {
+                  "source": "/r/:username/:slug",
+                  "destination": "https://bauuhowpbrqqmojqnqbr.supabase.co/functions/v1/redirect"
+          }
+    ],
+    "cleanUrls": true
+}
