@@ -489,11 +489,11 @@ window.approveApp = async (id, email, fullName) => {
   // Generate username from full name
   const username = fullName.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
   // Edge function will handle: create auth user (passwordless), insert into athletes, update application, send magic link
-  const { error } = await supabase.functions.invoke('approve-application', {
+  const { data, error } = await supabase.functions.invoke('approve-application', {
     body: { application_id: id, username }
   });
   if(error){ alert('Greska: ' + error.message); return; }
-  toast('✅ Atleta odobren — magic link poslat!');
+  alert('Atleta odobren!\n\nMagic link (kopiraj i posalji atleti):\n'+(data?.magic_link||'NEMA'));
   loadApplications();
   loadOverview();
 };
