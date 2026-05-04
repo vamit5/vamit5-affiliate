@@ -320,9 +320,60 @@ main{padding:0}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:13px 22px;border-radius:11px;background:linear-gradient(135deg,var(--brand-2),var(--brand));color:#0a0c14;font-weight:800;font-size:13px;box-shadow:0 16px 32px -10px rgba(0,240,255,0.5);z-index:100;transition:transform .4s cubic-bezier(.2,.8,.2,1)}
 .toast.show{transform:translateX(-50%) translateY(0)}
 
+/* === MOBILE / TABLET STYLES === */
+.mobile-menu-btn{display:none}
+
 @media(max-width:980px){
   .app{grid-template-columns:1fr}
-  aside{display:none}
+  aside{
+    position:fixed;left:-280px;top:0;height:100vh;width:260px;z-index:50;
+    transition:left .3s cubic-bezier(.2,.8,.2,1);
+    background:rgba(10,12,20,0.96);
+  }
+  aside.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,0.5)}
+  .mobile-menu-btn{
+    display:flex;width:40px;height:40px;border-radius:10px;
+    background:rgba(20,24,42,0.9);border:1px solid var(--border);
+    color:var(--text);align-items:center;justify-content:center;
+    cursor:pointer;font-family:inherit;flex-shrink:0;
+  }
+  .mobile-menu-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2}
+  .mobile-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:45;
+    display:none;backdrop-filter:blur(4px);
+  }
+  .mobile-overlay.show{display:block}
+}
+
+@media(max-width:768px){
+  .topbar{padding:12px 14px;gap:8px}
+  .streak-pill{font-size:11px;padding:5px 10px}
+  .user-chip .meta{display:none}
+  .user-chip{padding:4px;border-radius:50%;margin-left:auto}
+  .icon-btn{width:34px;height:34px}
+  .content{padding:16px 14px 80px;gap:14px}
+  .hero{padding:18px;gap:14px}
+  .hero h1{font-size:20px!important}
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .kpi{padding:14px}
+  .kpi .v{font-size:20px}
+  .kpi .l{font-size:9.5px}
+  .card{padding:16px}
+  .link-grid{grid-template-columns:1fr;gap:10px}
+  .split{grid-template-columns:1fr;gap:14px}
+  .ach-grid{grid-template-columns:repeat(3,1fr)!important}
+}
+
+@media(max-width:480px){
+  .topbar{padding:10px 12px}
+  .content{padding:14px 12px 80px}
+  .hero{padding:14px}
+  .hero h1{font-size:18px!important}
+  .kpi-row{gap:8px}
+  .kpi{padding:11px}
+  .kpi .v{font-size:18px}
+  .ach-grid{grid-template-columns:repeat(2,1fr)!important}
+  .card{padding:14px;border-radius:14px}
 }
 
 .loading-screen{position:fixed;inset:0;background:var(--bg-0);display:grid;place-items:center;z-index:1000}
@@ -402,7 +453,11 @@ main{padding:0}
   </aside>
 
   <main>
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
     <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
       <div class="streak-pill"><span class="flame">🔥</span> <b id="streakDays">0</b> dana</div>
       <div class="icon-btn"><svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M6 8a6 6 0 1112 0c0 7 3 9 3 9H3s3-2 3-9M13.7 21a2 2 0 01-3.4 0"/></svg><span class="dot"></span></div>
       <div class="user-chip">
@@ -1010,6 +1065,15 @@ window.copy = (url)=>{
 
 window.logout = async ()=>{ await supabase.auth.signOut(); location.href = '/login.html'; };
 
+window.toggleMobileMenu = ()=>{
+  document.querySelector('aside').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+};
+window.closeMobileMenu = ()=>{
+  document.querySelector('aside').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+};
+
 window.connectInstagram = ()=>{
   // Triggers OAuth flow via edge function
   location.href = `${SUPABASE_URL}/functions/v1/instagram-oauth-start?user_id=${athlete.id}`;
@@ -1087,69 +1151,4 @@ function showPushBanner(){
   `);
 }
 
-window.acceptPush = async () => {
-  const perm = await Notification.requestPermission();
-  if(perm !== 'granted') {
-    document.getElementById('pushBanner')?.remove();
-    return;
-  }
-  const reg = await navigator.serviceWorker.ready;
-  await subscribePush(reg);
-  document.getElementById('pushBanner')?.remove();
-};
-
-async function subscribePush(reg){
-  // VAPID public key — put yours after generation
-  const VAPID_PUBLIC = window.VAPID_PUBLIC_KEY || 'YOUR_VAPID_PUBLIC_KEY';
-  const sub = await reg.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC),
-  });
-  const j = sub.toJSON();
-  await supabase.from('push_subscriptions').upsert({
-    athlete_id: athlete.id,
-    endpoint: j.endpoint,
-    p256dh: j.keys.p256dh,
-    auth: j.keys.auth,
-    user_agent: navigator.userAgent,
-    device_label: getDeviceLabel(),
-  }, { onConflict: 'endpoint' });
-}
-
-function urlB64ToUint8Array(b64){
-  const padding = '='.repeat((4 - b64.length % 4) % 4);
-  const base64 = (b64 + padding).replace(/-/g,'+').replace(/_/g,'/');
-  const raw = atob(base64);
-  return Uint8Array.from(raw, c => c.charCodeAt(0));
-}
-
-function getDeviceLabel(){
-  const ua = navigator.userAgent;
-  const browser = /Edg/.test(ua) ? 'Edge' : /Chrome/.test(ua) ? 'Chrome' : /Firefox/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari' : 'Browser';
-  const os = /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : 'OS';
-  return `${browser} on ${os}`;
-}
-
-setupPushNotifications();
-
-// Real-time updates: listen for new activity
-supabase.channel('activity-feed').on('postgres_changes',
-  { event:'INSERT', schema:'public', table:'activity' },
-  (payload)=>{
-    const item = payload.new;
-    const time = new Date(item.created_at);
-    const node = document.createElement('div');
-    node.className = `feed-item ${item.type}`;
-    node.style.animation = 'fadeUp .5s cubic-bezier(.2,.8,.2,1)';
-    node.innerHTML = `
-      <div class="ic">${iconFor(item.type)}</div>
-      <div class="text">${item.title}</div>
-      ${item.meta?.amount_cents ? `<div class="am">+€${fmt(item.meta.amount_cents)}</div>` : ''}
-      <div class="when">upravo</div>`;
-    feed.insertBefore(node, feed.firstChild);
-    while(feed.children.length > 18) feed.removeChild(feed.lastChild);
-  }
-).subscribe();
-</script>
-</body>
-</html>
+window.acceptPush = async ()
