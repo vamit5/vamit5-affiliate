@@ -563,7 +563,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
 const SITE_URL = window.SITE_URL || window.location.origin;
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true }
+});
 
 // ============ TIER CONFIG ============
 const TIER = {
@@ -595,20 +597,46 @@ const PROMOTION_CRITERIA = {
   ]
 };
 
-// ============ AUTH CHECK ============
-const { data: { session } } = await supabase.auth.getSession();
+// ============ AUTH CHECK (with timeout & admin redirect) ============
+let session, athlete;
+try {
+  const sessionRes = await Promise.race([
+    supabase.auth.getSession(),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('auth timeout')), 8000))
+  ]);
+  session = sessionRes.data?.session;
+} catch(err) {
+  console.error('Auth error:', err);
+  showFatal('Greska autentifikacije', 'Auth provera nije uspela za 8s. Pokušaj F5.');
+  throw err;
+}
+
 if(!session){ location.href = '/login.html'; throw new Error('No session'); }
 
-// Load athlete profile
-let { data: athlete, error: athErr } = await supabase
-  .from('athletes')
-  .select('*')
-  .eq('id', session.user.id)
-  .maybeSingle();
+// If user is ADMIN, redirect to admin panel
+try {
+  const { data: admin } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle();
+  if(admin){ location.href = '/admin.html'; throw new Error('Is admin — redirecting'); }
+} catch(err) {
+  if(err.message?.includes('admin')) throw err;
+  // Otherwise just continue (admin check failure ok)
+}
 
-if(athErr) { showFatal('Greska baze', athErr.message); throw athErr; }
+// Load athlete profile
+try {
+  const athRes = await Promise.race([
+    supabase.from('athletes').select('*').eq('id', session.user.id).maybeSingle(),
+    new Promise((_, rej) => setTimeout(() => rej(new Error('athlete query timeout')), 8000))
+  ]);
+  if(athRes.error) { showFatal('Greska baze', athRes.error.message); throw athRes.error; }
+  athlete = athRes.data;
+} catch(err) {
+  showFatal('Greska ucitavanja', err.message);
+  throw err;
+}
+
 if(!athlete){
-  showFatal('Nalog nije aktiviran', 'Tvoja prijava je primljena ali jos nije odobrena. Proveri email za update.');
+  showFatal('Nalog nije aktiviran', 'Ulogovan si, ali nemas atleta nalog. Ako si admin — proveri public.admins tabelu. Ako si atleta kandidat — proveri da li je tvoja prijava odobrena.');
   throw new Error('No athlete row');
 }
 
@@ -950,4 +978,178 @@ const iconFor = (t)=>({sale:'💸', levelup:'🎉', badge:'🏅', streak:'🔥',
   `);
 });
 if(!activity.data?.length){
-  feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);font-size:13px">Pocn
+  feed.innerHTML = '<div style="text-align:center;padding:30px;color:var(--mute);font-size:13px">Pocni — sve sto se desava bice tu.</div>';
+}
+
+// ============ DONE — SHOW ============
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('app').style.display = 'grid';
+
+// ============ HELPERS ============
+function timeAgo(date){
+  const sec = Math.floor((Date.now() - date.getTime())/1000);
+  if(sec < 60) return 'pre ' + sec + 's';
+  if(sec < 3600) return 'pre ' + Math.floor(sec/60) + 'min';
+  if(sec < 86400) return 'pre ' + Math.floor(sec/3600) + 'h';
+  return 'pre ' + Math.floor(sec/86400) + 'd';
+}
+
+function showFatal(title, msg){
+  document.getElementById('errorTitle').textContent = title;
+  document.getElementById('errorMsg').textContent = msg;
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('errorScreen').classList.remove('hidden');
+}
+
+window.copy = (url)=>{
+  navigator.clipboard.writeText(url);
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 1800);
+};
+
+window.logout = async ()=>{ await supabase.auth.signOut(); location.href = '/login.html'; };
+
+window.connectInstagram = ()=>{
+  // Triggers OAuth flow via edge function
+  location.href = `${SUPABASE_URL}/functions/v1/instagram-oauth-start?user_id=${athlete.id}`;
+};
+
+window.setupStripe = async ()=>{
+  // Create Stripe Connect onboarding link via edge function
+  const { data, error } = await supabase.functions.invoke('stripe-connect-onboard', {
+    body: { athlete_id: athlete.id }
+  });
+  if(error){ alert('Greska: ' + error.message); return; }
+  if(data?.url) location.href = data.url;
+};
+
+window.connectTelegram = async ()=>{
+  // Generate one-time link code, save to athlete row, open Telegram with deep link
+  const code = Math.random().toString(36).slice(2,10).toUpperCase();
+  await supabase.from('athletes').update({ telegram_link_code: code }).eq('id', athlete.id);
+  const botUsername = window.TELEGRAM_BOT_USERNAME || 'vamit5_athletes_bot';
+  const tgUrl = `https://t.me/${botUsername}?start=${code}`;
+  // Open Telegram (mobile or web)
+  window.open(tgUrl, '_blank');
+  alert(`Telegram se otvara. Klikni START u botu.\n\nAko ne radi automatski — otidji na @${botUsername} i kucaj:\n/start ${code}`);
+};
+
+// ============ WEB PUSH SUBSCRIBE ============
+async function setupPushNotifications(){
+  if(!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+
+    // Already subscribed?
+    const existing = await reg.pushManager.getSubscription();
+    if(existing){
+      // Make sure DB has it
+      const sub = existing.toJSON();
+      await supabase.from('push_subscriptions').upsert({
+        athlete_id: athlete.id,
+        endpoint: sub.endpoint,
+        p256dh: sub.keys.p256dh,
+        auth: sub.keys.auth,
+        user_agent: navigator.userAgent,
+        device_label: getDeviceLabel(),
+      }, { onConflict: 'endpoint' });
+      return;
+    }
+
+    // Show prompt only if not denied
+    if(Notification.permission === 'denied') return;
+
+    if(Notification.permission === 'default'){
+      // Show non-intrusive banner first
+      showPushBanner();
+      return;
+    }
+
+    // Granted but not subscribed yet
+    await subscribePush(reg);
+  } catch(err){
+    console.warn('Push setup failed:', err.message);
+  }
+}
+
+function showPushBanner(){
+  const banners = document.getElementById('banners');
+  banners.insertAdjacentHTML('beforeend', `
+    <div class="action-banner" id="pushBanner">
+      <div class="ic">🔔</div>
+      <div class="text"><b>Ukljuci push notifikacije</b><span>Dobijaj realtime alerts kad neko kupi, pre isteka streak-a, novi izazovi…</span></div>
+      <button class="btn primary" onclick="acceptPush()">Ukljuci</button>
+      <button class="btn ghost" onclick="document.getElementById('pushBanner').remove()" style="padding:8px 12px">Kasnije</button>
+    </div>
+  `);
+}
+
+window.acceptPush = async () => {
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted') {
+    document.getElementById('pushBanner')?.remove();
+    return;
+  }
+  const reg = await navigator.serviceWorker.ready;
+  await subscribePush(reg);
+  document.getElementById('pushBanner')?.remove();
+};
+
+async function subscribePush(reg){
+  // VAPID public key — put yours after generation
+  const VAPID_PUBLIC = window.VAPID_PUBLIC_KEY || 'YOUR_VAPID_PUBLIC_KEY';
+  const sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlB64ToUint8Array(VAPID_PUBLIC),
+  });
+  const j = sub.toJSON();
+  await supabase.from('push_subscriptions').upsert({
+    athlete_id: athlete.id,
+    endpoint: j.endpoint,
+    p256dh: j.keys.p256dh,
+    auth: j.keys.auth,
+    user_agent: navigator.userAgent,
+    device_label: getDeviceLabel(),
+  }, { onConflict: 'endpoint' });
+}
+
+function urlB64ToUint8Array(b64){
+  const padding = '='.repeat((4 - b64.length % 4) % 4);
+  const base64 = (b64 + padding).replace(/-/g,'+').replace(/_/g,'/');
+  const raw = atob(base64);
+  return Uint8Array.from(raw, c => c.charCodeAt(0));
+}
+
+function getDeviceLabel(){
+  const ua = navigator.userAgent;
+  const browser = /Edg/.test(ua) ? 'Edge' : /Chrome/.test(ua) ? 'Chrome' : /Firefox/.test(ua) ? 'Firefox' : /Safari/.test(ua) ? 'Safari' : 'Browser';
+  const os = /Windows/.test(ua) ? 'Windows' : /Mac/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : /Android/.test(ua) ? 'Android' : /iPhone|iPad/.test(ua) ? 'iOS' : 'OS';
+  return `${browser} on ${os}`;
+}
+
+setupPushNotifications();
+
+// Real-time updates: listen for new activity
+supabase.channel('activity-feed').on('postgres_changes',
+  { event:'INSERT', schema:'public', table:'activity' },
+  (payload)=>{
+    const item = payload.new;
+    const time = new Date(item.created_at);
+    const node = document.createElement('div');
+    node.className = `feed-item ${item.type}`;
+    node.style.animation = 'fadeUp .5s cubic-bezier(.2,.8,.2,1)';
+    node.innerHTML = `
+      <div class="ic">${iconFor(item.type)}</div>
+      <div class="text">${item.title}</div>
+      ${item.meta?.amount_cents ? `<div class="am">+€${fmt(item.meta.amount_cents)}</div>` : ''}
+      <div class="when">upravo</div>`;
+    feed.insertBefore(node, feed.firstChild);
+    while(feed.children.length > 18) feed.removeChild(feed.lastChild);
+  }
+).subscribe();
+</script>
+</body>
+</html>
