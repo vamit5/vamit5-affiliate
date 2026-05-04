@@ -652,46 +652,58 @@ const PROMOTION_CRITERIA = {
   ]
 };
 
-// ============ AUTH CHECK (with timeout & admin redirect) ============
+// ============ AUTH CHECK — polling-based, race-condition safe ============
 let session, athlete;
+
+// If URL has auth tokens (came from magic link directly), redirect to callback page
+if (window.location.hash && (window.location.hash.includes('access_token=') || window.location.hash.includes('error='))) {
+  location.replace('/auth-callback.html' + window.location.hash);
+  throw new Error('Redirecting to callback');
+}
+
+// Poll for session up to 5 seconds (handles supabase-js init race)
+async function waitForSession(maxMs = 5000){
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    const { data: { session: s } } = await supabase.auth.getSession();
+    if (s) return s;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return null;
+}
+
 try {
-  const sessionRes = await Promise.race([
-    supabase.auth.getSession(),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('auth timeout')), 8000))
-  ]);
-  session = sessionRes.data?.session;
+  session = await waitForSession();
 } catch(err) {
   console.error('Auth error:', err);
-  showFatal('Greska autentifikacije', 'Auth provera nije uspela za 8s. Pokušaj F5.');
+  showFatal('Greska autentifikacije', err.message + ' — Pokušaj F5.');
   throw err;
 }
 
-if(!session){ location.href = '/login.html'; throw new Error('No session'); }
+if(!session){ location.replace('/login.html'); throw new Error('No session'); }
 
 // If user is ADMIN, redirect to admin panel
 try {
   const { data: admin } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle();
-  if(admin){ location.href = '/admin.html'; throw new Error('Is admin — redirecting'); }
+  if(admin){ location.replace('/admin.html'); throw new Error('Is admin — redirecting'); }
 } catch(err) {
   if(err.message?.includes('admin')) throw err;
   // Otherwise just continue (admin check failure ok)
 }
 
-// Load athlete profile
+// Load athlete profile (no timeout — RLS query should be fast)
 try {
-  const athRes = await Promise.race([
-    supabase.from('athletes').select('*').eq('id', session.user.id).maybeSingle(),
-    new Promise((_, rej) => setTimeout(() => rej(new Error('athlete query timeout')), 8000))
-  ]);
+  const athRes = await supabase.from('athletes').select('*').eq('id', session.user.id).maybeSingle();
   if(athRes.error) { showFatal('Greska baze', athRes.error.message); throw athRes.error; }
   athlete = athRes.data;
 } catch(err) {
-  showFatal('Greska ucitavanja', err.message);
+  showFatal('Greska ucitavanja', err.message || 'Nepoznata greska');
   throw err;
 }
 
 if(!athlete){
-  showFatal('Nalog nije aktiviran', 'Ulogovan si, ali nemas atleta nalog. Ako si admin — proveri public.admins tabelu. Ako si atleta kandidat — proveri da li je tvoja prijava odobrena.');
+  showFatal('Nalog nije aktiviran',
+    'Ulogovan si, ali nemas atleta nalog. Cekaj da admin odobri prijavu, ili kontaktiraj support na athletes@vamit5.app.');
   throw new Error('No athlete row');
 }
 
@@ -1143,12 +1155,4 @@ function showPushBanner(){
   const banners = document.getElementById('banners');
   banners.insertAdjacentHTML('beforeend', `
     <div class="action-banner" id="pushBanner">
-      <div class="ic">🔔</div>
-      <div class="text"><b>Ukljuci push notifikacije</b><span>Dobijaj realtime alerts kad neko kupi, pre isteka streak-a, novi izazovi…</span></div>
-      <button class="btn primary" onclick="acceptPush()">Ukljuci</button>
-      <button class="btn ghost" onclick="document.getElementById('pushBanner').remove()" style="padding:8px 12px">Kasnije</button>
-    </div>
-  `);
-}
-
-window.acceptPush = async ()
+      <div class="ic">�
