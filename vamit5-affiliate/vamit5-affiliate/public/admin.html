@@ -298,11 +298,26 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true }
 });
 
-// Auth check + admin verify
-const { data: { session } } = await supabase.auth.getSession();
-if(!session){ location.href = '/login.html'; throw new Error('No session'); }
+// Auth check — redirect to callback if URL has auth tokens, otherwise poll for session
+if (window.location.hash && (window.location.hash.includes('access_token=') || window.location.hash.includes('error='))) {
+  location.replace('/auth-callback.html' + window.location.hash);
+  throw new Error('Redirecting to callback');
+}
+
+async function waitForSession(maxMs = 5000){
+  const start = Date.now();
+  while (Date.now() - start < maxMs) {
+    const { data: { session: s } } = await supabase.auth.getSession();
+    if (s) return s;
+    await new Promise(r => setTimeout(r, 200));
+  }
+  return null;
+}
+
+const session = await waitForSession();
+if(!session){ location.replace('/login.html'); throw new Error('No session'); }
 const { data: admin } = await supabase.from('admins').select('*').eq('id', session.user.id).maybeSingle();
-if(!admin){ alert('Pristup zabranjen — nisi admin.'); location.href = '/dashboard.html'; throw new Error('Not admin'); }
+if(!admin){ alert('Pristup zabranjen — nisi admin.'); location.replace('/dashboard.html'); throw new Error('Not admin'); }
 
 document.getElementById('topMeta').textContent = admin.email;
 
@@ -666,25 +681,4 @@ window.closeMobileMenu = () => {
 };
 // Auto-close mobile menu when nav button clicked
 document.querySelectorAll('aside nav button').forEach(b => {
-  b.addEventListener('click', () => window.closeMobileMenu());
-});
-
-// Section loader
-function loadSection(s){
-  if(s === 'overview') loadOverview();
-  else if(s === 'applications') loadApplications();
-  else if(s === 'athletes') loadAthletes();
-  else if(s === 'sales') loadSales();
-  else if(s === 'payouts') loadPayouts();
-  else if(s === 'challenges') loadChallenges();
-}
-
-// Initial load
-await loadOverview();
-loadApplications(); // for badge count
-
-document.getElementById('loading').classList.add('hidden');
-document.getElementById('app').style.display = 'grid';
-</script>
-</body>
-</html>
+  b.addEventListener('click', () => window.
