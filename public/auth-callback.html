@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>VAMIT-5 · Prijava u toku…</title>
+<style>
+:root{--bg:#05060a;--text:#e9ecff;--dim:#9aa0c4;--brand:#00f0ff;--brand-2:#7a5bff;--red:#ff4d5e}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;display:grid;place-items:center;padding:20px;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.4),transparent 60%),
+    radial-gradient(700px 400px at 70% 80%,rgba(0,240,255,0.3),transparent 60%);
+}
+.box{
+  position:relative;z-index:1;max-width:400px;width:100%;
+  padding:36px 28px;border-radius:20px;text-align:center;
+  background:rgba(20,24,42,0.85);backdrop-filter:blur(20px);
+  border:1px solid rgba(0,240,255,0.2);
+  box-shadow:0 30px 60px -20px rgba(0,0,0,0.7);
+}
+.spinner{
+  width:48px;height:48px;margin:0 auto 20px;
+  border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);
+  border-radius:50%;animation:spin .7s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{font-size:20px;font-weight:800;margin-bottom:8px;letter-spacing:-0.01em}
+p{color:var(--dim);font-size:14px;line-height:1.5}
+.error{color:#ffb0b8}
+.error h1{color:#fff}
+.btn{
+  display:inline-block;margin-top:18px;padding:11px 22px;
+  border-radius:10px;font-weight:700;font-size:13px;text-decoration:none;
+  background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;cursor:pointer;border:none;
+}
+.detail{
+  margin-top:14px;padding:10px;border-radius:8px;
+  background:rgba(255,77,94,0.08);border:1px solid rgba(255,77,94,0.2);
+  font-size:11.5px;color:#ffb0b8;font-family:'JetBrains Mono',monospace;
+  word-break:break-word;text-align:left;
+}
+</style>
+</head>
+<body>
+<div class="box" id="box">
+  <div class="spinner"></div>
+  <h1>Prijava u toku…</h1>
+  <p id="status">Provera autentifikacije...</p>
+</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const SUPABASE_URL = window.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    flowType: 'implicit',
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+    storage: window.localStorage,
+  }
+});
+
+const status = document.getElementById('status');
+const box = document.getElementById('box');
+
+function showError(title, detail){
+  box.className = 'box error';
+  box.innerHTML = `
+    <h1>🚫 ${title}</h1>
+    <p>Pokušaj ponovo ili kontaktiraj support.</p>
+    ${detail ? `<div class="detail">${detail}</div>` : ''}
+    <a class="btn" href="/login.html">Vrati se na login</a>
+  `;
+}
+
+async function redirectByRole(userId){
+  status.textContent = 'Učitavanje profila...';
+  try {
+    // Check if admin first
+    const { data: admin } = await supabase
+      .from('admins').select('id').eq('id', userId).maybeSingle();
+    if (admin) { location.replace('/admin.html'); return; }
+
+    // Check if athlete
+    const { data: athlete } = await supabase
+      .from('athletes').select('id').eq('id', userId).maybeSingle();
+    if (athlete) { location.replace('/dashboard.html'); return; }
+
+    // No role found
+    showError('Nalog nije aktiviran',
+      'Tvoja prijava jos uvek nije odobrena. Sacekaj da admin proveri prijavu, ili kontaktiraj support na athletes@vamit5.app.');
+  } catch (err) {
+    showError('Greska ucitavanja profila', err.message);
+  }
+}
+
+// Strategy 1: Listen for auth state changes (handles URL hash automatically)
+const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+  console.log('[auth] Event:', event, 'Has session:', !!session);
+  if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION' || event === 'TOKEN_REFRESHED') && session?.user) {
+    authListener.subscription.unsubscribe();
+    redirectByRole(session.user.id);
+  }
+});
+
+// Strategy 2: Polling fallback in case state change doesn't fire
+const startTime = Date.now();
+const POLL_INTERVAL = 250;
+const MAX_WAIT = 12000;
+
+async function pollSession(){
+  while (Date.now() - startTime < MAX_WAIT) {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      authListener.subscription.unsubscribe();
+      redirectByRole(session.user.id);
+      return;
+    }
+    // Update UI status periodically
+    const elapsed = Math.floor((Date.now() - startTime)/1000);
+    if (elapsed > 2) status.textContent = `Provera u toku... (${elapsed}s)`;
+    await new Promise(r => setTimeout(r, POLL_INTERVAL));
+  }
+
+  // Timeout: if URL has tokens, try one explicit exchange
+  authListener.subscription.unsubscribe();
+
+  const hash = window.location.hash;
+  if (hash.includes('access_token=') || hash.includes('error=')) {
+    const errorMatch = hash.match(/error_description=([^&]+)/);
+    if (errorMatch) {
+      showError('Auth greska', decodeURIComponent(errorMatch[1].replace(/\+/g, ' ')));
+      return;
+    }
+  }
+
+  // No tokens in URL — user just landed here without auth
+  if (!hash || hash.length < 10) {
+    location.replace('/login.html');
+    return;
+  }
+
+  showError('Prijava nije uspela',
+    'Sesija nije mogla biti uspostavljena. Idi nazad na login i pošalji nov magic link.');
+}
+
+pollSession();
+</script>
+</body>
+</html>
