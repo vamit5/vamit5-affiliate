@@ -127,15 +127,22 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:-0.02em;margi
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
 const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true }
+});
+
+// If URL has auth tokens (came from magic link redirect), forward to callback
+if (window.location.hash && (window.location.hash.includes('access_token=') || window.location.hash.includes('error='))) {
+  location.replace('/auth-callback.html' + window.location.hash);
+}
 
 // Auto-redirect if already logged in
 (async ()=>{
+  await new Promise(r => setTimeout(r, 300)); // give supabase-js time to init
   const { data: { session } } = await supabase.auth.getSession();
   if(session){
-    // Check if admin or athlete
     const { data: admin } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle();
-    location.href = admin ? '/admin.html' : '/login.html';
+    location.replace(admin ? '/admin.html' : '/dashboard.html');
   }
 })();
 
@@ -159,7 +166,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
 
   const { error } = await supabase.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.origin + '/login.html' }
+    options: { emailRedirectTo: window.location.origin + '/auth-callback.html' }
   });
 
   if(error){
@@ -176,7 +183,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
 document.getElementById('googleBtn').addEventListener('click', async ()=>{
   const { error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/login.html' }
+    options: { redirectTo: window.location.origin + '/auth-callback.html' }
   });
   if(error) showError(error.message);
 });
