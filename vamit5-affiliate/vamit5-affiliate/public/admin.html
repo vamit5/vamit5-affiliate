@@ -134,6 +134,7 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
       <button data-section="sales">Prodaje</button>
       <button data-section="payouts">Isplate</button>
       <button data-section="challenges">Izazovi</button>
+      <button data-section="content">Sadrzaj</button>
     </nav>
     <button class="logout-btn" onclick="logout()">Logout</button>
   </aside>
@@ -197,9 +198,47 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
 
       <div class="section" id="sec-challenges">
         <div class="card">
-          <div class="card-head"><h2>Dnevni izazovi</h2><button class="btn brand" onclick="generateChallenges()">Generisi za danas</button></div>
-          <table><thead><tr><th>Datum</th><th>Tip</th><th>Naslov</th><th>Cilj</th><th>XP</th></tr></thead>
-            <tbody id="challengesBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
+          <div class="card-head"><h2>Dnevni izazovi</h2><button class="btn brand" onclick="generateChallenges()">Auto-generisi za danas</button></div>
+          <table><thead><tr><th>Datum</th><th>Tip</th><th>Naslov</th><th>Cilj</th><th>XP</th><th>Akcije</th></tr></thead>
+            <tbody id="challengesBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Dodaj custom izazov za danas</h2></div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
+            <input id="cchType" placeholder="Tip (npr. first_sale, reels, stories, clicks)" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px" value="reels">
+            <input id="cchEmoji" placeholder="Emoji" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px" value="🎬">
+            <input id="cchTitle" placeholder="Naslov (Reel maraton)" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px;grid-column:1/-1">
+            <input id="cchDesc" placeholder="Opis" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px;grid-column:1/-1">
+            <input id="cchTarget" type="number" placeholder="Cilj (5)" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px" value="3">
+            <input id="cchXP" type="number" placeholder="XP nagrada (500)" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px" value="500">
+          </div>
+          <button class="btn green" onclick="addCustomChallenge()">Dodaj custom izazov</button>
+        </div>
+      </div>
+
+      <div class="section" id="sec-content">
+        <div class="card">
+          <div class="card-head"><h2>Banner obavestenja (gore u dashboardu atlete)</h2><button class="btn brand" onclick="saveSetting('athlete_announcement')">Snimi</button></div>
+          <input id="annTitle" placeholder="Naslov (npr. Mesec maja)" style="width:100%;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;margin-bottom:8px">
+          <textarea id="annText" placeholder="Tekst banner-a (npr. Ko zatvori 5 prodaja u maju dobija +1000 XP bonus!)" style="width:100%;min-height:60px;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;resize:vertical"></textarea>
+          <div style="font-size:11px;color:var(--mute);margin-top:8px">Ostavi prazno za sakrij banner.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Motivacione poruke (rotiraju u hero-u)</h2><button class="btn brand" onclick="saveSetting('motiv_quotes')">Snimi</button></div>
+          <textarea id="motivQuotes" placeholder="Jedna poruka po redu" style="width:100%;min-height:140px;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;resize:vertical"></textarea>
+          <div style="font-size:11px;color:var(--mute);margin-top:8px">Atleta vidi random jednu pri svakom otvaranju dashboarda.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Welcome poruka (default tekst u hero)</h2><button class="btn brand" onclick="saveSetting('default_welcome')">Snimi</button></div>
+          <textarea id="welcomeText" placeholder="Tvoj atleta dashboard. Kopiraj affiliate linkove..." style="width:100%;min-height:80px;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;resize:vertical"></textarea>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h2>Paketi (toggle koji su aktivni za atlete)</h2><button class="btn ghost" onclick="loadProducts()">Refresh</button></div>
+          <table><thead><tr><th>Naziv</th><th>Slug</th><th>Cena (€)</th><th>Trajanje</th><th>Status</th><th>Akcije</th></tr></thead>
+            <tbody id="productsBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
         </div>
       </div>
     </div>
@@ -302,6 +341,7 @@ document.querySelectorAll('aside nav button').forEach(function(b){
     if (sec === 'sales') loadSales();
     if (sec === 'payouts') loadPayouts();
     if (sec === 'challenges') loadChallenges();
+    if (sec === 'content') { loadContent(); loadProducts(); }
   });
 });
 
@@ -419,7 +459,8 @@ window.loadChallenges = async function(){
         '<td>' + escapeHtml(c.type) + '</td>' +
         '<td>' + (c.emoji || '') + ' ' + escapeHtml(c.title) + '</td>' +
         '<td>' + (c.target || 0) + '</td>' +
-        '<td>+' + (c.xp_reward || 0) + ' XP</td></tr>';
+        '<td>+' + (c.xp_reward || 0) + ' XP</td>' +
+        '<td><button class="btn red" onclick="deleteChallenge(\'' + c.id + '\')">Obrisi</button></td></tr>';
     }).join('');
   } catch(e){ document.getElementById('challengesBody').innerHTML = '<tr><td colspan="5" class="empty">Greska: ' + e.message + '</td></tr>'; }
 };
@@ -450,6 +491,15 @@ window.rejectApp = async function(id){
     if (error){ alert('Greska: ' + error.message); return; }
     alert('Aplikacija odbijena.');
     loadApplications();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.deleteChallenge = async function(id){
+  if (!confirm('Obrisi izazov?')) return;
+  try {
+    const { error } = await supabase.from('challenges').delete().eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadChallenges();
   } catch(e){ alert('Greska: ' + e.message); }
 };
 
@@ -492,6 +542,87 @@ window.toggleMobileMenu = function(){
 window.closeMobileMenu = function(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('mobileOverlay').classList.remove('show');
+};
+
+window.loadProducts = async function(){
+  try {
+    const { data, error } = await supabase.from('products').select('*').order('display_order');
+    if (error) throw error;
+    const body = document.getElementById('productsBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Nema paketa.</td></tr>'; return; }
+    body.innerHTML = data.map(function(p){
+      return '<tr><td><b>' + escapeHtml(p.name) + '</b></td>' +
+        '<td><code>' + p.slug + '</code></td>' +
+        '<td>' + Number(p.price_eur).toFixed(2) + '</td>' +
+        '<td>' + p.duration_months + ' mes</td>' +
+        '<td><span class="tag ' + (p.is_active ? 'approved' : 'pending') + '">' + (p.is_active ? 'AKTIVAN' : 'NEAKTIVAN') + '</span></td>' +
+        '<td><button class="btn ghost" onclick="toggleProduct(\'' + p.id + '\',' + (!p.is_active) + ')">' + (p.is_active ? 'Iskljuci' : 'Ukljuci') + '</button></td></tr>';
+    }).join('');
+  } catch(e){ document.getElementById('productsBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.toggleProduct = async function(id, active){
+  try {
+    const { error } = await supabase.from('products').update({ is_active: active }).eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadProducts();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.addCustomChallenge = async function(){
+  const today = new Date().toISOString().split('T')[0];
+  const ch = {
+    challenge_date: today,
+    type: document.getElementById('cchType').value || 'reels',
+    title: document.getElementById('cchTitle').value,
+    description: document.getElementById('cchDesc').value,
+    emoji: document.getElementById('cchEmoji').value || '🎯',
+    target: parseInt(document.getElementById('cchTarget').value) || 1,
+    xp_reward: parseInt(document.getElementById('cchXP').value) || 100
+  };
+  if (!ch.title) { alert('Naslov je obavezan.'); return; }
+  try {
+    const { error } = await supabase.from('challenges').insert(ch);
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert('Custom izazov dodat!');
+    document.getElementById('cchTitle').value = '';
+    document.getElementById('cchDesc').value = '';
+    loadChallenges();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.loadContent = async function(){
+  try {
+    const { data } = await supabase.from('site_settings').select('*');
+    const map = {};
+    (data || []).forEach(function(r){ map[r.key] = r.value || {}; });
+
+    const ann = map.athlete_announcement || {};
+    document.getElementById('annTitle').value = ann.title || '';
+    document.getElementById('annText').value = ann.text || '';
+
+    const motiv = map.motiv_quotes || {};
+    document.getElementById('motivQuotes').value = (motiv.quotes || []).join('\n');
+
+    const wel = map.default_welcome || {};
+    document.getElementById('welcomeText').value = wel.text || '';
+  } catch(e){ console.error('content load failed', e); }
+};
+
+window.saveSetting = async function(key){
+  let value = {};
+  if (key === 'athlete_announcement') {
+    value = { title: document.getElementById('annTitle').value, text: document.getElementById('annText').value };
+  } else if (key === 'motiv_quotes') {
+    value = { quotes: document.getElementById('motivQuotes').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean) };
+  } else if (key === 'default_welcome') {
+    value = { text: document.getElementById('welcomeText').value };
+  }
+  try {
+    const { error } = await supabase.from('site_settings').upsert({ key: key, value: value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert('Snimljeno!');
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
 window.logout = async function(){
