@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VAMIT-5 · Admin Console</title>
 <style>
-:root{--bg:#05060a;--surface:rgba(20,24,42,0.85);--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--brand:#00f0ff;--brand2:#7a5bff;--lime:#a6ff3b;--gold:#ffc24b;--red:#ff4d5e;--border:rgba(255,255,255,0.08)}
+:root{--bg:#05060a;--surface:rgba(20,24,42,0.85);--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--brand:#00f0ff;--brand2:#7a5bff;--brand3:#ff3b9a;--lime:#a6ff3b;--gold:#ffc24b;--red:#ff4d5e;--border:rgba(255,255,255,0.08)}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.4),transparent 60%),radial-gradient(700px 400px at 70% 80%,rgba(0,240,255,0.3),transparent 60%)}
@@ -21,50 +21,91 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .reset-btn.show{display:inline-block}
 .loading.hidden{display:none}
 
-.app{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:24px 20px 80px}
+.app{position:relative;z-index:1;display:grid;grid-template-columns:220px 1fr;min-height:100vh}
 
-.topbar{display:flex;align-items:center;gap:14px;margin-bottom:24px;flex-wrap:wrap}
-.brand{display:flex;align-items:center;gap:10px}
-.brand .mark{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));text-align:center;line-height:38px;font-weight:900;font-size:13px;color:#fff}
-.brand b{font-size:15px;font-weight:900}
-.user{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--dim);font-family:monospace}
-.btn{padding:9px 14px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border)}
-.btn:hover{background:rgba(255,255,255,0.1)}
-.btn.red{background:rgba(255,77,94,0.1);border-color:rgba(255,77,94,0.3);color:#ffb0b8}
-.btn.green{background:linear-gradient(135deg,var(--lime),#7cc94b);color:#0a0c14;border:none}
-.btn.brand{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none}
+aside{position:sticky;top:0;height:100vh;padding:20px 14px;border-right:1px solid var(--border);background:linear-gradient(180deg,rgba(10,12,20,0.85),rgba(10,12,20,0.5));backdrop-filter:blur(18px);display:flex;flex-direction:column;gap:6px;z-index:30}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px;margin-bottom:10px}
+.brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));text-align:center;line-height:34px;font-weight:900;font-size:13px;color:#fff}
+.brand b{font-size:13px;font-weight:900;letter-spacing:0.02em}
+.brand small{display:block;font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em;margin-top:2px}
+nav{display:flex;flex-direction:column;gap:2px;flex:1}
+nav button{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:9px;background:transparent;border:none;color:var(--dim);font-family:inherit;font-size:12.5px;text-align:left;cursor:pointer;font-weight:600}
+nav button:hover{background:rgba(255,255,255,0.04);color:var(--text)}
+nav button.active{background:linear-gradient(90deg,rgba(122,91,255,0.18),rgba(0,240,255,0.06));color:var(--text)}
+nav .badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:6px;font-weight:800}
+.logout-btn{margin-top:auto;padding:10px 12px;border-radius:9px;background:rgba(255,77,94,0.06);border:1px solid rgba(255,77,94,0.2);color:#ffb0b8;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left}
+.logout-btn:hover{background:rgba(255,77,94,0.12)}
 
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+main{padding:0;min-height:100vh}
+.topbar{display:flex;align-items:center;gap:14px;padding:14px 24px;border-bottom:1px solid var(--border);background:rgba(10,12,20,0.5);backdrop-filter:blur(18px);position:sticky;top:0;z-index:20}
+.topbar h1{font-size:17px;font-weight:800}
+.topbar .meta{margin-left:auto;color:var(--mute);font-size:11.5px;font-family:monospace}
+.mobile-menu-btn{display:none;width:36px;height:36px;border-radius:9px;background:rgba(20,24,42,0.9);border:1px solid var(--border);color:var(--text);align-items:center;justify-content:center;cursor:pointer;font-family:inherit;flex-shrink:0}
+.mobile-menu-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2}
+
+.content{padding:22px 24px 60px;display:flex;flex-direction:column;gap:18px}
+.section{display:none}
+.section.active{display:flex;flex-direction:column;gap:16px}
+
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
 .kpi{padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
 .kpi .l{font-size:10px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:6px}
-.kpi .v{font-size:24px;font-weight:800;letter-spacing:-0.01em}
+.kpi .v{font-size:22px;font-weight:800;letter-spacing:-0.01em}
+.kpi .v small{font-size:13px;color:var(--mute);font-weight:600}
 
-.section{padding:20px;border-radius:18px;background:var(--surface);border:1px solid var(--border);margin-bottom:16px;backdrop-filter:blur(20px);overflow-x:auto}
-.section h2{font-size:16px;font-weight:800;margin-bottom:14px}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
-th{text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--mute);font-weight:700;border-bottom:1px solid var(--border)}
-td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:18px;backdrop-filter:blur(18px);overflow-x:auto}
+.card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.card-head h2{font-size:15px;font-weight:800}
+
+table{width:100%;border-collapse:collapse;font-size:12.5px;min-width:560px}
+th{text-align:left;padding:9px 11px;font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--mute);font-weight:700;border-bottom:1px solid var(--border)}
+td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
 .tag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase}
 .tag.pending{background:rgba(255,194,75,0.12);color:var(--gold)}
 .tag.approved{background:rgba(166,255,59,0.12);color:var(--lime)}
 .tag.rejected{background:rgba(255,77,94,0.12);color:#ffb0b8}
-.actions{display:flex;gap:6px;flex-wrap:wrap}
-.empty{text-align:center;padding:30px;color:var(--mute);font-size:13px}
+.tag.confirmed{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.refunded{background:rgba(255,77,94,0.12);color:#ffb0b8}
+.tag.paid{background:rgba(0,240,255,0.12);color:var(--brand)}
+.tag.recruit{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.pro{background:rgba(0,240,255,0.12);color:var(--brand)}
+.tag.commando{background:rgba(255,194,75,0.12);color:var(--gold)}
+.tag.elite{background:rgba(255,59,154,0.12);color:var(--brand3)}
+
+.btn{padding:7px 12px;border-radius:7px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:11px}
+.btn.green{background:linear-gradient(135deg,var(--lime),#7cc94b);color:#0a0c14}
+.btn.red{background:rgba(255,77,94,0.1);border:1px solid rgba(255,77,94,0.3);color:#ffb0b8}
+.btn.brand{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14}
+.btn.ghost{background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border)}
+.actions{display:flex;gap:5px;flex-wrap:wrap}
+.empty{text-align:center;padding:30px;color:var(--mute);font-size:12px}
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal.show{display:flex}
-.modal .box{max-width:520px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:24px}
-.modal h3{font-size:16px;margin-bottom:14px;font-weight:800}
-.modal textarea{width:100%;min-height:80px;padding:10px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:monospace;font-size:11px}
-.modal .actions{margin-top:14px;justify-content:flex-end}
-.modal p{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:10px}
+.modal .box{max-width:520px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:22px}
+.modal h3{font-size:16px;margin-bottom:12px;font-weight:800}
+.modal textarea{width:100%;min-height:80px;padding:10px;border-radius:7px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:monospace;font-size:11px}
+.modal .modal-actions{margin-top:14px;display:flex;gap:8px;justify-content:flex-end}
+.modal p{font-size:13px;color:var(--dim);line-height:1.5;margin-bottom:8px}
 
+.mobile-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:25;display:none;backdrop-filter:blur(4px)}
+.mobile-overlay.show{display:block}
+
+@media(max-width:980px){
+  .app{grid-template-columns:1fr}
+  aside{position:fixed;left:-260px;top:0;height:100vh;width:240px;transition:left .3s;z-index:50}
+  aside.open{left:0;box-shadow:8px 0 32px rgba(0,0,0,0.5)}
+  .mobile-menu-btn{display:flex}
+}
 @media(max-width:768px){
-  .app{padding:16px 14px 60px}
-  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .topbar{padding:12px 14px}
+  .topbar h1{font-size:14px}
+  .topbar .meta{font-size:10px}
+  .content{padding:14px 12px 60px}
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi{padding:12px}
   .kpi .v{font-size:18px}
-  .section{padding:14px}
-  .section h2{font-size:14px}
+  .card{padding:14px}
 }
 </style>
 </head>
@@ -80,36 +121,99 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
 </div>
 
 <div class="app" id="app" style="display:none">
-  <div class="topbar">
-    <div class="brand"><div class="mark">A</div><b>VAMIT-5 ADMIN</b></div>
-    <div class="user"><span id="adminEmail">...</span><button class="btn red" onclick="logout()">Logout</button></div>
-  </div>
+  <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileMenu()"></div>
+  <aside id="sidebar">
+    <div class="brand">
+      <div class="mark">A</div>
+      <div><b>VAMIT-5</b><small>Admin</small></div>
+    </div>
+    <nav>
+      <button class="active" data-section="overview">Overview</button>
+      <button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
+      <button data-section="athletes">Atlete</button>
+      <button data-section="sales">Prodaje</button>
+      <button data-section="payouts">Isplate</button>
+      <button data-section="challenges">Izazovi</button>
+    </nav>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </aside>
 
-  <div class="kpi-row">
-    <div class="kpi"><div class="l">Atlete (aktivne)</div><div class="v" id="kpiAthletes">0</div></div>
-    <div class="kpi"><div class="l">Pending prijave</div><div class="v" id="kpiPending">0</div></div>
-    <div class="kpi"><div class="l">Prodaje (mesec)</div><div class="v" id="kpiSales">0</div></div>
-    <div class="kpi"><div class="l">Provizija (mesec €)</div><div class="v" id="kpiCommission">0</div></div>
-  </div>
+  <main>
+    <div class="topbar">
+      <button class="mobile-menu-btn" onclick="toggleMobileMenu()" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 6h18M3 12h18M3 18h18"/></svg>
+      </button>
+      <h1 id="sectionTitle">Overview</h1>
+      <div class="meta" id="adminEmail">...</div>
+    </div>
 
-  <div class="section">
-    <h2>Aplikacije</h2>
-    <table><thead><tr><th>Datum</th><th>Ime</th><th>Email</th><th>IG</th><th>Status</th><th>Akcije</th></tr></thead>
-    <tbody id="appsBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
-  </div>
+    <div class="content">
+      <div class="section active" id="sec-overview">
+        <div class="kpi-row">
+          <div class="kpi"><div class="l">Atlete</div><div class="v" id="kpiAthletes">0</div></div>
+          <div class="kpi"><div class="l">Pending prijave</div><div class="v" id="kpiPending">0</div></div>
+          <div class="kpi"><div class="l">Prodaje (mesec)</div><div class="v" id="kpiSales">0</div></div>
+          <div class="kpi"><div class="l">Provizija (€)</div><div class="v" id="kpiCommission">0</div></div>
+          <div class="kpi"><div class="l">Klikovi (7d)</div><div class="v" id="kpiClicks">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Najnovija aktivnost</h2></div>
+          <table><thead><tr><th>Vreme</th><th>Tip</th><th>Naslov</th></tr></thead>
+            <tbody id="activityBody"><tr><td colspan="3" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
 
-  <div class="section">
-    <h2>Atlete</h2>
-    <table><thead><tr><th>Username</th><th>Ime</th><th>Email</th><th>Tier</th><th>XP</th><th>Streak</th></tr></thead>
-    <tbody id="athletesBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
-  </div>
+      <div class="section" id="sec-applications">
+        <div class="card">
+          <div class="card-head"><h2>Aplikacije</h2><button class="btn ghost" onclick="loadApplications()">Refresh</button></div>
+          <table><thead><tr><th>Datum</th><th>Ime</th><th>Email</th><th>IG</th><th>Drzava</th><th>Status</th><th>Akcije</th></tr></thead>
+            <tbody id="appsBody"><tr><td colspan="7" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="section" id="sec-athletes">
+        <div class="card">
+          <div class="card-head"><h2>Atlete</h2><button class="btn ghost" onclick="loadAthletes()">Refresh</button></div>
+          <table><thead><tr><th>Username</th><th>Ime</th><th>Email</th><th>Tier</th><th>XP</th><th>Streak</th><th>Stripe</th></tr></thead>
+            <tbody id="athletesBody"><tr><td colspan="7" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="section" id="sec-sales">
+        <div class="card">
+          <div class="card-head"><h2>Prodaje</h2><button class="btn ghost" onclick="loadSales()">Refresh</button></div>
+          <table><thead><tr><th>Vreme</th><th>Atleta</th><th>Paket</th><th>Iznos (€)</th><th>Provizija (€)</th><th>Status</th></tr></thead>
+            <tbody id="salesBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="section" id="sec-payouts">
+        <div class="card">
+          <div class="card-head"><h2>Isplate</h2><button class="btn brand" onclick="triggerPayouts()">Pokreni mesecne isplate</button></div>
+          <table><thead><tr><th>Period</th><th>Atleta</th><th>Iznos (€)</th><th>Status</th><th>Datum</th></tr></thead>
+            <tbody id="payoutsBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="section" id="sec-challenges">
+        <div class="card">
+          <div class="card-head"><h2>Dnevni izazovi</h2><button class="btn brand" onclick="generateChallenges()">Generisi za danas</button></div>
+          <table><thead><tr><th>Datum</th><th>Tip</th><th>Naslov</th><th>Cilj</th><th>XP</th></tr></thead>
+            <tbody id="challengesBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>
 
 <div class="modal" id="modal">
   <div class="box">
     <h3 id="modalTitle">...</h3>
     <div id="modalBody"></div>
-    <div class="actions"><button class="btn" onclick="closeModal()">Zatvori</button></div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="modalCopyBtn" style="display:none">Kopiraj link</button>
+      <button class="btn brand" onclick="closeModal()">Zatvori</button>
+    </div>
   </div>
 </div>
 
@@ -157,11 +261,7 @@ if (!session) {
   });
 }
 
-if (!session) {
-  setStatus('Nema sesije, preusmerenje na login...');
-  location.replace('/login.html');
-  throw new Error('No session');
-}
+if (!session) { location.replace('/login.html'); throw new Error('No session'); }
 
 setStatus('Provera admin permisija...');
 let adminData = null;
@@ -172,99 +272,168 @@ try {
   ]);
   if (r.error) throw new Error(r.error.message);
   adminData = r.data;
-} catch(e) {
-  showFatal('Greska baze: ' + e.message);
-  throw e;
-}
+} catch(e) { showFatal('Greska baze: ' + e.message); throw e; }
 
-if (!adminData) {
-  setStatus('Nisi admin — preusmerenje...');
-  alert('Pristup zabranjen — nisi admin.');
-  location.replace('/dashboard.html');
-  throw new Error('Not admin');
-}
+if (!adminData) { alert('Pristup zabranjen — nisi admin.'); location.replace('/dashboard.html'); throw new Error('Not admin'); }
 
 document.getElementById('adminEmail').textContent = adminData.email;
+setStatus('Ucitavanje...');
 
-setStatus('Ucitavanje podataka...');
-
-function fmtDate(s){ if(!s) return '—'; const d = new Date(s); return d.toLocaleDateString('sr',{ day:'2-digit', month:'short', year:'numeric'}); }
+function fmtDate(s){ if(!s) return '-'; const d = new Date(s); return d.toLocaleDateString('sr',{ day:'2-digit', month:'short', year:'2-digit'}); }
+function fmtDT(s){ if(!s) return '-'; const d = new Date(s); return d.toLocaleString('sr',{ day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'}); }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+function escapeAttr(s){ return String(s||'').replace(/'/g,'&#39;').replace(/"/g,'&quot;'); }
+
+// Section switcher
+document.querySelectorAll('aside nav button').forEach(function(b){
+  b.addEventListener('click', function(){
+    const sec = b.getAttribute('data-section');
+    document.querySelectorAll('aside nav button').forEach(function(x){ x.classList.remove('active'); });
+    b.classList.add('active');
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('active'); });
+    document.getElementById('sec-' + sec).classList.add('active');
+    document.getElementById('sectionTitle').textContent = b.textContent.trim().replace(/\s+\d+$/,'');
+    closeMobileMenu();
+    if (sec === 'sales') loadSales();
+    if (sec === 'payouts') loadPayouts();
+    if (sec === 'challenges') loadChallenges();
+  });
+});
 
 async function loadOverview(){
   try {
     const startMonth = new Date(); startMonth.setDate(1); startMonth.setHours(0,0,0,0);
-    const [aR, pR, sR] = await Promise.all([
+    const week = new Date(Date.now() - 7*86400000);
+    const [aR, pR, sR, cR, actR] = await Promise.all([
       supabase.from('athletes').select('id', { count: 'exact', head: true }),
       supabase.from('applications').select('id', { count: 'exact', head: true }).eq('status','pending'),
-      supabase.from('sales').select('commission_cents,status,created_at').gte('created_at', startMonth.toISOString())
+      supabase.from('sales').select('commission_cents,status,created_at').gte('created_at', startMonth.toISOString()),
+      supabase.from('clicks').select('id', { count: 'exact', head: true }).gte('created_at', week.toISOString()),
+      supabase.from('activity').select('*').order('created_at',{ ascending: false }).limit(20)
     ]);
     document.getElementById('kpiAthletes').textContent = aR.count || 0;
-    document.getElementById('kpiPending').textContent = pR.count || 0;
+    const pendingCount = pR.count || 0;
+    document.getElementById('kpiPending').textContent = pendingCount;
+    if (pendingCount > 0){ const b = document.getElementById('appBadge'); b.style.display='inline-block'; b.textContent = pendingCount; }
     const sales = (sR.data || []).filter(function(s){ return s.status === 'confirmed' || s.status === 'pending'; });
     document.getElementById('kpiSales').textContent = sales.length;
-    const total = sales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0);
-    document.getElementById('kpiCommission').textContent = (total / 100).toFixed(0);
+    document.getElementById('kpiCommission').textContent = (sales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0) / 100).toFixed(0);
+    document.getElementById('kpiClicks').textContent = cR.count || 0;
+    const acts = actR.data || [];
+    document.getElementById('activityBody').innerHTML = acts.length
+      ? acts.map(function(a){ return '<tr><td>' + fmtDT(a.created_at) + '</td><td><span class="tag pro">' + escapeHtml(a.type) + '</span></td><td>' + a.title + '</td></tr>'; }).join('')
+      : '<tr><td colspan="3" class="empty">Jos nema aktivnosti.</td></tr>';
   } catch(e){ console.error('overview load failed', e); }
 }
 
-async function loadApplications(){
+window.loadApplications = async function(){
   try {
-    const { data, error } = await supabase.from('applications').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('applications').select('*').order('created_at',{ ascending: false });
     if (error) throw error;
     const body = document.getElementById('appsBody');
-    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema aplikacija.</td></tr>'; return; }
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="7" class="empty">Jos nema aplikacija.</td></tr>'; return; }
     body.innerHTML = data.map(function(a){
       const actions = a.status === 'pending'
-        ? '<button class="btn green" onclick="approveApp(\'' + a.id + '\',\'' + escapeHtml(a.email).replace(/'/g,'&#39;') + '\',\'' + escapeHtml(a.full_name).replace(/'/g,'&#39;') + '\')">Odobri</button>' +
+        ? '<button class="btn green" onclick="approveApp(\'' + a.id + '\',\'' + escapeAttr(a.email) + '\',\'' + escapeAttr(a.full_name) + '\')">Odobri</button>' +
           '<button class="btn red" onclick="rejectApp(\'' + a.id + '\')">Odbij</button>'
         : '';
       return '<tr><td>' + fmtDate(a.created_at) + '</td>' +
         '<td><b>' + escapeHtml(a.full_name) + '</b></td>' +
         '<td>' + escapeHtml(a.email) + '</td>' +
         '<td>@' + escapeHtml(a.instagram_handle || '') + '</td>' +
+        '<td>' + escapeHtml(a.country || '') + '</td>' +
         '<td><span class="tag ' + a.status + '">' + a.status + '</span></td>' +
         '<td><div class="actions">' + actions + '</div></td></tr>';
     }).join('');
-  } catch(e){ document.getElementById('appsBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
-}
+  } catch(e){ document.getElementById('appsBody').innerHTML = '<tr><td colspan="7" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
 
-async function loadAthletes(){
+window.loadAthletes = async function(){
   try {
-    const { data, error } = await supabase.from('athletes').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('athletes').select('*').order('created_at',{ ascending: false });
     if (error) throw error;
     const body = document.getElementById('athletesBody');
-    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema atleta.</td></tr>'; return; }
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="7" class="empty">Jos nema atleta.</td></tr>'; return; }
     body.innerHTML = data.map(function(a){
+      const tier = (a.tier || 'recruit').toLowerCase();
+      const stripe = a.stripe_account_id ? '<span class="tag confirmed">OK</span>' : '<span class="tag pending">NE</span>';
       return '<tr><td><b>@' + escapeHtml(a.username) + '</b></td>' +
         '<td>' + escapeHtml(a.full_name) + '</td>' +
         '<td>' + escapeHtml(a.email) + '</td>' +
-        '<td><span class="tag approved">' + (a.tier || 'recruit').toUpperCase() + '</span></td>' +
+        '<td><span class="tag ' + tier + '">' + tier.toUpperCase() + '</span></td>' +
         '<td>' + (a.xp || 0) + '</td>' +
-        '<td>' + (a.current_streak || 0) + '</td></tr>';
+        '<td>' + (a.current_streak || 0) + '</td>' +
+        '<td>' + stripe + '</td></tr>';
     }).join('');
-  } catch(e){ document.getElementById('athletesBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
-}
+  } catch(e){ document.getElementById('athletesBody').innerHTML = '<tr><td colspan="7" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.loadSales = async function(){
+  try {
+    const { data, error } = await supabase.from('sales').select('*, athletes(username,full_name), products(name)').order('created_at',{ ascending: false }).limit(100);
+    if (error) throw error;
+    const body = document.getElementById('salesBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema prodaja.</td></tr>'; return; }
+    body.innerHTML = data.map(function(s){
+      const a = s.athletes || {};
+      return '<tr><td>' + fmtDT(s.created_at) + '</td>' +
+        '<td>@' + escapeHtml(a.username || '?') + '</td>' +
+        '<td>' + escapeHtml((s.products && s.products.name) || s.product_slug || '') + '</td>' +
+        '<td>' + ((s.amount_cents || 0)/100).toFixed(2) + '</td>' +
+        '<td>' + ((s.commission_cents || 0)/100).toFixed(2) + '</td>' +
+        '<td><span class="tag ' + s.status + '">' + s.status + '</span></td></tr>';
+    }).join('');
+  } catch(e){ document.getElementById('salesBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.loadPayouts = async function(){
+  try {
+    const { data, error } = await supabase.from('payouts').select('*, athletes(username)').order('created_at',{ ascending: false });
+    if (error) throw error;
+    const body = document.getElementById('payoutsBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Jos nema isplata.</td></tr>'; return; }
+    body.innerHTML = data.map(function(p){
+      return '<tr><td>' + (p.period || '-') + '</td>' +
+        '<td>@' + escapeHtml((p.athletes && p.athletes.username) || '?') + '</td>' +
+        '<td>' + ((p.amount_cents || 0)/100).toFixed(2) + '</td>' +
+        '<td><span class="tag ' + p.status + '">' + p.status + '</span></td>' +
+        '<td>' + fmtDT(p.created_at) + '</td></tr>';
+    }).join('');
+  } catch(e){ document.getElementById('payoutsBody').innerHTML = '<tr><td colspan="5" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.loadChallenges = async function(){
+  try {
+    const today = new Date().toISOString().split('T')[0];
+    const { data, error } = await supabase.from('challenges').select('*').eq('challenge_date', today);
+    if (error) throw error;
+    const body = document.getElementById('challengesBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Nema izazova za danas. Klikni "Generisi za danas".</td></tr>'; return; }
+    body.innerHTML = data.map(function(c){
+      return '<tr><td>' + c.challenge_date + '</td>' +
+        '<td>' + escapeHtml(c.type) + '</td>' +
+        '<td>' + (c.emoji || '') + ' ' + escapeHtml(c.title) + '</td>' +
+        '<td>' + (c.target || 0) + '</td>' +
+        '<td>+' + (c.xp_reward || 0) + ' XP</td></tr>';
+    }).join('');
+  } catch(e){ document.getElementById('challengesBody').innerHTML = '<tr><td colspan="5" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
 
 window.approveApp = async function(id, email, fullName){
-  if (!confirm('Odobri ' + fullName + ' (' + email + ')?\n\nKreira se atleta nalog i salje magic link.')) return;
+  if (!confirm('Odobri ' + fullName + ' (' + email + ')?')) return;
   const username = fullName.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
   try {
-    const { data, error } = await supabase.functions.invoke('approve-application', {
-      body: { application_id: id, username: username }
-    });
-    if (error) { alert('Greska: ' + error.message); return; }
-    if (data && data.error) { alert('Greska: ' + data.error); return; }
+    const { data, error } = await supabase.functions.invoke('approve-application', { body: { application_id: id, username: username } });
+    if (error){ alert('Greska: ' + error.message); return; }
+    if (data && data.error){ alert('Greska: ' + data.error); return; }
     const link = (data && data.magic_link) || '';
     const sent = data && data.email_sent;
     showModal(fullName + ' je odobren', 
       '<p>' + (sent ? 'Email poslat na ' + email : 'Email NIJE poslat — kopiraj link i posalji rucno') + '</p>' +
       '<p>Magic link (vazi 24h):</p>' +
-      '<textarea readonly>' + link + '</textarea>'
-    );
-    loadApplications();
-    loadAthletes();
-    loadOverview();
+      '<textarea readonly id="modalLink">' + link + '</textarea>',
+      link);
+    loadApplications(); loadAthletes(); loadOverview();
   } catch(e){ alert('Greska: ' + e.message); }
 };
 
@@ -272,23 +441,53 @@ window.rejectApp = async function(id){
   const reason = prompt('Razlog odbijanja:');
   if (reason === null) return;
   try {
-    const { error } = await supabase.from('applications').update({
-      status: 'rejected',
-      rejection_reason: reason,
-      reviewed_at: new Date().toISOString()
-    }).eq('id', id);
+    const { error } = await supabase.from('applications').update({ status: 'rejected', rejection_reason: reason, reviewed_at: new Date().toISOString() }).eq('id', id);
     if (error){ alert('Greska: ' + error.message); return; }
     alert('Aplikacija odbijena.');
     loadApplications();
   } catch(e){ alert('Greska: ' + e.message); }
 };
 
-function showModal(title, body){
+window.generateChallenges = async function(){
+  if (!confirm('Generisi danasnje izazove?')) return;
+  try {
+    const { data, error } = await supabase.functions.invoke('generate-challenges', { body: {} });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert((data && data.message) || ('Generisano ' + ((data && data.generated) || 0) + ' izazova.'));
+    loadChallenges();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.triggerPayouts = async function(){
+  if (!confirm('Pokreni mesecne isplate? Stripe Connect transfer ide na sve atlete.')) return;
+  try {
+    const { data, error } = await supabase.functions.invoke('monthly-payouts', { body: {} });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert((data && data.message) || 'Pokrenuto.');
+    loadPayouts();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+function showModal(title, body, copyLink){
   document.getElementById('modalTitle').textContent = title;
   document.getElementById('modalBody').innerHTML = body;
+  const cb = document.getElementById('modalCopyBtn');
+  if (copyLink){
+    cb.style.display = 'inline-flex';
+    cb.onclick = function(){ navigator.clipboard.writeText(copyLink); cb.textContent = 'Kopirano'; setTimeout(function(){ cb.textContent = 'Kopiraj link'; }, 1500); };
+  } else { cb.style.display = 'none'; }
   document.getElementById('modal').classList.add('show');
 }
 window.closeModal = function(){ document.getElementById('modal').classList.remove('show'); };
+
+window.toggleMobileMenu = function(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('mobileOverlay').classList.toggle('show');
+};
+window.closeMobileMenu = function(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('mobileOverlay').classList.remove('show');
+};
 
 window.logout = async function(){
   await supabase.auth.signOut();
@@ -300,7 +499,7 @@ loadApplications();
 loadAthletes();
 
 document.getElementById('loading').classList.add('hidden');
-document.getElementById('app').style.display = 'block';
+document.getElementById('app').style.display = 'grid';
 </script>
 </body>
 </html>
