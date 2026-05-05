@@ -1,93 +1,41 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VAMIT-5 Athletes · Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg-0:#05060a;--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;
-  --brand:#00f0ff;--brand-2:#7a5bff;--brand-3:#ff3b9a;
-}
 *{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Inter',system-ui,sans-serif;background:var(--bg-0);color:var(--text);
-  min-height:100vh;display:grid;place-items:center;padding:20px;
-  -webkit-font-smoothing:antialiased;
-}
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.4),transparent 60%),
-    radial-gradient(700px 400px at 70% 80%,rgba(0,240,255,0.3),transparent 60%);
-}
-.card{
-  position:relative;z-index:1;
-  width:100%;max-width:420px;
-  padding:36px;border-radius:24px;
-  background:rgba(20,24,42,0.85);backdrop-filter:blur(20px);
-  border:1px solid rgba(0,240,255,0.2);
-  box-shadow:0 30px 60px -20px rgba(0,0,0,0.7);
-}
-.logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:24px}
-.logo .mark{
-  width:42px;height:42px;border-radius:12px;
-  background:conic-gradient(from 180deg,var(--brand),var(--brand-2),var(--brand-3),var(--brand));
-  position:relative;display:grid;place-items:center;
-}
-.logo .mark::after{content:"";position:absolute;inset:3px;border-radius:9px;background:#0a0c14}
-.logo .mark span{position:relative;z-index:1;font-weight:900;font-size:14px;color:#fff}
-.logo b{font-size:18px;font-weight:900;letter-spacing:0.02em}
-h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:-0.02em;margin-bottom:6px}
-.sub{color:var(--dim);text-align:center;font-size:13px;margin-bottom:28px}
-
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#05060a;color:#e9ecff;min-height:100vh;display:grid;place-items:center;padding:20px}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.4),transparent 60%),radial-gradient(700px 400px at 70% 80%,rgba(0,240,255,0.3),transparent 60%)}
+.card{position:relative;z-index:1;width:100%;max-width:420px;padding:36px;border-radius:24px;background:rgba(20,24,42,0.9);backdrop-filter:blur(20px);border:1px solid rgba(0,240,255,0.2)}
+.logo{text-align:center;margin-bottom:24px}
+.logo .mark{display:inline-block;width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,#00f0ff,#7a5bff,#ff3b9a);text-align:center;line-height:42px;font-weight:900;font-size:14px;color:#fff}
+.logo b{display:block;margin-top:10px;font-size:18px;font-weight:900;letter-spacing:0.02em}
+h1{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
+.sub{color:#9aa0c4;text-align:center;font-size:13px;margin-bottom:24px}
 .field{margin-bottom:14px}
-.field label{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.12em;display:block;margin-bottom:6px}
-.field input{
-  width:100%;padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.04);color:var(--text);
-  font-family:inherit;font-size:14px;outline:none;transition:all .2s ease;
-}
-.field input:focus{border-color:var(--brand);box-shadow:0 0 0 4px rgba(0,240,255,0.12);background:rgba(255,255,255,0.06)}
-.btn{
-  width:100%;padding:13px;border-radius:11px;border:none;cursor:pointer;
-  font-family:inherit;font-weight:700;font-size:14px;
-  background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;
-  box-shadow:0 8px 24px -8px rgba(0,240,255,0.6);
-  transition:all .2s ease;margin-top:6px;
-}
-.btn:hover{transform:translateY(-1px)}
+.field label{font-size:11px;font-weight:700;color:#9aa0c4;text-transform:uppercase;letter-spacing:0.12em;display:block;margin-bottom:6px}
+.field input{width:100%;padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#e9ecff;font-family:inherit;font-size:14px;outline:none}
+.field input:focus{border-color:#00f0ff}
+.btn{width:100%;padding:13px;border-radius:11px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:14px;background:linear-gradient(135deg,#00f0ff,#7a5bff);color:#0a0c14;margin-top:6px}
 .btn:disabled{opacity:.6;cursor:wait}
-.divider{display:flex;align-items:center;gap:10px;margin:20px 0;color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:0.15em}
-.divider::before,.divider::after{content:"";flex:1;height:1px;background:rgba(255,255,255,0.08)}
-.gbtn{
-  width:100%;padding:13px;border-radius:11px;cursor:pointer;
-  font-family:inherit;font-weight:600;font-size:14px;
-  background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.12);
-  display:flex;align-items:center;justify-content:center;gap:10px;
-  transition:all .2s ease;
-}
-.gbtn:hover{background:rgba(255,255,255,0.08)}
-.foot{text-align:center;margin-top:20px;color:var(--dim);font-size:13px}
-.foot a{color:var(--brand);text-decoration:none;font-weight:600}
-.note{
-  margin-top:16px;padding:12px;border-radius:10px;
-  background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.18);
-  color:var(--dim);font-size:12px;line-height:1.5;
-}
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#0a0c14;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px}
+.foot{text-align:center;margin-top:20px;color:#9aa0c4;font-size:13px}
+.foot a{color:#00f0ff;text-decoration:none;font-weight:600}
+.note{margin-top:16px;padding:12px;border-radius:10px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.18);color:#9aa0c4;font-size:12px;line-height:1.5}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,0.3);border-top-color:#0a0c14;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px;vertical-align:-2px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .error-box{display:none;padding:10px 14px;background:rgba(255,77,94,0.1);border:1px solid rgba(255,77,94,0.35);border-radius:10px;color:#ffb0b8;font-size:13px;margin-bottom:14px}
 .error-box.show{display:block}
 .success-box{display:none;padding:14px;background:rgba(166,255,59,0.1);border:1px solid rgba(166,255,59,0.35);border-radius:10px;color:#b5ffb0;font-size:13px;margin-bottom:14px;text-align:center}
 .success-box.show{display:block}
+.reset-link{display:block;text-align:center;margin-top:14px;color:#626890;font-size:11px;text-decoration:none}
 </style>
 </head>
 <body>
 <div class="card">
   <div class="logo">
-    <div class="mark"><span>V5</span></div>
+    <div class="mark">V5</div>
     <b>VAMIT-5 ATHLETES</b>
   </div>
   <h1>Dobrodosao nazad</h1>
@@ -99,64 +47,65 @@ h1{font-size:24px;font-weight:800;text-align:center;letter-spacing:-0.02em;margi
   <form id="loginForm">
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" required placeholder="ti@gmail.com" />
+      <input id="email" type="email" required placeholder="ti@gmail.com">
     </div>
     <button type="submit" class="btn" id="submitBtn">
-      <span id="btnText">Pošalji magic link →</span>
+      <span id="btnText">Posalji magic link</span>
     </button>
   </form>
-
-  <div class="divider">ili</div>
-
-  <button class="gbtn" id="googleBtn">
-    <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8.18c0-.62-.05-1.21-.15-1.78H8.84v3.36h4.31c-.18.99-.74 1.83-1.59 2.4v1.99h2.57c1.5-1.38 2.38-3.42 2.38-5.97z"/><path fill="#34A853" d="M8.84 16.5c2.16 0 3.96-.71 5.28-1.94l-2.57-1.99c-.72.48-1.62.77-2.71.77-2.08 0-3.85-1.4-4.49-3.29H1.69v2.06c1.32 2.62 4.04 4.39 7.15 4.39z"/><path fill="#FBBC05" d="M4.35 10.05c-.16-.48-.25-.99-.25-1.55s.09-1.07.25-1.55V4.89H1.69C1.13 6.01.81 7.27.81 8.5s.32 2.49.88 3.61l2.66-2.06z"/><path fill="#EA4335" d="M8.84 3.66c1.18 0 2.23.41 3.06 1.2l2.28-2.28C12.79.92 10.99.18 8.84.18c-3.11 0-5.83 1.77-7.15 4.39l2.66 2.06c.64-1.89 2.41-3.29 4.49-3.29z"/></svg>
-    Nastavi sa Google nalogom
-  </button>
 
   <div class="foot">
     Nemas nalog? <a href="/index.html#apply">Prijavi se za audiciju</a>
   </div>
-
   <div class="note">
-    🔒 Magic link login. Bez lozinke. Klikneš link iz emaila → ulaziš. Sigurnije od bilo koje lozinke.
+    Magic link login. Bez lozinke. Klikni link iz email-a i ulazis.
   </div>
+  <a class="reset-link" href="javascript:void(0)" onclick="localStorage.clear();sessionStorage.clear();alert('Sesija ocistena. Probaj ponovo.');location.reload()">Reset sesije (ako se nesto zaglavi)</a>
 </div>
 
 <script src="/config.js"></script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
   auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true }
 });
 
-// If URL has auth tokens (came from magic link redirect), forward to callback
-if (window.location.hash && (window.location.hash.includes('access_token=') || window.location.hash.includes('error='))) {
+// If URL has tokens (came directly from magic link), forward to callback handler
+if (window.location.hash.indexOf('access_token=') > -1 || window.location.hash.indexOf('error=') > -1) {
   location.replace('/auth-callback.html' + window.location.hash);
 }
 
-// Auto-redirect if already logged in
-(async ()=>{
-  await new Promise(r => setTimeout(r, 300)); // give supabase-js time to init
-  const { data: { session } } = await supabase.auth.getSession();
-  if(session){
-    const { data: admin } = await supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle();
-    location.replace(admin ? '/admin.html' : '/dashboard.html');
-  }
+// Auto-redirect if already logged in (with timeout — never blocks form display)
+(async function() {
+  try {
+    const result = await Promise.race([
+      supabase.auth.getSession(),
+      new Promise(function(r){ setTimeout(function(){ r({ data: { session: null } }); }, 2000); })
+    ]);
+    const session = result.data && result.data.session;
+    if (session && session.user) {
+      const { data: admin } = await Promise.race([
+        supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle(),
+        new Promise(function(r){ setTimeout(function(){ r({ data: null }); }, 2000); })
+      ]);
+      location.replace(admin ? '/admin.html' : '/dashboard.html');
+    }
+  } catch (e) { console.log('[login] auto-redirect skipped', e); }
 })();
 
-const showError = (msg)=>{
+const showError = function(msg) {
   const e = document.getElementById('errorBox');
-  e.textContent = msg; e.classList.add('show');
-  setTimeout(()=>e.classList.remove('show'), 6000);
+  e.textContent = msg;
+  e.classList.add('show');
+  setTimeout(function(){ e.classList.remove('show'); }, 6000);
 };
-const showSuccess = (msg)=>{
-  document.getElementById('successBox').textContent = msg;
-  document.getElementById('successBox').classList.add('show');
+const showSuccess = function(msg) {
+  const s = document.getElementById('successBox');
+  s.textContent = msg;
+  s.classList.add('show');
 };
 
-document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const email = document.getElementById('email').value.trim().toLowerCase();
   const btn = document.getElementById('submitBtn');
@@ -165,27 +114,19 @@ document.getElementById('loginForm').addEventListener('submit', async (e)=>{
   txt.innerHTML = '<span class="spinner"></span>Slanje...';
 
   const { error } = await supabase.auth.signInWithOtp({
-    email,
+    email: email,
     options: { emailRedirectTo: window.location.origin + '/auth-callback.html' }
   });
 
-  if(error){
+  if (error) {
     showError(error.message);
     btn.disabled = false;
-    txt.textContent = 'Pošalji magic link →';
+    txt.textContent = 'Posalji magic link';
   } else {
-    showSuccess('✅ Link poslat! Proveri email (i spam folder).');
+    showSuccess('Link poslat! Proveri email (i spam folder).');
     btn.disabled = true;
     txt.textContent = 'Link poslat';
   }
-});
-
-document.getElementById('googleBtn').addEventListener('click', async ()=>{
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin + '/auth-callback.html' }
-  });
-  if(error) showError(error.message);
 });
 </script>
 </body>
