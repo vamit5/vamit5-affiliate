@@ -86,7 +86,7 @@ if (window.location.hash.indexOf('access_token=') > -1 || window.location.hash.i
     const session = result.data && result.data.session;
     if (session && session.user) {
       const { data: admin } = await Promise.race([
-        supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle(),
+        supabase.from('admins').select('id').eq('email', session.user.email).maybeSingle(),
         new Promise(function(r){ setTimeout(function(){ r({ data: null }); }, 2000); })
       ]);
       location.replace(admin ? '/admin.html' : '/dashboard.html');
