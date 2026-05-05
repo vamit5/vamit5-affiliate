@@ -184,7 +184,7 @@ if (!session) {
 setStatus('Provera role...');
 try {
   const r = await Promise.race([
-    supabase.from('admins').select('id').eq('id', session.user.id).maybeSingle(),
+    supabase.from('admins').select('id,email').eq('email', session.user.email).maybeSingle(),
     new Promise(function(rs){ setTimeout(function(){ rs({ data: null }); }, 3000); })
   ]);
   if (r.data) { location.replace('/admin.html'); throw new Error('Is admin'); }
