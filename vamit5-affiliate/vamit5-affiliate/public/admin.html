@@ -272,7 +272,7 @@ setStatus('Provera admin permisija...');
 let adminData = null;
 try {
   const r = await Promise.race([
-    supabase.from('admins').select('*').eq('id', session.user.id).maybeSingle(),
+    supabase.from('admins').select('*').eq('email', session.user.email).maybeSingle(),
     new Promise(function(rs){ setTimeout(function(){ rs({ data: null, error: { message: 'DB timeout 5s' } }); }, 5000); })
   ]);
   if (r.error) throw new Error(r.error.message);
