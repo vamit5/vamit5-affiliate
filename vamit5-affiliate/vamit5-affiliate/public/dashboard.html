@@ -142,9 +142,16 @@ const showFatal = function(msg){
 };
 
 setStatus('Provera tokena...');
-if (window.location.hash.indexOf('access_token=') > -1 || window.location.hash.indexOf('error=') > -1) {
-  location.replace('/auth-callback.html' + window.location.hash);
-  throw new Error('redirect to callback');
+// If URL has error in hash, show it
+const errMatch = window.location.hash.match(/error_description=([^&]+)/);
+if (errMatch) {
+  showFatal('Auth greska: ' + decodeURIComponent(errMatch[1].replace(/\+/g, ' ')));
+  throw new Error('Auth error in URL hash');
+}
+// If URL has access tokens, give supabase-js time to process them
+if (window.location.hash.indexOf('access_token=') > -1) {
+  setStatus('Obrada magic link tokena...');
+  await new Promise(function(r){ setTimeout(r, 800); });
 }
 
 setStatus('Provera sesije...');
