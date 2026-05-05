@@ -72,7 +72,8 @@ const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
 
 // If URL has tokens (came directly from magic link), forward to callback handler
 if (window.location.hash.indexOf('access_token=') > -1 || window.location.hash.indexOf('error=') > -1) {
-  location.replace('/auth-callback.html' + window.location.hash);
+  // hash will be handled by dashboard.html
+  location.replace('/dashboard.html' + window.location.hash);
 }
 
 // Auto-redirect if already logged in (with timeout — never blocks form display)
@@ -115,7 +116,7 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email,
-    options: { emailRedirectTo: window.location.origin + '/auth-callback.html' }
+    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
   });
 
   if (error) {
