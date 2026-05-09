@@ -679,6 +679,22 @@ window.togglePush = async function(){
   } catch(e){}
 })();
 
+// Show notification popup if came from notification click
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const nt = params.get('notif'); const nb = params.get('body');
+  if (nt || nb) {
+    const div = document.createElement('div');
+    div.id = 'notifPopup';
+    div.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);max-width:420px;width:90%;padding:18px 22px;border-radius:14px;background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(122,91,255,0.08));border:1.5px solid rgba(0,240,255,0.4);backdrop-filter:blur(20px);z-index:300;box-shadow:0 16px 40px rgba(0,0,0,0.5)';
+    div.innerHTML = '<div style="display:flex;gap:12px;align-items:flex-start"><div style="font-size:24px">📢</div><div style="flex:1"><div style="font-weight:800;font-size:14px;margin-bottom:4px">' + (nt || 'Notifikacija') + '</div><div style="color:var(--dim);font-size:13px;line-height:1.5">' + (nb || '') + '</div></div><button onclick="this.parentElement.parentElement.remove()" style="background:none;border:none;color:var(--mute);cursor:pointer;font-size:18px;padding:0;line-height:1">×</button></div>';
+    document.body.appendChild(div);
+    // Clean URL
+    const cleanUrl = window.location.pathname;
+    history.replaceState({}, '', cleanUrl);
+  }
+})();
+
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
 
