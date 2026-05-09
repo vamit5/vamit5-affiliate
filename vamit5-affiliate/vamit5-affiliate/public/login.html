@@ -47,18 +47,29 @@ h1{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
   <form id="loginForm">
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" required placeholder="ti@gmail.com">
+      <input id="email" type="email" required placeholder="ti@gmail.com" autocomplete="email">
     </div>
     <button type="submit" class="btn" id="submitBtn">
-      <span id="btnText">Posalji magic link</span>
+      <span id="btnText">Posalji 6-cifreni kod</span>
     </button>
+  </form>
+
+  <form id="otpForm" style="display:none;margin-top:14px">
+    <div class="field">
+      <label for="code">Kod iz email-a (6 cifara)</label>
+      <input id="code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" required placeholder="123456" autocomplete="one-time-code" style="text-align:center;font-size:20px;letter-spacing:6px;font-weight:800">
+    </div>
+    <button type="submit" class="btn" id="verifyBtn">
+      <span id="verifyText">Potvrdi i uloguj se</span>
+    </button>
+    <div style="text-align:center;margin-top:12px"><a href="javascript:void(0)" onclick="resetForm()" style="color:var(--brand);font-size:12px;text-decoration:none">Zatrazi nov kod</a></div>
   </form>
 
   <div class="foot">
     Nemas nalog? <a href="/index.html#apply">Prijavi se za audiciju</a>
   </div>
   <div class="note">
-    Magic link login. Bez lozinke. Klikni link iz email-a i ulazis.
+    Bez lozinke. Dobijas 6-cifreni kod na email — unesi ga ispod. Radi i u PWA aplikaciji (iOS Home Screen ikoni).
   </div>
   <a class="reset-link" href="javascript:void(0)" onclick="localStorage.clear();sessionStorage.clear();alert('Sesija ocistena. Probaj ponovo.');location.reload()">Reset sesije (ako se nesto zaglavi)</a>
 </div>
@@ -106,6 +117,8 @@ const showSuccess = function(msg) {
   s.classList.add('show');
 };
 
+let savedEmail = '';
+
 document.getElementById('loginForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const email = document.getElementById('email').value.trim().toLowerCase();
@@ -116,19 +129,58 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
 
   const { error } = await supabase.auth.signInWithOtp({
     email: email,
-    options: { emailRedirectTo: window.location.origin + '/dashboard.html' }
+    options: { shouldCreateUser: true }
   });
 
   if (error) {
     showError(error.message);
     btn.disabled = false;
-    txt.textContent = 'Posalji magic link';
+    txt.textContent = 'Posalji 6-cifreni kod';
   } else {
-    showSuccess('Link poslat! Proveri email (i spam folder).');
-    btn.disabled = true;
-    txt.textContent = 'Link poslat';
+    savedEmail = email;
+    showSuccess('Kod poslat na ' + email + '. Proveri email (i spam).');
+    document.getElementById('loginForm').style.display = 'none';
+    document.getElementById('otpForm').style.display = 'block';
+    setTimeout(function(){ document.getElementById('code').focus(); }, 100);
   }
 });
+
+document.getElementById('otpForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const code = document.getElementById('code').value.trim();
+  const btn = document.getElementById('verifyBtn');
+  const txt = document.getElementById('verifyText');
+  btn.disabled = true;
+  txt.innerHTML = '<span class="spinner"></span>Provera...';
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: savedEmail,
+    token: code,
+    type: 'email'
+  });
+
+  if (error) {
+    showError(error.message);
+    btn.disabled = false;
+    txt.textContent = 'Potvrdi i uloguj se';
+    return;
+  }
+
+  if (data && data.session) {
+    showSuccess('Uspesno! Preusmeravam...');
+    const { data: admin } = await supabase.from('admins').select('id').eq('email', savedEmail).maybeSingle();
+    setTimeout(function(){ location.replace(admin ? '/admin.html' : '/dashboard.html'); }, 600);
+  }
+});
+
+window.resetForm = function(){
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('otpForm').style.display = 'none';
+  document.getElementById('code').value = '';
+  document.getElementById('submitBtn').disabled = false;
+  document.getElementById('btnText').textContent = 'Posalji 6-cifreni kod';
+  document.getElementById('successBox').classList.remove('show');
+};
 </script>
 </body>
 </html>
