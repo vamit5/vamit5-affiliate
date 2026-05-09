@@ -108,6 +108,16 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .feed .item .ago{color:var(--mute);font-size:10.5px;white-space:nowrap;margin-top:2px}
 .feed .empty{text-align:center;padding:30px;color:var(--mute);font-size:12.5px}
 
+.push-banner-big{padding:18px 20px;border-radius:15px;background:linear-gradient(135deg,rgba(0,240,255,0.12),rgba(122,91,255,0.08));border:1.5px solid rgba(0,240,255,0.35);display:flex;align-items:center;gap:14px;flex-wrap:wrap;box-shadow:0 12px 32px -16px rgba(0,240,255,0.4)}
+.push-banner-big.cta{background:linear-gradient(135deg,rgba(255,194,75,0.15),rgba(255,59,154,0.08));border-color:rgba(255,194,75,0.45);animation:pulseGlow 2.4s ease-in-out infinite}
+.push-banner-big.on{background:linear-gradient(135deg,rgba(166,255,59,0.1),rgba(0,240,255,0.05));border-color:rgba(166,255,59,0.35)}
+.push-banner-big.warn{background:rgba(255,77,94,0.08);border-color:rgba(255,77,94,0.3)}
+.push-banner-big .e{font-size:32px;flex-shrink:0}
+.push-banner-big .t{flex:1;font-size:14px;line-height:1.45;min-width:200px}
+.push-banner-big .t b{color:var(--text);font-size:15px;display:block;margin-bottom:2px}
+.btn-pill-on{padding:11px 22px;border-radius:11px;border:none;cursor:pointer;font-family:inherit;font-weight:800;font-size:13px;background:linear-gradient(135deg,var(--gold),#ff8c42);color:#0a0c14;white-space:nowrap;box-shadow:0 6px 18px -6px rgba(255,194,75,0.5)}
+.btn-pill-off{padding:9px 16px;border-radius:9px;border:1px solid var(--border);cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;background:rgba(255,255,255,0.04);color:var(--dim);white-space:nowrap}
+@keyframes pulseGlow{0%,100%{box-shadow:0 12px 32px -16px rgba(255,194,75,0.4)}50%{box-shadow:0 16px 40px -10px rgba(255,194,75,0.6)}}
 .push-banner{padding:14px 16px;border-radius:13px;background:linear-gradient(135deg,rgba(0,240,255,0.1),rgba(122,91,255,0.06));border:1px solid rgba(0,240,255,0.25);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .push-banner .e{font-size:22px}
 .push-banner .t{flex:1;font-size:13px;line-height:1.4}
@@ -120,8 +130,54 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .footer{margin-top:30px;padding:18px;text-align:center;color:var(--mute);font-size:12px;line-height:1.6}
 .footer a{color:var(--brand);text-decoration:none}
 
-@media(max-width:880px){.row2{grid-template-columns:1fr}.hero-grid{grid-template-columns:1fr}.kpi-row{grid-template-columns:repeat(2,1fr)}.link-grid{grid-template-columns:1fr}.ach-grid{grid-template-columns:repeat(4,1fr)}}
-@media(max-width:480px){.app{padding:14px 12px 60px}.hero{padding:18px}.hero h1{font-size:20px}.card{padding:16px}.user-chip .meta{display:none}}
+@media(max-width:980px){
+  .row2{grid-template-columns:1fr;gap:12px}
+  .hero-grid{grid-template-columns:1fr;gap:14px}
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px}
+  .link-grid{grid-template-columns:1fr}
+  .ach-grid{grid-template-columns:repeat(5,1fr);gap:6px}
+  .topbar{gap:8px}
+  .user-chip .meta{display:none}
+  .streak{font-size:12px;padding:6px 11px}
+  .streak .flame{font-size:16px}
+  .push-banner-big{padding:14px 16px;gap:11px}
+  .push-banner-big .e{font-size:26px}
+  .push-banner-big .t{font-size:13px;min-width:0;width:100%;order:1}
+  .push-banner-big .e{order:0}
+  .btn-pill-on,.btn-pill-off{order:2;width:100%;padding:12px}
+}
+@media(max-width:600px){
+  .app{padding:14px 11px 70px}
+  .topbar{padding:8px 0;gap:6px;flex-wrap:wrap}
+  .brand small{display:none}
+  .brand b{font-size:13px}
+  .hero{padding:18px 16px}
+  .hero h1{font-size:19px;margin-bottom:4px}
+  .hero p{font-size:12.5px}
+  .tier-card{padding:14px}
+  .tier-name{font-size:18px}
+  .points-legend{font-size:11.5px;padding:10px 12px}
+  .card{padding:16px 14px;border-radius:15px}
+  .card-head h2{font-size:14px}
+  .kpi{padding:12px}
+  .kpi .v{font-size:20px}
+  .kpi .ic{font-size:16px;margin-bottom:5px}
+  .kpi .l{font-size:9.5px}
+  .ach-grid{grid-template-columns:repeat(5,1fr);gap:5px}
+  .ach{font-size:18px;border-radius:9px}
+  .ch{padding:12px;gap:11px}
+  .ch .e{font-size:21px}
+  .ch .t{font-size:13px}
+  .ch .pts{font-size:12px}
+  .lcard{padding:14px}
+  .lcard .url{font-size:9.5px;padding:7px 9px}
+  .feed .item{padding:10px 0;font-size:12.5px}
+}
+@media(max-width:380px){
+  .kpi-row{grid-template-columns:1fr 1fr;gap:7px}
+  .ach-grid{grid-template-columns:repeat(4,1fr)}
+  .hero h1{font-size:17px}
+}
 </style>
 </head>
 <body>
@@ -135,7 +191,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
     <button class="btn red" onclick="logout()">Logout</button>
   </div>
 
-  <div id="pushBanner"></div>
+  <div id="pushBanner" style="margin-bottom:14px"></div>
   <div id="announce" style="margin-bottom:14px"></div>
 
   <div class="grid">
@@ -444,29 +500,62 @@ loadProducts();
   } catch(e){ console.error('feed', e); }
 })();
 
-// --- PUSH NOTIFICATIONS ---
-(async function(){
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+// --- PUSH NOTIFICATIONS — prominent at TOP ---
+(async function setupPush(){
+  const banner = document.getElementById('pushBanner');
+  const supported = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator).standalone;
+
+  if (!supported) {
+    if (isIOS && !isStandalone) {
+      banner.innerHTML = '<div class="push-banner-big"><div class="e">📲</div><div class="t"><b>Dodaj VAMIT-5 na pocetni ekran</b><br><span style="font-size:12.5px;color:var(--dim)">Na iPhone-u: Share dugme (📤) → "Add to Home Screen". Posle toga otvoriš ikonu i mozes ukljuciti push.</span></div></div>';
+    } else {
+      banner.innerHTML = '<div class="push-banner-big"><div class="e">⚠️</div><div class="t"><b>Push nije podrzan</b><br><span style="font-size:12.5px;color:var(--dim)">Otvori sajt u Chrome ili Firefox za push notifikacije.</span></div></div>';
+    }
+    return;
+  }
   if (!window.VAPID_PUBLIC_KEY || window.VAPID_PUBLIC_KEY === 'YOUR_VAPID_PUBLIC_KEY') return;
+
   try {
     const reg = await navigator.serviceWorker.register('/sw.js');
     await navigator.serviceWorker.ready;
     const existing = await reg.pushManager.getSubscription();
-    if (existing) return;
-    if (Notification.permission === 'denied') return;
-    const banner = document.getElementById('pushBanner');
-    banner.innerHTML = '<div class="push-banner" style="margin-bottom:14px"><div class="e">🔔</div><div class="t">Ukljuci notifikacije: dnevni izazovi, prodaje i <b>poeni</b> direktno na telefon.</div><button id="pushBtn">Ukljuci</button></div>';
+
+    if (existing) {
+      banner.innerHTML = '<div class="push-banner-big on"><div class="e">🔔</div><div class="t"><b>Notifikacije ukljucene</b><br><span style="font-size:12.5px;color:var(--dim)">Klikni desno za iskljucenje.</span></div><button id="pushOff" class="btn-pill-off">Iskljuci</button></div>';
+      document.getElementById('pushOff').onclick = async function(){
+        if (!confirm('Iskljuciti notifikacije? Necete dobijati izazove, prodaje, poene.')) return;
+        await existing.unsubscribe();
+        await supabase.from('push_subscriptions').delete().eq('endpoint', existing.endpoint);
+        setupPush();
+      };
+      return;
+    }
+
+    if (Notification.permission === 'denied') {
+      banner.innerHTML = '<div class="push-banner-big warn"><div class="e">🔕</div><div class="t"><b>Notifikacije BLOKIRANE</b><br><span style="font-size:12.5px;color:var(--dim)">Klikni 🔒 levo od URL-a → Notifications → Allow → refresh stranice.</span></div></div>';
+      return;
+    }
+
+    banner.innerHTML = '<div class="push-banner-big cta"><div class="e">🔔</div><div class="t"><b>Ukljuci notifikacije</b><br><span style="font-size:12.5px;color:var(--text)">Dnevni izazovi, prodaje, bonus poeni — direktno na telefon. <b>Klikni dugme desno.</b></span></div><button id="pushBtn" class="btn-pill-on">Ukljuci sad</button></div>';
     document.getElementById('pushBtn').onclick = async function(){
-      const perm = await Notification.requestPermission();
-      if (perm !== 'granted') { banner.innerHTML = ''; return; }
-      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(window.VAPID_PUBLIC_KEY) });
-      const json = sub.toJSON();
-      await supabase.from('push_subscriptions').upsert({ athlete_id: athlete.id, endpoint: json.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth }, { onConflict: 'endpoint' });
-      banner.innerHTML = '';
-      const t = document.getElementById('toast'); t.textContent = 'Notifikacije ukljucene!'; t.classList.add('show');
-      setTimeout(function(){ t.classList.remove('show'); }, 2000);
+      try {
+        const perm = await Notification.requestPermission();
+        if (perm === 'denied') { setupPush(); return; }
+        if (perm !== 'granted') return;
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(window.VAPID_PUBLIC_KEY) });
+        const json = sub.toJSON();
+        await supabase.from('push_subscriptions').upsert({ athlete_id: athlete.id, endpoint: json.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth }, { onConflict: 'endpoint' });
+        const t = document.getElementById('toast'); t.textContent = '🔔 Notifikacije ukljucene!'; t.classList.add('show');
+        setTimeout(function(){ t.classList.remove('show'); }, 2000);
+        setupPush();
+      } catch(err){ alert('Greska: ' + err.message); }
     };
-  } catch(e){ console.error('push', e); }
+  } catch(e){
+    console.error('push setup err', e);
+    banner.innerHTML = '<div class="push-banner-big warn"><div class="e">⚠️</div><div class="t">Push nije mogao da se inicijalizuje. Probaj refresh.</div></div>';
+  }
 })();
 
 function urlB64ToUint8(s){ const pad = '='.repeat((4 - s.length % 4) % 4); const b = (s + pad).replace(/-/g,'+').replace(/_/g,'/'); const raw = atob(b); const out = new Uint8Array(raw.length); for (let i = 0; i < raw.length; i++) out[i] = raw.charCodeAt(i); return out; }
