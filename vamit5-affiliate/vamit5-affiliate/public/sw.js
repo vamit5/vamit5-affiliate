@@ -1,65 +1,69 @@
-// VAMIT-5 Athletes — Service Worker (Web Push)
+// VAMIT-5 Athletes — Service Worker (Web Push) v2
 // =====================================================================
 
-self.addEventListener('install', (event) => {
-  self.skipWaiting();
-});
+const LOGO = 'https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg';
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-});
+self.addEventListener('install', (event) => { self.skipWaiting(); });
+self.addEventListener('activate', (event) => { event.waitUntil(self.clients.claim()); });
 
-// Receive push event
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-
   let data;
-  try {
-    data = event.data.json();
-  } catch (e) {
-    data = { title: 'VAMIT-5', body: event.data.text() };
-  }
+  try { data = event.data.json(); }
+  catch (e) { data = { title: 'VAMIT-5', body: event.data.text() }; }
 
   const title = data.title || 'VAMIT-5 Athletes';
   const options = {
     body: data.body || '',
-    icon: data.icon || '/icon-192.png',
-    badge: '/badge-72.png',
-    image: data.image,
-    tag: data.tag || 'vamit5',
+    icon: data.icon || LOGO,
+    badge: data.badge || LOGO,
+    image: data.image || LOGO,
+    tag: data.tag || ('vamit5-' + Date.now()),
     renotify: true,
-    requireInteraction: data.requireInteraction || false,
-    data: { url: data.url || '/dashboard.html', ...data.data },
-    actions: data.actions || [],
-    vibrate: [200, 100, 200],
-    timestamp: Date.now(),
+    requireInteraction: true,
+    silent: false,
+    data: {
+      url: data.url || '/dashboard.html',
+      title: title,
+      body: data.body || '',
+      timestamp: Date.now(),
+      ...(data.data || {})
+    },
+    actions: [
+      { action: 'open', title: 'Otvori' },
+      { action: 'view', title: 'Vidi sve' }
+    ],
+    vibrate: [220, 110, 220, 110, 220],
+    timestamp: Date.now()
   };
 
   event.waitUntil(self.registration.showNotification(title, options));
 });
 
-// Click on notification
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const url = event.notification.data?.url || '/dashboard.html';
+  const data = event.notification.data || {};
+  const action = event.action;
+
+  // "Vidi sve" action — ide na inbox stranicu sa istorijom
+  let url = data.url || '/dashboard.html';
+  if (action === 'view') {
+    url = '/dashboard.html?notif=' + encodeURIComponent(data.title || '') + '&body=' + encodeURIComponent(data.body || '');
+  }
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If a tab is already open, focus it
       for (const client of clientList) {
-        if (client.url.includes('/dashboard.html') && 'focus' in client) {
+        if ('focus' in client) {
           client.navigate(url);
           return client.focus();
         }
       }
-      // Otherwise open new tab
       if (clients.openWindow) return clients.openWindow(url);
     })
   );
 });
 
-// Subscription change (browser rotates the endpoint)
 self.addEventListener('pushsubscriptionchange', (event) => {
-  // App will re-subscribe on next dashboard open
-  console.log('Push subscription changed, will re-subscribe');
+  console.log('Push subscription changed, will re-subscribe on next open');
 });
