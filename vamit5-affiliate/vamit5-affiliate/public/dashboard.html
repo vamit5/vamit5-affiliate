@@ -9,7 +9,8 @@
 <style>
 :root{--bg:#05060a;--surface:rgba(20,24,42,0.85);--surface2:rgba(28,33,58,0.65);--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--brand:#00f0ff;--brand2:#7a5bff;--brand3:#ff3b9a;--lime:#a6ff3b;--gold:#ffc24b;--red:#ff4d5e;--border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14)}
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-0.005em;overflow-x:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-0.005em;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.btn,button{touch-action:manipulation}
 body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(1200px 600px at 10% -10%,rgba(122,91,255,0.35),transparent 60%),radial-gradient(900px 500px at 100% 0%,rgba(0,240,255,0.22),transparent 60%),radial-gradient(800px 400px at 50% 110%,rgba(255,59,154,0.20),transparent 60%);animation:aurora 18s ease-in-out infinite alternate}
 @keyframes aurora{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(25deg) saturate(1.15)}}
 .loading{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:1000;padding:20px;text-align:center}
@@ -503,16 +504,22 @@ loadProducts();
 // --- PUSH NOTIFICATIONS — prominent at TOP ---
 (async function setupPush(){
   const banner = document.getElementById('pushBanner');
-  const supported = ('serviceWorker' in navigator) && ('PushManager' in window) && ('Notification' in window);
+  const hasSW = 'serviceWorker' in navigator;
+  const hasPush = 'PushManager' in window;
+  const hasNotif = 'Notification' in window;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator).standalone;
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator).standalone === true;
 
-  if (!supported) {
-    if (isIOS && !isStandalone) {
-      banner.innerHTML = '<div class="push-banner-big"><div class="e">📲</div><div class="t"><b>Dodaj VAMIT-5 na pocetni ekran</b><br><span style="font-size:12.5px;color:var(--dim)">Na iPhone-u: Share dugme (📤) → "Add to Home Screen". Posle toga otvoriš ikonu i mozes ukljuciti push.</span></div></div>';
-    } else {
-      banner.innerHTML = '<div class="push-banner-big"><div class="e">⚠️</div><div class="t"><b>Push nije podrzan</b><br><span style="font-size:12.5px;color:var(--dim)">Otvori sajt u Chrome ili Firefox za push notifikacije.</span></div></div>';
-    }
+  // iOS Safari < 16.4 doesn't support web push at all
+  // iOS Safari 16.4+ supports it ONLY in PWA (added to home screen)
+  if (isIOS && !isStandalone) {
+    banner.innerHTML = '<div class="push-banner-big cta"><div class="e">📲</div><div class="t"><b>Dodaj VAMIT-5 na pocetni ekran</b><br><span style="font-size:12.5px;color:var(--dim)">Na iPhone-u Safari: dugme <b>Share (📤) ↑</b> dole → <b>Add to Home Screen</b>. Otvoris ikonu i mozes ukljuciti notifikacije. iOS push radi SAMO u PWA modu.</span></div></div>';
+    return;
+  }
+
+  if (!hasSW || !hasPush || !hasNotif) {
+    const detail = (hasSW ? '✓' : '✗') + ' SW · ' + (hasPush ? '✓' : '✗') + ' Push · ' + (hasNotif ? '✓' : '✗') + ' Notif';
+    banner.innerHTML = '<div class="push-banner-big warn"><div class="e">⚠️</div><div class="t"><b>Push nije podrzan</b><br><span style="font-size:12.5px;color:var(--dim)">Detalji: ' + detail + '. ' + (isIOS ? 'iOS treba 16.4+ i sajt dodat na home screen.' : 'Otvori u Chrome/Firefox/Edge/Safari 16.4+.') + '</span></div></div>';
     return;
   }
   if (!window.VAPID_PUBLIC_KEY || window.VAPID_PUBLIC_KEY === 'YOUR_VAPID_PUBLIC_KEY') return;
