@@ -184,6 +184,20 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="card-head"><h2><span class="em">🏆</span><span id="achTitle">Dostignuca</span></h2><span class="badge" id="achBadge">0/0</span></div>
       <div class="ach-grid" id="achGrid"></div>
     </div>
+
+    <div class="card">
+      <div class="card-head"><h2><span class="em">👥</span>Moj tim</h2><span class="badge" id="teamBadge">0 atleta · €0</span></div>
+      <div style="padding:14px 16px;border-radius:11px;background:linear-gradient(135deg,rgba(122,91,255,0.1),rgba(0,240,255,0.05));border:1px solid rgba(122,91,255,0.3);margin-bottom:14px;font-size:13px;line-height:1.5">
+        <b style="color:var(--brand2)">15% od svake prodaje atlete iz tvog tima ide tebi.</b><br>
+        <span style="color:var(--dim);font-size:12px">Pozovi prijatelja sa tvojim invite kodom.</span>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
+          <code id="myInviteCode" style="padding:7px 13px;background:#0a0c14;border:1px solid var(--border);border-radius:8px;font-size:14px;color:var(--brand);font-weight:800;letter-spacing:0.05em">...</code>
+          <button class="btn" onclick="copyInvite()">Kopiraj invite link</button>
+          <button class="btn" onclick="togglePush()" id="pushToggleBtn" style="margin-left:auto">🔔 Notifikacije</button>
+        </div>
+      </div>
+      <div id="teamList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
   </div>
 
   <div class="footer" id="footer"></div>
@@ -294,7 +308,8 @@ if (tier.nextXp) {
   document.getElementById('xpNext').textContent = 'MAX nivo';
 }
 document.getElementById('kpiXP').textContent = xp.toLocaleString();
-document.getElementById('pointsLegend').textContent = get('points_legend', 'text', '1000 poena = 5€ bonus · 5000 poena = 20€ bonus · 15000 poena = 50€ bonus');
+const legend = get('points_legend', 'text', '1000 poena = 5€ bonus · 5000 poena = 20€ bonus · 15000 poena = 50€ bonus');
+document.getElementById('pointsLegend').innerHTML = legend.split(/\s*[·\n]\s*/).filter(Boolean).map(function(l){ return '<div style="padding:4px 0">' + l + '</div>'; }).join('');
 
 // Editable section titles
 document.getElementById('chTitle').textContent = get('challenges_section_title', 'text', 'Dnevni izazovi');
@@ -490,6 +505,82 @@ function urlB64ToUint8(s){ const pad = '='.repeat((4 - s.length % 4) % 4); const
       list.appendChild(div);
     });
   } catch(e){ console.error('team', e); }
+})();
+
+// --- TEAM ---
+(async function(){
+  try {
+    const inviteCode = athlete.invite_code || '?';
+    document.getElementById('myInviteCode').textContent = inviteCode;
+    window.copyInvite = function(){
+      const url = SITE + '/index.html?ref=' + inviteCode;
+      navigator.clipboard.writeText(url);
+      const t = document.getElementById('toast'); t.textContent = 'Invite link kopiran!'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 1500);
+    };
+
+    const { data: team } = await supabase.from('athletes').select('id,username,full_name,tier,xp,current_streak').eq('referred_by', athlete.id).order('xp',{ ascending:false });
+    const { data: teamSales } = await supabase.from('sales').select('team_referrer_id,team_commission_cents,athlete_id,status').eq('team_referrer_id', athlete.id).in('status',['confirmed','pending']);
+    const list = document.getElementById('teamList');
+    if (!team || !team.length){ list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--mute);font-size:12.5px">Jos nemas tim. Posalji invite link.</div>'; return; }
+
+    const totalCents = (teamSales || []).reduce(function(a,s){ return a + (s.team_commission_cents || 0); }, 0);
+    document.getElementById('teamBadge').textContent = team.length + ' atleta · €' + (totalCents/100).toFixed(0);
+
+    list.innerHTML = '';
+    team.forEach(function(m){
+      const mySales = (teamSales || []).filter(function(s){ return s.athlete_id === m.id; });
+      const myCents = mySales.reduce(function(a,s){ return a + (s.team_commission_cents || 0); }, 0);
+      const div = document.createElement('div');
+      div.style.cssText = 'display:grid;grid-template-columns:auto 1fr auto auto;gap:12px;align-items:center;padding:12px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border);font-size:13px;cursor:pointer';
+      div.innerHTML = '<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--brand2),var(--brand3));display:grid;place-items:center;font-weight:800;font-size:11px">' + (m.full_name || '?').split(' ').map(function(s){return s[0];}).slice(0,2).join('').toUpperCase() + '</div>' +
+        '<div><div style="font-weight:700">' + m.full_name + '</div><div style="font-size:11px;color:var(--mute)">@' + m.username + ' · ' + (m.tier||'recruit').toUpperCase() + ' · ' + (m.xp||0) + ' poena</div></div>' +
+        '<div style="text-align:right"><div style="font-weight:800;color:var(--gold)">€' + (myCents/100).toFixed(2) + '</div><div style="font-size:11px;color:var(--mute)">' + mySales.length + ' prodaja</div></div>' +
+        '<div style="font-size:18px;color:var(--mute)">›</div>';
+      div.onclick = function(){ alert('Detalji za @' + m.username + ':\n\nProdaje: ' + mySales.length + '\nProvizija tebi: €' + (myCents/100).toFixed(2) + '\nPoeni: ' + (m.xp||0) + '\nStreak: ' + (m.current_streak||0) + ' dana'); };
+      list.appendChild(div);
+    });
+  } catch(e){ console.error('team', e); }
+})();
+
+// --- PUSH TOGGLE ---
+window.togglePush = async function(){
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)){ alert('Tvoj browser ne podrzava notifikacije.'); return; }
+  if (!window.VAPID_PUBLIC_KEY || window.VAPID_PUBLIC_KEY === 'YOUR_VAPID_PUBLIC_KEY'){ alert('Notifikacije nisu konfigurisane.'); return; }
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    await navigator.serviceWorker.ready;
+    let existing = await reg.pushManager.getSubscription();
+    if (existing) {
+      // Already on → turn off
+      await existing.unsubscribe();
+      await supabase.from('push_subscriptions').delete().eq('endpoint', existing.endpoint);
+      const t = document.getElementById('toast'); t.textContent = '🔕 Notifikacije iskljucene'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 1800);
+      document.getElementById('pushToggleBtn').textContent = '🔔 Ukljuci notifikacije';
+    } else {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted'){ alert('Dao si NE — notifikacije ostaju iskljucene. Mozes promeniti u browser podesavanjima.'); return; }
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlB64ToUint8(window.VAPID_PUBLIC_KEY) });
+      const json = sub.toJSON();
+      await supabase.from('push_subscriptions').upsert({ athlete_id: athlete.id, endpoint: json.endpoint, p256dh: json.keys.p256dh, auth: json.keys.auth }, { onConflict: 'endpoint' });
+      const t = document.getElementById('toast'); t.textContent = '🔔 Notifikacije ukljucene!'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 2000);
+      document.getElementById('pushToggleBtn').textContent = '🔕 Iskljuci notifikacije';
+    }
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+// Update toggle button label based on current state
+(async function(){
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) return;
+    const sub = await reg.pushManager.getSubscription();
+    const btn = document.getElementById('pushToggleBtn');
+    if (btn) btn.textContent = sub ? '🔕 Iskljuci notifikacije' : '🔔 Ukljuci notifikacije';
+  } catch(e){}
 })();
 
 document.getElementById('loading').classList.add('hidden');
