@@ -264,6 +264,19 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
           <div id="ntResult" style="margin-top:12px;font-size:12px;color:var(--dim)"></div>
         </div>
         <div class="card">
+          <div class="card-head"><h2>📅 Zakazi notifikaciju za kasnije</h2></div>
+          <input id="schTitle" placeholder="Naslov" maxlength="50" style="width:100%;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;margin-bottom:8px">
+          <textarea id="schBody" placeholder="Telo poruke" maxlength="150" style="width:100%;min-height:60px;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;margin-bottom:8px"></textarea>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <input id="schDate" type="date" style="padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+            <input id="schTime" type="time" style="padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+          </div>
+          <select id="schTier" style="width:100%;padding:11px 14px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;margin-bottom:12px"><option value="">Svi atleti</option><option value="recruit">Samo REGRUTI</option><option value="pro">Samo PRO</option><option value="commando">Samo COMMANDO</option><option value="elite">Samo ELITE</option></select>
+          <button class="btn brand" onclick="scheduleNotif()">Zakazi</button>
+          <div style="margin-top:14px"><table style="font-size:11.5px"><thead><tr><th>Kada</th><th>Naslov</th><th>Tier</th><th>Status</th><th></th></tr></thead><tbody id="schedBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table></div>
+        </div>
+
+        <div class="card">
           <div class="card-head"><h2>📋 Brzi sabloni</h2></div>
           <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
             <button class="btn ghost" onclick="qn('🔥 Streak alert','Tvoj streak ce puknuti za 4h. Postavi 1 Story sad.')">🔥 Streak alert</button>
@@ -411,7 +424,7 @@ document.querySelectorAll('aside nav button').forEach(function(b){
     if (sec === 'payouts') loadPayouts();
     if (sec === 'challenges') loadChallenges();
     if (sec === 'content') { loadContent(); loadProducts(); }
-    if (sec === 'notify') {}
+    if (sec === 'notify') { loadScheduled(); }
   });
 });
 
@@ -680,6 +693,49 @@ window.loadContent = async function(){
     document.getElementById('t_ach').value = get('achievements_section_title','text');
     document.getElementById('t_footer').value = get('footer_help','text');
   } catch(e){ console.error('content load failed', e); }
+};
+
+window.scheduleNotif = async function(){
+  const title = document.getElementById('schTitle').value;
+  const body = document.getElementById('schBody').value;
+  const date = document.getElementById('schDate').value;
+  const time = document.getElementById('schTime').value;
+  const tier = document.getElementById('schTier').value || null;
+  if (!title || !body || !date || !time){ alert('Sva polja su obavezna.'); return; }
+  const sendAt = new Date(date + 'T' + time);
+  if (sendAt.getTime() < Date.now()){ alert('Vreme je u proslosti.'); return; }
+  try {
+    const { error } = await supabase.from('scheduled_notifications').insert({
+      title: title, body: body, send_at: sendAt.toISOString(), target_tier: tier
+    });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert('Zakazano za ' + sendAt.toLocaleString('sr'));
+    document.getElementById('schTitle').value = '';
+    document.getElementById('schBody').value = '';
+    loadScheduled();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.loadScheduled = async function(){
+  try {
+    const { data } = await supabase.from('scheduled_notifications').select('*').order('send_at',{ ascending: true }).limit(20);
+    const body = document.getElementById('schedBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Nema zakazanih.</td></tr>'; return; }
+    body.innerHTML = data.map(function(n){
+      const when = new Date(n.send_at).toLocaleString('sr',{ day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit'});
+      const status = n.sent ? '<span class="tag approved">poslato</span>' : '<span class="tag pending">na cekanju</span>';
+      return '<tr><td>' + when + '</td><td>' + escapeHtml(n.title) + '</td><td>' + (n.target_tier || 'svi') + '</td><td>' + status + '</td><td>' + (n.sent ? '' : '<button class="btn red" onclick="delScheduled(\'' + n.id + '\')">Obrisi</button>') + '</td></tr>';
+    }).join('');
+  } catch(e){ console.error('sched load', e); }
+};
+
+window.delScheduled = async function(id){
+  if (!confirm('Obrisi zakazanu notifikaciju?')) return;
+  try {
+    const { error } = await supabase.from('scheduled_notifications').delete().eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadScheduled();
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
 window.qn = function(t,b){ document.getElementById('ntTitle').value=t; document.getElementById('ntBody').value=b; };
