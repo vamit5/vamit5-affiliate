@@ -69,6 +69,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .kpi .ic{font-size:18px;margin-bottom:8px}
 .kpi .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:5px}
 .kpi .v{font-size:24px;font-weight:900;letter-spacing:-0.02em}
+.period-btn{padding:6px 12px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--dim);font-family:inherit;font-size:11.5px;font-weight:700;cursor:pointer;transition:all .2s}
+.period-btn:hover{background:rgba(255,255,255,0.08);color:var(--text)}
+.period-btn.active{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border-color:transparent}
 
 .card{padding:22px;border-radius:18px;background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(18px)}
 .card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
@@ -96,8 +99,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .lcard .url{font-family:monospace;font-size:10.5px;color:var(--brand);word-break:break-all;background:rgba(0,0,0,0.3);padding:8px 10px;border-radius:7px;margin-bottom:10px;border:1px solid rgba(0,240,255,0.1)}
 .lcard .copy{padding:8px 12px;border-radius:8px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:11.5px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;width:100%}
 
-.ach-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-.ach{aspect-ratio:1;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border);display:grid;place-items:center;font-size:22px;cursor:default;transition:all .25s}
+.ach-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px}
+.ach{aspect-ratio:1;border-radius:9px;background:rgba(255,255,255,0.03);border:1px solid var(--border);display:grid;place-items:center;font-size:18px;cursor:default;transition:all .25s;min-width:0}
 .ach.unlocked{background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(122,91,255,0.1));border-color:rgba(0,240,255,0.35);box-shadow:0 0 12px rgba(0,240,255,0.15)}
 .ach.locked{filter:grayscale(1) opacity(0.35)}
 
@@ -136,7 +139,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
   .hero-grid{grid-template-columns:1fr;gap:14px}
   .kpi-row{grid-template-columns:repeat(2,1fr);gap:10px}
   .link-grid{grid-template-columns:1fr}
-  .ach-grid{grid-template-columns:repeat(5,1fr);gap:6px}
+  .ach-grid{grid-template-columns:repeat(6,1fr);gap:5px}
   .topbar{gap:8px}
   .user-chip .meta{display:none}
   .streak{font-size:12px;padding:6px 11px}
@@ -148,6 +151,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
   .btn-pill-on,.btn-pill-off{order:2;width:100%;padding:12px}
 }
 @media(max-width:600px){
+  .ach-grid{grid-template-columns:repeat(7,1fr)!important;gap:4px}
+  .ach{font-size:15px;border-radius:8px}
+  .period-btn{padding:5px 9px;font-size:10.5px}
   .app{padding:14px 11px 70px}
   .topbar{padding:8px 0;gap:6px;flex-wrap:wrap}
   .brand small{display:none}
@@ -214,10 +220,17 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       </div>
     </div>
 
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
+      <span style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-right:auto">Period:</span>
+      <button class="period-btn" data-days="1" onclick="setPeriod(1, this)">Danas</button>
+      <button class="period-btn" data-days="7" onclick="setPeriod(7, this)">7 dana</button>
+      <button class="period-btn active" data-days="30" onclick="setPeriod(30, this)">30 dana</button>
+      <button class="period-btn" data-days="0" onclick="setPeriod(0, this)">Sve</button>
+    </div>
     <div class="kpi-row">
       <div class="kpi"><div class="ic">👀</div><div class="l" id="kpiL1">Klikovi</div><div class="v" id="kpiClicks">0</div></div>
       <div class="kpi"><div class="ic">💎</div><div class="l" id="kpiL2">Prodaje</div><div class="v" id="kpiSales">0</div></div>
-      <div class="kpi"><div class="ic">💸</div><div class="l" id="kpiL3">Provizija (€)</div><div class="v" id="kpiCommission">0</div></div>
+      <div class="kpi"><div class="ic">💸</div><div class="l" id="kpiL3">Zarada (€)</div><div class="v" id="kpiCommission">0</div></div>
       <div class="kpi"><div class="ic">⚡</div><div class="l" id="kpiL4">Poeni</div><div class="v" id="kpiXP">0</div></div>
     </div>
 
@@ -244,13 +257,20 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 
     <div class="card">
       <div class="card-head"><h2><span class="em">👥</span>Moj tim</h2><span class="badge" id="teamBadge">0 atleta · €0</span></div>
-      <div style="padding:14px 16px;border-radius:11px;background:linear-gradient(135deg,rgba(122,91,255,0.1),rgba(0,240,255,0.05));border:1px solid rgba(122,91,255,0.3);margin-bottom:14px;font-size:13px;line-height:1.5">
-        <b style="color:var(--brand2)">15% od svake prodaje atlete iz tvog tima ide tebi.</b><br>
-        <span style="color:var(--dim);font-size:12px">Pozovi prijatelja sa tvojim invite kodom.</span>
-        <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
-          <code id="myInviteCode" style="padding:7px 13px;background:#0a0c14;border:1px solid var(--border);border-radius:8px;font-size:14px;color:var(--brand);font-weight:800;letter-spacing:0.05em">...</code>
-          <button class="btn" onclick="copyInvite()">Kopiraj invite link</button>
-          <button class="btn" onclick="togglePush()" id="pushToggleBtn" style="margin-left:auto">🔔 Notifikacije</button>
+      <div style="padding:16px;border-radius:11px;background:linear-gradient(135deg,rgba(122,91,255,0.12),rgba(0,240,255,0.06));border:1px solid rgba(122,91,255,0.3);margin-bottom:14px;font-size:13px;line-height:1.55">
+        <b style="color:var(--brand2);font-size:14px">💰 15% provizija od tvog tima — dozivotno</b>
+        <div style="margin-top:8px;color:var(--dim)">Kako radi:</div>
+        <ol style="margin:6px 0 12px 18px;color:var(--dim);font-size:12.5px;line-height:1.7">
+          <li>Klikni <b>Kopiraj invite link</b> ispod</li>
+          <li>Posalji link prijatelju (WhatsApp, IG DM, SMS...)</li>
+          <li>On klikne link → otvara mu se VAMIT-5 prijava sa tvojim kodom (auto)</li>
+          <li>Popuni prijavu, admin odobri → on postaje atleta <b>tvog tima</b></li>
+          <li>Svaka njegova prodaja: 15% (od neto) tebi auto + njegova provizija njemu</li>
+        </ol>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <code id="myInviteCode" style="padding:8px 14px;background:#0a0c14;border:1px solid var(--brand);border-radius:8px;font-size:14px;color:var(--brand);font-weight:800;letter-spacing:0.08em">...</code>
+          <button class="btn" onclick="copyInvite()" style="background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none;font-weight:800">📋 Kopiraj link</button>
+          <button class="btn" onclick="shareInvite()">📤 Podeli</button>
         </div>
       </div>
       <div id="teamList" style="display:flex;flex-direction:column;gap:8px"></div>
@@ -412,19 +432,37 @@ async function loadProducts(){
 }
 loadProducts();
 
-// --- KPIs ---
-(async function(){
+// --- KPIs (period-aware) ---
+window.currentPeriodDays = 30;
+window.setPeriod = function(days, btn){
+  window.currentPeriodDays = days;
+  document.querySelectorAll('.period-btn').forEach(function(b){ b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  loadKPIs();
+};
+async function loadKPIs(){
   try {
-    const [clicksR, salesR] = await Promise.all([
-      supabase.from('clicks').select('id', { count:'exact', head:true }).eq('athlete_id', athlete.id),
-      supabase.from('sales').select('commission_cents,status').eq('athlete_id', athlete.id)
-    ]);
+    let clicksQ = supabase.from('clicks').select('id', { count:'exact', head:true }).eq('athlete_id', athlete.id);
+    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,created_at').eq('athlete_id', athlete.id);
+    if (window.currentPeriodDays > 0) {
+      const since = new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString();
+      clicksQ = clicksQ.gte('created_at', since);
+      salesQ = salesQ.gte('created_at', since);
+    }
+    const [clicksR, salesR] = await Promise.all([clicksQ, salesQ]);
     document.getElementById('kpiClicks').textContent = (clicksR.count || 0).toLocaleString();
     const sales = (salesR.data || []).filter(function(s){ return s.status === 'confirmed' || s.status === 'pending'; });
     document.getElementById('kpiSales').textContent = sales.length;
-    document.getElementById('kpiCommission').textContent = (sales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0) / 100).toFixed(2);
+    const totalEarn = sales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0);
+    // Add team commission earnings for this period
+    let teamQ = supabase.from('sales').select('team_commission_cents,status,created_at').eq('team_referrer_id', athlete.id);
+    if (window.currentPeriodDays > 0) teamQ = teamQ.gte('created_at', new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString());
+    const teamR = await teamQ;
+    const teamEarn = (teamR.data || []).filter(function(s){ return s.status === 'confirmed' || s.status === 'pending'; }).reduce(function(a,s){ return a + (s.team_commission_cents || 0); }, 0);
+    document.getElementById('kpiCommission').textContent = ((totalEarn + teamEarn) / 100).toFixed(2);
   } catch(e){ console.error('KPI', e); }
-})();
+}
+loadKPIs();
 
 // --- DAILY CHALLENGES ---
 (async function(){
@@ -575,8 +613,19 @@ function urlB64ToUint8(s){ const pad = '='.repeat((4 - s.length % 4) % 4); const
     window.copyInvite = function(){
       const url = SITE + '/index.html?ref=' + inviteCode;
       navigator.clipboard.writeText(url);
-      const t = document.getElementById('toast'); t.textContent = 'Invite link kopiran!'; t.classList.add('show');
-      setTimeout(function(){ t.classList.remove('show'); }, 1500);
+      const t = document.getElementById('toast'); t.textContent = 'Invite link kopiran! Posalji prijatelju.'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 2000);
+    };
+    window.shareInvite = async function(){
+      const url = SITE + '/index.html?ref=' + inviteCode;
+      const text = 'Pridruzi se VAMIT-5 Athletes timu i zaradjuj proviziju! Moja invite: ' + url;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'VAMIT-5 Athletes', text: text, url: url }); } catch(e){}
+      } else {
+        navigator.clipboard.writeText(text);
+        const t = document.getElementById('toast'); t.textContent = 'Tekst kopiran! Paste u WhatsApp/IG.'; t.classList.add('show');
+        setTimeout(function(){ t.classList.remove('show'); }, 2000);
+      }
     };
 
     const { data: team } = await supabase.from('athletes').select('id,username,full_name,tier,xp,current_streak').eq('referred_by', athlete.id).order('xp',{ ascending:false });
@@ -611,8 +660,19 @@ function urlB64ToUint8(s){ const pad = '='.repeat((4 - s.length % 4) % 4); const
     window.copyInvite = function(){
       const url = SITE + '/index.html?ref=' + inviteCode;
       navigator.clipboard.writeText(url);
-      const t = document.getElementById('toast'); t.textContent = 'Invite link kopiran!'; t.classList.add('show');
-      setTimeout(function(){ t.classList.remove('show'); }, 1500);
+      const t = document.getElementById('toast'); t.textContent = 'Invite link kopiran! Posalji prijatelju.'; t.classList.add('show');
+      setTimeout(function(){ t.classList.remove('show'); }, 2000);
+    };
+    window.shareInvite = async function(){
+      const url = SITE + '/index.html?ref=' + inviteCode;
+      const text = 'Pridruzi se VAMIT-5 Athletes timu i zaradjuj proviziju! Moja invite: ' + url;
+      if (navigator.share) {
+        try { await navigator.share({ title: 'VAMIT-5 Athletes', text: text, url: url }); } catch(e){}
+      } else {
+        navigator.clipboard.writeText(text);
+        const t = document.getElementById('toast'); t.textContent = 'Tekst kopiran! Paste u WhatsApp/IG.'; t.classList.add('show');
+        setTimeout(function(){ t.classList.remove('show'); }, 2000);
+      }
     };
 
     const { data: team } = await supabase.from('athletes').select('id,username,full_name,tier,xp,current_streak').eq('referred_by', athlete.id).order('xp',{ ascending:false });
