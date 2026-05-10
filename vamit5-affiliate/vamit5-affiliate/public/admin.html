@@ -488,14 +488,14 @@ window.loadAthletes = async function(){
     body.innerHTML = data.map(function(a){
       const tier = (a.tier || 'recruit').toLowerCase();
       const stripe = a.stripe_account_id ? '<span class="tag confirmed">OK</span>' : '<span class="tag pending">NE</span>';
-      const hasBank = a.payout_full_name && (a.payout_email || a.payout_iban);
+      const hasBank = a.payout_full_name && a.payout_account_number;
       return '<tr><td><b>@' + escapeHtml(a.username) + '</b></td>' +
         '<td>' + escapeHtml(a.full_name) + '</td>' +
         '<td>' + escapeHtml(a.email) + '</td>' +
         '<td><span class="tag ' + tier + '">' + tier.toUpperCase() + '</span></td>' +
         '<td>' + (a.xp || 0) + '</td>' +
         '<td>' + (a.current_streak || 0) + '</td>' +
-        '<td><button class="btn ' + (hasBank ? 'green' : 'red') + '" onclick="showPayoutDetails(\'' + a.id + '\')">' + (hasBank ? a.payout_method.toUpperCase() : 'NEMA') + '</button></td></tr>';
+        '<td><button class="btn ' + (hasBank ? 'green' : 'red') + '" onclick="showPayoutDetails(\'' + a.id + '\')">' + (hasBank ? '✓ OK' : '✗ NEMA') + '</button></td></tr>';
     }).join('');
   } catch(e){ document.getElementById('athletesBody').innerHTML = '<tr><td colspan="7" class="empty">Greska: ' + e.message + '</td></tr>'; }
 };
@@ -793,23 +793,20 @@ window.saveSetting = async function(key){
 
 window.showPayoutDetails = async function(athleteId){
   try {
-    const { data } = await supabase.from('athletes').select('username,full_name,email,payout_method,payout_full_name,payout_email,payout_iban,payout_swift,payout_bank_name,payout_address,payout_phone').eq('id', athleteId).maybeSingle();
+    const { data } = await supabase.from('athletes').select('username,full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone').eq('id', athleteId).maybeSingle();
     if (!data) { alert('Atleta nije pronadjen'); return; }
     let body = '<p style="font-size:14px;color:var(--text);font-weight:700">@' + data.username + ' · ' + data.full_name + '</p>';
     body += '<p style="font-size:12px;color:var(--mute)">Email: ' + data.email + '</p>';
     body += '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">';
-    if (!data.payout_full_name) {
+    if (!data.payout_full_name || !data.payout_account_number) {
       body += '<p style="color:#ffb0b8">⚠️ Atleta jos nije uneo bankovne podatke!</p>';
     } else {
-      body += '<p><b>Metoda:</b> ' + (data.payout_method || '—').toUpperCase() + '</p>';
-      body += '<p><b>Pravo ime:</b> ' + (data.payout_full_name || '—') + '</p>';
-      if (data.payout_email) body += '<p><b>Email:</b> <code>' + data.payout_email + '</code></p>';
-      if (data.payout_iban) body += '<p><b>IBAN:</b> <code>' + data.payout_iban + '</code></p>';
-      if (data.payout_swift) body += '<p><b>SWIFT:</b> <code>' + data.payout_swift + '</code></p>';
+      const text = 'Ime: ' + data.payout_full_name + '\nRacun: ' + data.payout_account_number + '\nBanka: ' + (data.payout_bank_name || '-') + '\nTelefon: ' + (data.payout_phone || '-');
+      body += '<p><b>Pravo ime:</b> ' + data.payout_full_name + '</p>';
+      body += '<p><b>Broj racuna:</b> <code style="font-size:13px;color:var(--brand)">' + data.payout_account_number + '</code></p>';
       if (data.payout_bank_name) body += '<p><b>Banka:</b> ' + data.payout_bank_name + '</p>';
-      if (data.payout_address) body += '<p><b>Adresa:</b> ' + data.payout_address + '</p>';
       if (data.payout_phone) body += '<p><b>Telefon:</b> <code>' + data.payout_phone + '</code></p>';
-      body += '<button class="btn ghost" onclick="navigator.clipboard.writeText(' + JSON.stringify(JSON.stringify(data)) + ');this.textContent=\'Kopirano!\'" style="margin-top:10px">📋 Kopiraj sve podatke</button>';
+      body += '<button class="btn ghost" onclick="navigator.clipboard.writeText(' + JSON.stringify(text) + ');this.textContent=\'Kopirano!\'" style="margin-top:10px">📋 Kopiraj sve</button>';
     }
     showModal('Bankovni podaci', body);
   } catch(e){ alert('Greska: ' + e.message); }
