@@ -44,26 +44,26 @@ h1{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
   <div class="error-box" id="errorBox"></div>
   <div class="success-box" id="successBox"></div>
 
-  <form id="loginForm">
+  <div id="loginForm">
     <div class="field">
       <label for="email">Email</label>
-      <input id="email" type="email" required placeholder="ti@gmail.com" autocomplete="email">
+      <input id="email" type="email" placeholder="ti@gmail.com" autocomplete="email">
     </div>
-    <button type="submit" class="btn" id="submitBtn">
-      <span id="btnText">Posalji 6-cifreni kod</span>
+    <button type="button" class="btn" id="submitBtn" onclick="sendCode()">
+      <span id="btnText">Posalji kod na email</span>
     </button>
-  </form>
+  </div>
 
-  <form id="otpForm" style="display:none;margin-top:14px">
+  <div id="otpForm" style="display:none;margin-top:14px">
     <div class="field">
-      <label for="code">Kod iz email-a (6 cifara)</label>
-      <input id="code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" required placeholder="123456" autocomplete="one-time-code" style="text-align:center;font-size:20px;letter-spacing:6px;font-weight:800">
+      <label for="code">Kod iz email-a</label>
+      <input id="code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="10" placeholder="123456" autocomplete="one-time-code" style="text-align:center;font-size:20px;letter-spacing:4px;font-weight:800">
     </div>
-    <button type="submit" class="btn" id="verifyBtn">
+    <button type="button" class="btn" id="verifyBtn" onclick="verifyCode()">
       <span id="verifyText">Potvrdi i uloguj se</span>
     </button>
     <div style="text-align:center;margin-top:12px"><a href="javascript:void(0)" onclick="resetForm()" style="color:var(--brand);font-size:12px;text-decoration:none">Zatrazi nov kod</a></div>
-  </form>
+  </div>
 
   <div class="foot">
     Nemas nalog? <a href="/index.html#apply">Prijavi se za audiciju</a>
@@ -118,60 +118,63 @@ const showSuccess = function(msg) {
 };
 
 let savedEmail = '';
+try { savedEmail = localStorage.getItem('v5_otp_email') || ''; if (savedEmail) document.getElementById('email').value = savedEmail; } catch(e){}
 
-document.getElementById('loginForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
+window.sendCode = async function(){
   const email = document.getElementById('email').value.trim().toLowerCase();
   const btn = document.getElementById('submitBtn');
   const txt = document.getElementById('btnText');
+  if (!email || !email.includes('@')) { showError('Unesi validan email adresu'); return; }
   btn.disabled = true;
   txt.innerHTML = '<span class="spinner"></span>Slanje...';
-
-  const { error } = await supabase.auth.signInWithOtp({
-    email: email,
-    options: { shouldCreateUser: true }
-  });
-
-  if (error) {
-    showError(error.message);
-    btn.disabled = false;
-    txt.textContent = 'Posalji 6-cifreni kod';
-  } else {
+  console.log('[login] sendCode start', email);
+  try {
+    const result = await supabase.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } });
+    console.log('[login] sendCode result:', result);
+    if (result.error) {
+      showError('Greska (' + (result.error.status || '?') + '): ' + result.error.message);
+      btn.disabled = false; txt.textContent = 'Posalji kod na email';
+      return;
+    }
     savedEmail = email;
-    showSuccess('Kod poslat na ' + email + '. Proveri email (i spam).');
+    try { localStorage.setItem('v5_otp_email', email); } catch(e){}
+    showSuccess('Kod poslat na ' + email + '. Proveri email + spam folder.');
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('otpForm').style.display = 'block';
-    setTimeout(function(){ document.getElementById('code').focus(); }, 100);
+    setTimeout(function(){ try { document.getElementById('code').focus(); } catch(e){} }, 200);
+  } catch(err) {
+    console.error('[login] sendCode err:', err);
+    showError('Greska: ' + (err.message || JSON.stringify(err)));
+    btn.disabled = false; txt.textContent = 'Posalji kod na email';
   }
-});
+};
 
-document.getElementById('otpForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
+window.verifyCode = async function(){
   const code = document.getElementById('code').value.trim();
+  if (!code || code.length < 5) { showError('Unesi kod iz email-a'); return; }
   const btn = document.getElementById('verifyBtn');
   const txt = document.getElementById('verifyText');
   btn.disabled = true;
   txt.innerHTML = '<span class="spinner"></span>Provera...';
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: savedEmail,
-    token: code,
-    type: 'email'
-  });
-
-  if (error) {
-    showError(error.message);
-    btn.disabled = false;
-    txt.textContent = 'Potvrdi i uloguj se';
-    return;
+  try {
+    const result = await supabase.auth.verifyOtp({ email: savedEmail, token: code, type: 'email' });
+    console.log('[login] verify result:', result);
+    if (result.error) {
+      showError('Greska: ' + result.error.message);
+      btn.disabled = false; txt.textContent = 'Potvrdi i uloguj se';
+      return;
+    }
+    if (result.data && result.data.session) {
+      try { localStorage.removeItem('v5_otp_email'); } catch(e){}
+      showSuccess('Uspesno! Preusmeravam...');
+      const adm = await supabase.from('admins').select('id').eq('email', savedEmail).maybeSingle();
+      setTimeout(function(){ location.replace(adm.data ? '/admin.html' : '/dashboard.html'); }, 600);
+    }
+  } catch(err) {
+    showError('Greska: ' + (err.message || JSON.stringify(err)));
+    btn.disabled = false; txt.textContent = 'Potvrdi i uloguj se';
   }
-
-  if (data && data.session) {
-    showSuccess('Uspesno! Preusmeravam...');
-    const { data: admin } = await supabase.from('admins').select('id').eq('email', savedEmail).maybeSingle();
-    setTimeout(function(){ location.replace(admin ? '/admin.html' : '/dashboard.html'); }, 600);
-  }
-});
+};
 
 window.resetForm = function(){
   document.getElementById('loginForm').style.display = 'block';
