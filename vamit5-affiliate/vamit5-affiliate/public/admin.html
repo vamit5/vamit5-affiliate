@@ -134,6 +134,7 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
       <button class="active" data-section="overview">Overview</button>
       <button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
       <button data-section="athletes">Atlete</button>
+      <button data-section="customers">Klijenti</button>
       <button data-section="sales">Prodaje</button>
       <button data-section="payouts">Isplate</button>
       <button data-section="challenges">Izazovi</button>
@@ -182,6 +183,17 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
           <div class="card-head"><h2>Atlete</h2><button class="btn ghost" onclick="loadAthletes()">Refresh</button></div>
           <table><thead><tr><th>Username</th><th>Ime</th><th>Email</th><th>Tier</th><th>XP</th><th>Streak</th><th>Bank/PayPal</th></tr></thead>
             <tbody id="athletesBody"><tr><td colspan="7" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <div class="section" id="sec-customers">
+        <div class="card">
+          <div class="card-head"><h2>👥 Svi klijenti (preko atleta)</h2><button class="btn ghost" onclick="loadCustomers()">Refresh</button></div>
+          <div style="padding:12px;border-radius:10px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:12.5px;color:var(--dim);margin-bottom:12px;line-height:1.5">
+            Lista svih korisnika koje su atleti doveli. Status: <b style="color:var(--gold)">pending</b> = na trial-u (jos nije platio) · <b style="color:var(--lime)">confirmed</b> = aktivno plaća · <b style="color:#ffb0b8">refunded</b> = otkazano.
+          </div>
+          <table><thead><tr><th>Datum</th><th>Email klijenta</th><th>Atleta</th><th>Paket</th><th>Iznos</th><th>Status</th></tr></thead>
+            <tbody id="customersBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
         </div>
       </div>
 
@@ -446,6 +458,7 @@ document.querySelectorAll('aside nav button').forEach(function(b){
     if (sec === 'challenges') loadChallenges();
     if (sec === 'content') { loadContent(); loadProducts(); }
     if (sec === 'qr') { generateAllQR(); }
+    if (sec === 'customers') { loadCustomers(); }
     if (sec === 'notify') { loadScheduled(); }
   });
 });
@@ -648,6 +661,28 @@ window.toggleMobileMenu = function(){
 window.closeMobileMenu = function(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('mobileOverlay').classList.remove('show');
+};
+
+window.loadCustomers = async function(){
+  try {
+    const { data, error } = await supabase.from('sales').select('*, athletes(username,full_name), products(name,slug)').order('created_at',{ ascending: false }).limit(200);
+    if (error) throw error;
+    const body = document.getElementById('customersBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema klijenata. Cekamo prvi skenirani QR.</td></tr>'; return; }
+    body.innerHTML = data.map(function(s){
+      const a = s.athletes || {};
+      const p = s.products || {};
+      const email = s.customer_email || '—';
+      return '<tr>' +
+        '<td>' + fmtDT(s.created_at) + '</td>' +
+        '<td><b>' + escapeHtml(email) + '</b>' + (s.customer_country ? ' <span style="color:var(--mute);font-size:10px">' + s.customer_country + '</span>' : '') + '</td>' +
+        '<td>@' + escapeHtml(a.username || '?') + '<br><span style="font-size:10.5px;color:var(--mute)">' + escapeHtml(a.full_name || '') + '</span></td>' +
+        '<td>' + escapeHtml(p.name || p.slug || '') + '</td>' +
+        '<td>' + ((s.gross_amount_cents || 0)/100).toFixed(2) + ' €</td>' +
+        '<td><span class="tag ' + s.status + '">' + s.status + '</span></td>' +
+        '</tr>';
+    }).join('');
+  } catch(e){ document.getElementById('customersBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
 };
 
 window.generateAllQR = async function(){
