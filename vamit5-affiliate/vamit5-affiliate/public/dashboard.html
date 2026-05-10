@@ -259,6 +259,11 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="link-grid" id="linkGrid"></div>
     </div>
 
+    <div class="card">
+      <div class="card-head"><h2><span class="em">👤</span>Moji klijenti</h2><span class="badge" id="customersBadge">0</span></div>
+      <div id="customersList" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
     <div class="card" id="payout-card">
       <div class="card-head"><h2><span class="em">💸</span>Bankovni podaci za isplate</h2></div>
       <div style="padding:14px;border-radius:11px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12.5px;color:var(--gold);margin-bottom:14px;line-height:1.5">
@@ -816,6 +821,31 @@ try {
     if (athlete.payout_phone) document.getElementById('po_phone').value = athlete.payout_phone;
   }
 } catch(e) { console.error('payout pre-fill', e); }
+
+// --- MOJI KLIJENTI ---
+(async function(){
+  try {
+    const { data } = await supabase.from('sales').select('*, products(name,slug)').eq('athlete_id', athlete.id).order('created_at',{ ascending: false }).limit(50);
+    const list = document.getElementById('customersList');
+    const badge = document.getElementById('customersBadge');
+    if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--mute);font-size:12.5px">Jos nemas klijenata. Deli svoj QR kod / link!</div>'; badge.textContent = '0'; return; }
+    badge.textContent = data.length;
+    list.innerHTML = '';
+    data.forEach(function(s){
+      const p = s.products || {};
+      const email = s.customer_email || '—';
+      const myCom = ((s.commission_cents || 0)/100).toFixed(2);
+      const statusColor = s.status === 'confirmed' ? 'var(--lime)' : s.status === 'pending' ? 'var(--gold)' : '#ffb0b8';
+      const statusText = s.status === 'confirmed' ? '✓ aktivan' : s.status === 'pending' ? '⏳ na trial-u' : s.status;
+      const div = document.createElement('div');
+      div.style.cssText = 'display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border);font-size:13px';
+      div.innerHTML = '<div><div style="font-weight:700">' + email + '</div>' +
+        '<div style="font-size:11px;color:var(--mute);margin-top:3px">' + (p.name || p.slug || '') + ' · <span style="color:' + statusColor + '">' + statusText + '</span> · ' + new Date(s.created_at).toLocaleDateString('sr') + '</div></div>' +
+        '<div style="text-align:right"><div style="font-weight:800;color:var(--gold)">+' + myCom + ' €</div><div style="font-size:10.5px;color:var(--mute)">tvoja provizija</div></div>';
+      list.appendChild(div);
+    });
+  } catch(e){ console.error('customers', e); }
+})();
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
