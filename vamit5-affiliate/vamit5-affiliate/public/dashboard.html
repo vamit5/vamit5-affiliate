@@ -64,6 +64,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .xp-fill{height:100%;background:linear-gradient(90deg,var(--brand),var(--brand2));border-radius:99px;transition:width .8s ease;box-shadow:0 0 12px rgba(0,240,255,0.5)}
 .xp-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--mute);font-weight:600}
 
+.po-l{font-size:11px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px}
+.po-i{width:100%;padding:11px 14px;border-radius:9px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;outline:none}
+.po-i:focus{border-color:var(--brand)}
 .points-legend{margin-top:14px;padding:12px 14px;border-radius:11px;background:linear-gradient(135deg,rgba(255,194,75,0.08),rgba(255,59,154,0.05));border:1px solid rgba(255,194,75,0.2);font-size:12px;color:var(--gold);font-weight:600;line-height:1.5}
 
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
@@ -166,7 +169,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
   .hero p{font-size:12.5px}
   .tier-card{padding:14px}
   .tier-name{font-size:18px}
-  .points-legend{font-size:11.5px;padding:10px 12px}
+  .po-l{font-size:11px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px}
+.po-i{width:100%;padding:11px 14px;border-radius:9px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;outline:none}
+.po-i:focus{border-color:var(--brand)}
+.points-legend{font-size:11.5px;padding:10px 12px}
   .card{padding:16px 14px;border-radius:15px}
   .card-head h2{font-size:14px}
   .kpi{padding:12px}
@@ -756,6 +762,49 @@ window.togglePush = async function(){
     const cleanUrl = window.location.pathname;
     history.replaceState({}, '', cleanUrl);
   }
+})();
+
+// --- PAYOUT METHODS ---
+window.togglePayoutFields = function(){
+  const m = document.getElementById('po_method').value;
+  document.getElementById('po_email_field').style.display = (m === 'wise' || m === 'paypal') ? 'block' : 'none';
+  document.getElementById('po_iban_field').style.display = m === 'iban' ? 'block' : 'none';
+  document.getElementById('po_swift_field').style.display = m === 'iban' ? 'block' : 'none';
+  document.getElementById('po_bank_field').style.display = m === 'iban' ? 'block' : 'none';
+};
+window.savePayout = async function(){
+  const m = document.getElementById('po_method').value;
+  const data = {
+    payout_method: m,
+    payout_full_name: document.getElementById('po_name').value || null,
+    payout_email: document.getElementById('po_email').value || null,
+    payout_iban: document.getElementById('po_iban').value || null,
+    payout_swift: document.getElementById('po_swift').value || null,
+    payout_bank_name: document.getElementById('po_bank').value || null,
+    payout_address: document.getElementById('po_address').value || null,
+    payout_phone: document.getElementById('po_phone').value || null
+  };
+  if (!data.payout_full_name) { document.getElementById('po_status').textContent = 'Puno ime je obavezno!'; return; }
+  if ((m === 'wise' || m === 'paypal') && !data.payout_email) { document.getElementById('po_status').textContent = 'Email je obavezan za ' + m + '!'; return; }
+  if (m === 'iban' && !data.payout_iban) { document.getElementById('po_status').textContent = 'IBAN je obavezan!'; return; }
+  try {
+    const { error } = await supabase.from('athletes').update(data).eq('id', athlete.id);
+    if (error){ document.getElementById('po_status').textContent = 'Greska: ' + error.message; return; }
+    document.getElementById('po_status').textContent = '✓ Snimljeno! Prima isplate od 20. u sledecem mesecu.';
+    document.getElementById('po_status').style.color = 'var(--lime)';
+  } catch(e){ document.getElementById('po_status').textContent = 'Greska: ' + e.message; }
+};
+// Pre-fill payout fields
+(function(){
+  if (athlete.payout_method) document.getElementById('po_method').value = athlete.payout_method;
+  if (athlete.payout_full_name) document.getElementById('po_name').value = athlete.payout_full_name;
+  if (athlete.payout_email) document.getElementById('po_email').value = athlete.payout_email;
+  if (athlete.payout_iban) document.getElementById('po_iban').value = athlete.payout_iban;
+  if (athlete.payout_swift) document.getElementById('po_swift').value = athlete.payout_swift;
+  if (athlete.payout_bank_name) document.getElementById('po_bank').value = athlete.payout_bank_name;
+  if (athlete.payout_address) document.getElementById('po_address').value = athlete.payout_address;
+  if (athlete.payout_phone) document.getElementById('po_phone').value = athlete.payout_phone;
+  togglePayoutFields();
 })();
 
 document.getElementById('loading').classList.add('hidden');
