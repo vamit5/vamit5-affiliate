@@ -259,6 +259,32 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div class="link-grid" id="linkGrid"></div>
     </div>
 
+    <div class="card" id="payout-card">
+      <div class="card-head"><h2><span class="em">💸</span>Moji bankovni podaci za isplate</h2></div>
+      <div style="padding:12px 14px;border-radius:11px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12.5px;color:var(--gold);margin-bottom:14px;line-height:1.5">
+        Isplate se vrše <b>20. u mesecu</b> za prethodni mesec. Bira jedan od 3 metode — sve podržane za Srbiju.
+      </div>
+      <div style="display:grid;gap:10px">
+        <div>
+          <label class="po-l">Metoda isplate</label>
+          <select id="po_method" onchange="togglePayoutFields()" style="width:100%;padding:11px 14px;border-radius:9px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+            <option value="wise">Wise (najbrze i najjeftinije za EUR)</option>
+            <option value="paypal">PayPal (instant ali ima fee)</option>
+            <option value="iban">Bankovna uplata (SEPA / SWIFT)</option>
+          </select>
+        </div>
+        <div><label class="po-l">Puno ime (kao u banci)</label><input id="po_name" class="po-i"></div>
+        <div id="po_email_field"><label class="po-l">Email (Wise/PayPal)</label><input id="po_email" type="email" class="po-i" placeholder="ti@gmail.com"></div>
+        <div id="po_iban_field" style="display:none"><label class="po-l">IBAN broj</label><input id="po_iban" class="po-i" placeholder="RS35260005601001611379"></div>
+        <div id="po_swift_field" style="display:none"><label class="po-l">SWIFT/BIC</label><input id="po_swift" class="po-i" placeholder="UCBKRSBG"></div>
+        <div id="po_bank_field" style="display:none"><label class="po-l">Naziv banke</label><input id="po_bank" class="po-i"></div>
+        <div><label class="po-l">Adresa</label><input id="po_address" class="po-i" placeholder="Beograd, ulica, broj"></div>
+        <div><label class="po-l">Telefon</label><input id="po_phone" class="po-i" placeholder="+381 60 ..."></div>
+      </div>
+      <button class="btn" onclick="savePayout()" style="margin-top:14px;width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none;font-weight:800">💾 Snimi bankovne podatke</button>
+      <div id="po_status" style="margin-top:10px;font-size:12px;color:var(--dim);text-align:center"></div>
+    </div>
+
     <div class="card">
       <div class="card-head"><h2><span class="em">🏆</span><span id="achTitle">Dostignuca</span></h2><span class="badge" id="achBadge">0/0</span></div>
       <div class="ach-grid" id="achGrid"></div>
@@ -794,18 +820,20 @@ window.savePayout = async function(){
     document.getElementById('po_status').style.color = 'var(--lime)';
   } catch(e){ document.getElementById('po_status').textContent = 'Greska: ' + e.message; }
 };
-// Pre-fill payout fields
-(function(){
-  if (athlete.payout_method) document.getElementById('po_method').value = athlete.payout_method;
-  if (athlete.payout_full_name) document.getElementById('po_name').value = athlete.payout_full_name;
-  if (athlete.payout_email) document.getElementById('po_email').value = athlete.payout_email;
-  if (athlete.payout_iban) document.getElementById('po_iban').value = athlete.payout_iban;
-  if (athlete.payout_swift) document.getElementById('po_swift').value = athlete.payout_swift;
-  if (athlete.payout_bank_name) document.getElementById('po_bank').value = athlete.payout_bank_name;
-  if (athlete.payout_address) document.getElementById('po_address').value = athlete.payout_address;
-  if (athlete.payout_phone) document.getElementById('po_phone').value = athlete.payout_phone;
-  togglePayoutFields();
-})();
+// Pre-fill payout fields (safe — only if elements exist)
+try {
+  if (document.getElementById('po_method')) {
+    if (athlete.payout_method) document.getElementById('po_method').value = athlete.payout_method;
+    if (athlete.payout_full_name) document.getElementById('po_name').value = athlete.payout_full_name;
+    if (athlete.payout_email) document.getElementById('po_email').value = athlete.payout_email;
+    if (athlete.payout_iban) document.getElementById('po_iban').value = athlete.payout_iban;
+    if (athlete.payout_swift) document.getElementById('po_swift').value = athlete.payout_swift;
+    if (athlete.payout_bank_name) document.getElementById('po_bank').value = athlete.payout_bank_name;
+    if (athlete.payout_address) document.getElementById('po_address').value = athlete.payout_address;
+    if (athlete.payout_phone) document.getElementById('po_phone').value = athlete.payout_phone;
+    togglePayoutFields();
+  }
+} catch(e) { console.error('payout pre-fill', e); }
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
