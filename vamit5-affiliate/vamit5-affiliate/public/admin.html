@@ -134,11 +134,11 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
       <button class="active" data-section="overview">Overview</button>
       <button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
       <button data-section="athletes">Atlete</button>
+      <button data-section="organizers">Organizatori</button>
       <button data-section="customers">Klijenti</button>
       <button data-section="sales">Prodaje</button>
-      <button data-section="payouts">Isplate</button>
+      <button data-section="payouts">Isplate <span class="badge" id="payoutBadge" style="display:none">0</span></button>
       <button data-section="challenges">Izazovi</button>
-      <button data-section="qr">QR kodovi</button>
       <button data-section="content">Sadrzaj</button>
       <button data-section="notify">Notifikacije</button>
     </nav>
@@ -197,18 +197,79 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
         </div>
       </div>
 
+      <div class="section" id="sec-organizers">
+        <div class="card">
+          <div class="card-head"><h2>🎪 Dodaj novog organizatora</h2></div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
+            <input id="orgName" placeholder="Puno ime (npr. Marko Petrovic)" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+            <input id="orgEmail" type="email" placeholder="Email za login (npr. marko@gmail.com)" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+            <input id="orgPromoCode" placeholder="Promo kod (npr. TOURDEFRUSKA)" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--gold);font-family:inherit;font-size:13px;text-transform:uppercase">
+            <input id="orgCommission" type="number" min="0" max="100" step="1" placeholder="Provizija u %" value="30" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn brand" onclick="addOrganizer()">+ Dodaj organizatora</button>
+            <button class="btn ghost" onclick="loadOrganizers()">Refresh listu</button>
+          </div>
+          <div style="margin-top:10px;padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:12px;color:var(--dim);line-height:1.6">
+            <b style="color:var(--brand)">Posle dodavanja:</b> organizator se loguje na <code>vamit5-affiliate.vercel.app/login.html</code> sa svojim email-om i automatski ulazi u svoj dashboard.<br>
+            <b style="color:var(--brand)">VAZNO:</b> isti promo kod mora postojati i u Stripe Dashboard-u (Coupons → Promotion codes).
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>Postojeci organizatori</h2></div>
+          <table>
+            <thead><tr><th>Ime</th><th>Email</th><th>Promo kod</th><th>Provizija</th><th>Aktivnih prijava</th><th>Akcije</th></tr></thead>
+            <tbody id="organizersBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="section" id="sec-sales">
         <div class="card">
-          <div class="card-head"><h2>Prodaje</h2><button class="btn ghost" onclick="loadSales()">Refresh</button></div>
-          <table><thead><tr><th>Vreme</th><th>Atleta</th><th>Paket</th><th>Iznos (€)</th><th>Provizija (€)</th><th>Status</th></tr></thead>
-            <tbody id="salesBody"><tr><td colspan="6" class="empty">Ucitavanje...</td></tr></tbody></table>
+          <div class="card-head">
+            <h2>Prodaje <span id="salesCountBadge" style="font-size:12px;color:var(--mute);font-weight:400"></span></h2>
+            <button class="btn ghost" onclick="loadSales()">Refresh</button>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:8px;margin-bottom:14px">
+            <select id="salesFilterAthlete" onchange="loadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+              <option value="">Svaki atleta</option>
+            </select>
+            <select id="salesFilterOrganizer" onchange="loadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+              <option value="">Svaki event</option>
+              <option value="__none__">Bez eventa (direkt)</option>
+            </select>
+            <select id="salesFilterStatus" onchange="loadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+              <option value="">Svi statusi</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="pending">Pending (trial)</option>
+              <option value="refunded">Refunded</option>
+            </select>
+            <input id="salesFilterEmail" placeholder="Email kupca..." oninput="debounceLoadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+            <input id="salesFilterFrom" type="date" onchange="loadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+            <input id="salesFilterTo" type="date" onchange="loadSales()" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-size:12.5px">
+          </div>
+          <div style="overflow-x:auto">
+            <table><thead><tr><th>Vreme</th><th>Kupac</th><th>Atleta</th><th>Event/Direkt</th><th>Bruto €</th><th>Atleti €</th><th>Organizatoru €</th><th>Status</th><th>Akcije</th></tr></thead>
+              <tbody id="salesBody"><tr><td colspan="9" class="empty">Ucitavanje...</td></tr></tbody></table>
+          </div>
         </div>
       </div>
 
       <div class="section" id="sec-payouts">
+        <!-- Organizer payout requests -->
+        <div class="card" style="margin-bottom:14px;border-color:rgba(255,194,75,0.35)">
+          <div class="card-head"><h2>🎪 Zahtevi za isplatu — ORGANIZATORI <span id="orgPayoutCount" style="font-size:12px;color:var(--mute);font-weight:400"></span></h2><button class="btn ghost" onclick="loadOrgPayouts()">Refresh</button></div>
+          <div style="padding:10px;border-radius:8px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12px;color:var(--dim);margin-bottom:12px;line-height:1.6">
+            <b style="color:var(--gold)">Tok rada:</b> 1) Organizator klikne "Zatrazi isplatu" u svom dashbordu. 2) Ti vidis zahtev ovde sa bankovnim podacima. 3) Uradis bankovni transfer. 4) Klikni <b>"Oznaci kao placeno"</b> → email automatski stize organizatoru.
+          </div>
+          <table><thead><tr><th>Datum</th><th>Organizator</th><th>Email</th><th>Iznos €</th><th>Bank info</th><th>Status</th><th>Akcije</th></tr></thead>
+            <tbody id="orgPayoutsBody"><tr><td colspan="7" class="empty">Ucitavanje...</td></tr></tbody></table>
+        </div>
+
+        <!-- Athlete payouts (old monthly system) -->
         <div class="card">
-          <div class="card-head"><h2>Isplate</h2><button class="btn brand" onclick="triggerPayouts()">Pokreni mesecne isplate</button></div>
-          <table><thead><tr><th>Period</th><th>Atleta</th><th>Iznos (€)</th><th>Status</th><th>Datum</th></tr></thead>
+          <div class="card-head"><h2>👤 Isplate atletama (mesecne)</h2><button class="btn brand" onclick="triggerPayouts()">Pokreni mesecne isplate</button></div>
+          <table><thead><tr><th>Period</th><th>Atleta</th><th>Iznos €</th><th>Status</th><th>Datum</th></tr></thead>
             <tbody id="payoutsBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
         </div>
       </div>
@@ -230,37 +291,6 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
             <input id="cchXP" type="number" placeholder="XP nagrada (500)" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:12.5px" value="500">
           </div>
           <button class="btn green" onclick="addCustomChallenge()">Dodaj custom izazov</button>
-        </div>
-      </div>
-
-      <div class="section" id="sec-qr">
-        <!-- EVENT QR PACK — za eventove sa organizatorom (30%) -->
-        <div class="card" style="margin-bottom:14px;border-color:rgba(255,194,75,0.35)">
-          <div class="card-head"><h2>🎪 EVENT QR Pack (organizator dobija 30%)</h2></div>
-          <div style="padding:12px;border-radius:10px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12.5px;color:var(--dim);margin-bottom:12px;line-height:1.6">
-            <b style="color:var(--gold)">Kad ides na event</b> (Tour de Fruska, Beograd Maraton...) — unesi promo kod tog organizatora, sistem pravi <b>poseban QR za svaku atletu</b>. Kupac koji skenira: atleta dobija svoj %, organizator dobija 30%, oboje vide prijavu u svom dashboardu.
-            <br><b style="color:var(--gold)">Pre upotrebe:</b> organizator mora postojati u bazi (insert u organizers + Stripe promotion code sa istim kodom).
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
-            <input id="eventOrgCode" placeholder="Promo kod organizatora (npr. TOURDEFRUSKA)" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--gold);font-family:inherit;font-size:13px;flex:1;min-width:200px;text-transform:uppercase">
-            <button class="btn brand" style="background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14" onclick="generateEventPack()">🎯 Generisi Event QR Pack</button>
-          </div>
-          <div id="eventPackGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
-        </div>
-
-        <!-- STANDARD QR — atleta individualno (Instagram/social) -->
-        <div class="card">
-          <div class="card-head"><h2>📱 Standardni QR kodovi za atlete (Instagram + Event)</h2></div>
-          <div style="padding:14px;border-radius:11px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:13px;color:var(--dim);margin-bottom:14px;line-height:1.6">
-            <b style="color:var(--brand)">Bez organizatora.</b> Atleta dobija 2 QR-a:
-            <br>• <b style="color:var(--gold)">Event (gold)</b> — 7-dana FREE trial (za samostalni event ili WhatsApp pozive)
-            <br>• <b style="color:var(--brand)">Monthly (cyan)</b> — Instagram, redovne prodaje (kartica odmah)
-          </div>
-          <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-            <button class="btn brand" onclick="generateAllQR()">🎯 Generisi QR za sve atlete</button>
-            <button class="btn ghost" onclick="window.print()">🖨️ Print sve</button>
-          </div>
-          <div id="qrGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
         </div>
       </div>
 
@@ -467,11 +497,11 @@ document.querySelectorAll('aside nav button').forEach(function(b){
     document.getElementById('sec-' + sec).classList.add('active');
     document.getElementById('sectionTitle').textContent = b.textContent.trim().replace(/\s+\d+$/,'');
     closeMobileMenu();
-    if (sec === 'sales') loadSales();
-    if (sec === 'payouts') loadPayouts();
+    if (sec === 'sales') { initSalesFilters(); loadSales(); }
+    if (sec === 'payouts') { loadOrgPayouts(); loadPayouts(); }
     if (sec === 'challenges') loadChallenges();
     if (sec === 'content') { loadContent(); loadProducts(); }
-    if (sec === 'qr') { generateAllQR(); }
+    if (sec === 'organizers') loadOrganizers();
     if (sec === 'customers') { loadCustomers(); }
     if (sec === 'notify') { loadScheduled(); }
   });
@@ -546,22 +576,204 @@ window.loadAthletes = async function(){
   } catch(e){ document.getElementById('athletesBody').innerHTML = '<tr><td colspan="7" class="empty">Greska: ' + e.message + '</td></tr>'; }
 };
 
+// =====================================================================
+// PRODAJE — sa filterima i event/direkt oznakom
+// =====================================================================
+let _salesFiltersInited = false;
+let _salesDebounce = null;
+window.debounceLoadSales = function(){ clearTimeout(_salesDebounce); _salesDebounce = setTimeout(window.loadSales, 300); };
+
+window.initSalesFilters = async function(){
+  if (_salesFiltersInited) return;
+  _salesFiltersInited = true;
+  try {
+    const [{ data: ath }, { data: orgs }] = await Promise.all([
+      supabase.from('athletes').select('id,username,full_name').order('full_name'),
+      supabase.from('organizers').select('id,full_name,promo_code').order('full_name')
+    ]);
+    const aSel = document.getElementById('salesFilterAthlete');
+    (ath||[]).forEach(function(a){
+      const o = document.createElement('option'); o.value = a.id; o.textContent = a.full_name + ' (@' + a.username + ')'; aSel.appendChild(o);
+    });
+    const oSel = document.getElementById('salesFilterOrganizer');
+    (orgs||[]).forEach(function(o){
+      const op = document.createElement('option'); op.value = o.id; op.textContent = o.full_name + ' · ' + o.promo_code; oSel.appendChild(op);
+    });
+  } catch(e){ console.log('initSalesFilters err', e); }
+};
+
 window.loadSales = async function(){
   try {
-    const { data, error } = await supabase.from('sales').select('*, athletes(username,full_name), products(name)').order('created_at',{ ascending: false }).limit(100);
+    const fAth = document.getElementById('salesFilterAthlete')?.value || '';
+    const fOrg = document.getElementById('salesFilterOrganizer')?.value || '';
+    const fStatus = document.getElementById('salesFilterStatus')?.value || '';
+    const fEmail = (document.getElementById('salesFilterEmail')?.value || '').trim();
+    const fFrom = document.getElementById('salesFilterFrom')?.value || '';
+    const fTo = document.getElementById('salesFilterTo')?.value || '';
+
+    let q = supabase.from('sales').select('*, athletes(username,full_name), products(name), organizers(full_name,promo_code)').order('created_at',{ ascending: false }).limit(500);
+    if (fAth) q = q.eq('athlete_id', fAth);
+    if (fOrg === '__none__') q = q.is('organizer_id', null);
+    else if (fOrg) q = q.eq('organizer_id', fOrg);
+    if (fStatus) q = q.eq('status', fStatus);
+    if (fEmail) q = q.ilike('customer_email', '%' + fEmail + '%');
+    if (fFrom) q = q.gte('created_at', fFrom + 'T00:00:00');
+    if (fTo) q = q.lte('created_at', fTo + 'T23:59:59');
+
+    const { data, error } = await q;
     if (error) throw error;
     const body = document.getElementById('salesBody');
-    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema prodaja.</td></tr>'; return; }
+    const badge = document.getElementById('salesCountBadge');
+    if (badge) badge.textContent = '(' + (data?.length || 0) + ' prodaja)';
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="9" class="empty">Nema rezultata za odabrane filtere.</td></tr>'; return; }
     body.innerHTML = data.map(function(s){
       const a = s.athletes || {};
-      return '<tr><td>' + fmtDT(s.created_at) + '</td>' +
-        '<td>@' + escapeHtml(a.username || '?') + '</td>' +
-        '<td>' + escapeHtml((s.products && s.products.name) || s.product_slug || '') + '</td>' +
-        '<td>' + ((s.amount_cents || 0)/100).toFixed(2) + '</td>' +
-        '<td>' + ((s.commission_cents || 0)/100).toFixed(2) + '</td>' +
-        '<td><span class="tag ' + s.status + '">' + s.status + '</span></td></tr>';
+      const org = s.organizers;
+      const gross = ((s.gross_amount_cents || s.amount_cents || 0)/100).toFixed(2);
+      const athCommission = ((s.commission_cents || 0)/100).toFixed(2);
+      const orgCommission = ((s.organizer_commission_cents || 0)/100).toFixed(2);
+      const eventLabel = org
+        ? '<span class="tag" style="background:rgba(255,194,75,0.15);color:#ffc24b;border:1px solid rgba(255,194,75,0.3)">🎪 ' + escapeHtml(org.promo_code) + '</span>'
+        : '<span class="tag" style="background:rgba(0,240,255,0.1);color:#00f0ff;border:1px solid rgba(0,240,255,0.25)">📱 DIREKT</span>';
+      return '<tr>' +
+        '<td>' + fmtDT(s.created_at) + '</td>' +
+        '<td>' + escapeHtml(s.customer_email || '-') + '</td>' +
+        '<td>@' + escapeHtml(a.username || '?') + '<br><small style="color:var(--mute)">' + escapeHtml(a.full_name || '') + '</small></td>' +
+        '<td>' + eventLabel + '</td>' +
+        '<td>' + gross + '</td>' +
+        '<td>' + athCommission + '</td>' +
+        '<td>' + orgCommission + '</td>' +
+        '<td><span class="tag ' + s.status + '">' + s.status + '</span></td>' +
+        '<td><button class="btn red" style="padding:5px 10px;font-size:11px" onclick="deleteSale(\'' + s.id + '\')">Obrisi</button></td>' +
+        '</tr>';
     }).join('');
-  } catch(e){ document.getElementById('salesBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
+  } catch(e){ document.getElementById('salesBody').innerHTML = '<tr><td colspan="9" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.deleteSale = async function(id){
+  if (!confirm('Obrisi ovu prodaju trajno?')) return;
+  try {
+    const { error } = await supabase.from('sales').delete().eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadSales();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+// =====================================================================
+// ORGANIZATORI — dodaj/obrisi
+// =====================================================================
+window.loadOrganizers = async function(){
+  try {
+    const { data, error } = await supabase.from('organizers').select('*').order('created_at',{ ascending: false });
+    if (error) throw error;
+    const body = document.getElementById('organizersBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="6" class="empty">Jos nema organizatora. Dodaj prvog gore.</td></tr>'; return; }
+    // Count active sales per organizer
+    const countsPromises = data.map(function(o){
+      return supabase.from('sales').select('id', { count: 'exact', head: true }).eq('organizer_id', o.id);
+    });
+    const counts = await Promise.all(countsPromises);
+    body.innerHTML = data.map(function(o, i){
+      const cnt = counts[i].count || 0;
+      return '<tr>' +
+        '<td><b>' + escapeHtml(o.full_name) + '</b></td>' +
+        '<td>' + escapeHtml(o.email) + '</td>' +
+        '<td><b style="color:var(--gold)">' + escapeHtml(o.promo_code) + '</b></td>' +
+        '<td>' + Math.round((o.commission_pct || 0.3) * 100) + '%</td>' +
+        '<td>' + cnt + '</td>' +
+        '<td><button class="btn red" style="padding:5px 10px;font-size:11px" onclick="deleteOrganizer(\'' + o.id + '\',\'' + escapeHtml(o.full_name) + '\')">Obrisi</button></td>' +
+        '</tr>';
+    }).join('');
+  } catch(e){ document.getElementById('organizersBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.addOrganizer = async function(){
+  const name = (document.getElementById('orgName').value || '').trim();
+  const email = (document.getElementById('orgEmail').value || '').trim().toLowerCase();
+  const code = (document.getElementById('orgPromoCode').value || '').trim().toUpperCase();
+  const pct = parseFloat(document.getElementById('orgCommission').value || '30') / 100;
+  if (!name || !email || !code){ alert('Popuni sva tri polja: ime, email, promo kod'); return; }
+  if (!email.includes('@')){ alert('Email nije validan'); return; }
+  if (pct < 0 || pct > 1){ alert('Provizija mora biti izmedju 0 i 100'); return; }
+  try {
+    const { error } = await supabase.from('organizers').insert({
+      full_name: name, email: email, promo_code: code, commission_pct: pct
+    });
+    if (error){ alert('Greska: ' + error.message); return; }
+    document.getElementById('orgName').value = '';
+    document.getElementById('orgEmail').value = '';
+    document.getElementById('orgPromoCode').value = '';
+    document.getElementById('orgCommission').value = '30';
+    alert('Organizator dodat. Sada mu treba poslati link: vamit5-affiliate.vercel.app/login.html (uloguje se sa email-om ' + email + ').');
+    loadOrganizers();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.deleteOrganizer = async function(id, name){
+  if (!confirm('Obrisi organizatora "' + name + '"? Sve njegove prodaje ostaju u bazi ali bez organizator_id.')) return;
+  try {
+    const { error } = await supabase.from('organizers').delete().eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadOrganizers();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+// =====================================================================
+// ISPLATE — zahtevi od organizatora + stare mesecne isplate
+// =====================================================================
+window.loadOrgPayouts = async function(){
+  try {
+    const { data, error } = await supabase.from('organizer_payout_requests').select('*, organizers(full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').order('requested_at',{ ascending: false });
+    if (error) throw error;
+    const body = document.getElementById('orgPayoutsBody');
+    const pending = (data || []).filter(function(p){ return p.status === 'pending'; });
+    const badge = document.getElementById('payoutBadge');
+    const orgCount = document.getElementById('orgPayoutCount');
+    if (badge){ if (pending.length){ badge.style.display=''; badge.textContent = pending.length; } else { badge.style.display='none'; } }
+    if (orgCount) orgCount.textContent = '(' + pending.length + ' na čekanju)';
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="7" class="empty">Jos nema zahteva za isplatu.</td></tr>'; return; }
+    body.innerHTML = data.map(function(p){
+      const o = p.organizers || {};
+      const bank = '<small style="color:var(--mute);line-height:1.5">' +
+        (o.payout_full_name ? 'Ime: <b>' + escapeHtml(o.payout_full_name) + '</b><br>' : '') +
+        (o.payout_account_number ? 'Racun: <b>' + escapeHtml(o.payout_account_number) + '</b><br>' : '') +
+        (o.payout_bank_name ? 'Banka: ' + escapeHtml(o.payout_bank_name) + '<br>' : '') +
+        (o.payout_phone ? 'Tel: ' + escapeHtml(o.payout_phone) : '') +
+        '</small>';
+      const isPending = p.status === 'pending';
+      const actions = isPending
+        ? '<button class="btn green" style="padding:5px 10px;font-size:11px" onclick="markOrgPayoutPaid(\'' + p.id + '\')">✓ Plaćeno</button> <button class="btn red" style="padding:5px 10px;font-size:11px;margin-left:4px" onclick="rejectOrgPayout(\'' + p.id + '\')">Odbij</button>'
+        : '<small style="color:var(--mute)">' + (p.paid_at ? fmtDT(p.paid_at) : '') + '</small>';
+      return '<tr>' +
+        '<td>' + fmtDT(p.requested_at) + '</td>' +
+        '<td><b>' + escapeHtml(o.full_name || '?') + '</b></td>' +
+        '<td>' + escapeHtml(o.email || '?') + '</td>' +
+        '<td><b>' + ((p.amount_cents || 0)/100).toFixed(2) + '</b></td>' +
+        '<td>' + (bank.length > 80 ? bank : '<small style="color:#ff8a3b">Bez bank info</small>') + '</td>' +
+        '<td><span class="tag ' + p.status + '">' + p.status + '</span></td>' +
+        '<td>' + actions + '</td>' +
+        '</tr>';
+    }).join('');
+  } catch(e){ document.getElementById('orgPayoutsBody').innerHTML = '<tr><td colspan="7" class="empty">Greska: ' + e.message + '</td></tr>'; }
+};
+
+window.markOrgPayoutPaid = async function(id){
+  if (!confirm('Potvrdi da je isplata izvrsena (bankovni transfer urađen)?')) return;
+  try {
+    const { error } = await supabase.from('organizer_payout_requests').update({ status: 'paid', paid_at: new Date().toISOString() }).eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadOrgPayouts();
+  } catch(e){ alert('Greska: ' + e.message); }
+};
+
+window.rejectOrgPayout = async function(id){
+  const reason = prompt('Razlog odbijanja (opciono):');
+  if (reason === null) return;
+  try {
+    const { error } = await supabase.from('organizer_payout_requests').update({ status: 'rejected', notes: reason || null, paid_at: new Date().toISOString() }).eq('id', id);
+    if (error){ alert('Greska: ' + error.message); return; }
+    loadOrgPayouts();
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
 window.loadPayouts = async function(){
@@ -569,7 +781,7 @@ window.loadPayouts = async function(){
     const { data, error } = await supabase.from('payouts').select('*, athletes(username)').order('created_at',{ ascending: false });
     if (error) throw error;
     const body = document.getElementById('payoutsBody');
-    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Jos nema isplata.</td></tr>'; return; }
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Jos nema isplata atleta.</td></tr>'; return; }
     body.innerHTML = data.map(function(p){
       return '<tr><td>' + (p.period || '-') + '</td>' +
         '<td>@' + escapeHtml((p.athletes && p.athletes.username) || '?') + '</td>' +
@@ -699,94 +911,6 @@ window.loadCustomers = async function(){
   } catch(e){ document.getElementById('customersBody').innerHTML = '<tr><td colspan="6" class="empty">Greska: ' + e.message + '</td></tr>'; }
 };
 
-window.generateAllQR = async function(){
-  const grid = document.getElementById('qrGrid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mute);padding:20px">Ucitavanje atleta...</div>';
-  try {
-    const { data: athletes } = await supabase.from('athletes').select('id,username,full_name,promo_code').not('promo_code','is',null).order('full_name');
-    if (!athletes || !athletes.length){ grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ffb0b8;padding:20px">Nijedan atleta nema promo_code! Pokreni SQL prvo da bi se promo kodovi mapirali.</div>'; return; }
-    const EVENT_LINK = 'https://buy.stripe.com/8x2bJ0fAwfPwgd90sSeEo0s';
-    const MONTHLY_LINK = 'https://buy.stripe.com/eVq3cuewseLsgd94J8eEo0q';
-    grid.innerHTML = '';
-    athletes.forEach(function(a){
-      const eventUrl = EVENT_LINK + '?prefilled_promo_code=' + a.promo_code;
-      const monthlyUrl = MONTHLY_LINK + '?prefilled_promo_code=' + a.promo_code;
-      const qrEvent = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(eventUrl) + '&color=ffc24b&bgcolor=0a0c14&qzone=2';
-      const qrMonthly = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(monthlyUrl) + '&color=00f0ff&bgcolor=0a0c14&qzone=2';
-      const card = document.createElement('div');
-      card.style.cssText = 'padding:14px;border-radius:14px;background:#0a0c14;border:1px solid var(--border);page-break-inside:avoid';
-      card.innerHTML =
-        '<div style="text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">' +
-          '<div style="font-size:14px;font-weight:800;color:var(--brand)">' + a.full_name + '</div>' +
-          '<div style="font-size:10.5px;color:var(--mute);font-family:monospace;margin-top:3px">@' + a.username + ' · promo: <b style="color:var(--gold)">' + a.promo_code + '</b></div>' +
-        '</div>' +
-        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
-          '<div style="text-align:center">' +
-            '<div style="font-size:10.5px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">🎯 EVENT (7d FREE)</div>' +
-            '<img src="' + qrEvent + '" style="width:100%;border-radius:8px;background:#fff">' +
-            '<a href="' + qrEvent + '&download=1" download="qr-event-' + a.username + '.png" class="btn brand" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:10px">⬇ Event QR</a>' +
-          '</div>' +
-          '<div style="text-align:center">' +
-            '<div style="font-size:10.5px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">📱 IG/MEDIA</div>' +
-            '<img src="' + qrMonthly + '" style="width:100%;border-radius:8px;background:#fff">' +
-            '<a href="' + qrMonthly + '&download=1" download="qr-monthly-' + a.username + '.png" class="btn brand" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:10px">⬇ Monthly QR</a>' +
-          '</div>' +
-        '</div>' +
-        '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:9.5px;color:var(--mute);font-family:monospace;line-height:1.5;word-break:break-all">' +
-          '<div><b style="color:var(--gold)">EVENT:</b> ' + eventUrl + '</div>' +
-          '<div style="margin-top:4px"><b style="color:var(--brand)">IG:</b> ' + monthlyUrl + '</div>' +
-        '</div>';
-      grid.appendChild(card);
-    });
-  } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8;padding:20px">Greska: ' + e.message + '</div>'; }
-};
-
-// =====================================================================
-// EVENT QR PACK — pravi QR po atleti za odredjenog organizatora (30%)
-// =====================================================================
-window.generateEventPack = async function(){
-  const orgCode = (document.getElementById('eventOrgCode').value || '').trim().toUpperCase();
-  const grid = document.getElementById('eventPackGrid');
-  if (!orgCode){ grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px">Unesi promo kod organizatora prvo (npr. TOURDEFRUSKA).</div>'; return; }
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mute);padding:20px">Provera organizatora...</div>';
-  try {
-    const { data: org } = await supabase.from('organizers').select('id,full_name,promo_code,commission_pct').eq('promo_code', orgCode).maybeSingle();
-    if (!org){
-      grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px;background:rgba(255,77,94,0.1);border:1px solid rgba(255,77,94,0.35);border-radius:10px">Organizator sa kodom <b>'+orgCode+'</b> ne postoji u bazi.<br><br>Prvi korak: dodaj ga u Supabase (SQL):<br><code style="display:block;margin-top:8px;padding:8px;background:#0a0c14;border-radius:6px;font-size:11px">insert into public.organizers (email, full_name, promo_code) values (\'organizer@gmail.com\', \'Marko Petrovic\', \''+orgCode+'\');</code><br>I dodaj <b>'+orgCode+'</b> kao Promotion code u Stripe Dashboard.</div>';
-      return;
-    }
-    const { data: athletes } = await supabase.from('athletes').select('id,username,full_name,promo_code').not('promo_code','is',null).order('full_name');
-    if (!athletes || !athletes.length){ grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px">Nijedan atleta nema promo kod.</div>'; return; }
-
-    const EVENT_LINK = 'https://buy.stripe.com/8x2bJ0fAwfPwgd90sSeEo0s';
-    grid.innerHTML =
-      '<div style="grid-column:1/-1;padding:12px;background:rgba(166,255,59,0.08);border:1px solid rgba(166,255,59,0.3);border-radius:10px;color:#b5ffb0;font-size:13px;margin-bottom:6px">' +
-        '✓ Organizator: <b>' + org.full_name + '</b> · kod: <b>' + org.promo_code + '</b> · provizija: <b>' + Math.round((org.commission_pct||0.3)*100) + '%</b>' +
-      '</div>';
-    athletes.forEach(function(a){
-      const eventUrl = EVENT_LINK + '?prefilled_promo_code=' + orgCode + '&client_reference_id=' + a.promo_code;
-      const qrEvent = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(eventUrl) + '&color=ffc24b&bgcolor=0a0c14&qzone=2';
-      const card = document.createElement('div');
-      card.style.cssText = 'padding:14px;border-radius:14px;background:#0a0c14;border:1px solid rgba(255,194,75,0.35);page-break-inside:avoid';
-      card.innerHTML =
-        '<div style="text-align:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">' +
-          '<div style="font-size:14px;font-weight:800;color:var(--brand)">' + a.full_name + '</div>' +
-          '<div style="font-size:10.5px;color:var(--mute);font-family:monospace;margin-top:3px">@' + a.username + ' · <b style="color:var(--gold)">' + a.promo_code + '</b></div>' +
-          '<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:700">🎪 ' + org.full_name + '</div>' +
-        '</div>' +
-        '<div style="text-align:center">' +
-          '<div style="font-size:10.5px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">🎯 EVENT QR · 7d FREE</div>' +
-          '<img src="' + qrEvent + '" style="width:100%;border-radius:8px;background:#fff">' +
-          '<a href="' + qrEvent + '&download=1" download="qr-' + orgCode + '-' + a.username + '.png" class="btn" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:11px;background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14">⬇ Download</a>' +
-        '</div>' +
-        '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:var(--mute);font-family:monospace;line-height:1.5;word-break:break-all">' +
-          eventUrl +
-        '</div>';
-      grid.appendChild(card);
-    });
-  } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8;padding:20px">Greska: ' + e.message + '</div>'; }
-};
-
 window.loadProducts = async function(){
   try {
     const { data, error } = await supabase.from('products').select('*').order('display_order');
@@ -905,80 +1029,98 @@ window.sendBulkNotif = async function(){
   const body = document.getElementById('ntBody').value;
   const url = document.getElementById('ntUrl').value || '/dashboard.html';
   const target_tier = document.getElementById('ntTier').value || null;
-  if (!title || !body){ alert('Naslov i telo su obavezni.'); return; }
-  if (!confirm('Posalji "'+title+'" svim '+(target_tier||'atletama')+'?')) return;
-  document.getElementById('ntResult').textContent = 'Saljem...';
+  if (!title || !body){ alert('Naslov i telo su obavezni'); return; }
+  if (!confirm('Posalji "' + title + '" svim atletama?')) return;
   try {
-    const { data, error } = await supabase.functions.invoke('send-bulk-notification', { body: { title, body, url, target_tier } });
-    if (error){ document.getElementById('ntResult').textContent = 'Greska: '+error.message; return; }
-    if (data && data.error){ document.getElementById('ntResult').textContent = 'Greska: '+data.error; return; }
-    document.getElementById('ntResult').textContent = 'Poslato '+(data.sent||0)+' od '+(data.total||0)+' atleta. Failed: '+(data.failed||0);
-  } catch(e){ document.getElementById('ntResult').textContent = 'Greska: '+e.message; }
+    const { data, error } = await supabase.functions.invoke('send-bulk-notification', {
+      body: { title: title, body: body, url: url, target_tier: target_tier }
+    });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert('Poslato! Stiglo na ' + ((data && data.sent) || 0) + ' uredjaja.');
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
-window.saveAllTitles = async function(){
-  const map = {
-    hero_subtitle: { text: document.getElementById('t_hero').value },
-    challenges_section_title: { text: document.getElementById('t_challenges').value },
-    links_section_title: { text: document.getElementById('t_links').value },
-    links_subtitle: { text: document.getElementById('t_links_sub').value },
-    feed_section_title: { text: document.getElementById('t_feed').value },
-    achievements_section_title: { text: document.getElementById('t_ach').value },
-    footer_help: { text: document.getElementById('t_footer').value }
-  };
+window.testNotif = async function(){
+  const title = document.getElementById('ntTitle').value || 'Test';
+  const body = document.getElementById('ntBody').value || 'Test poruka';
   try {
-    const rows = Object.entries(map).map(function([key,value]){ return { key, value, updated_at: new Date().toISOString() }; });
-    const { error } = await supabase.from('site_settings').upsert(rows, { onConflict: 'key' });
-    if (error){ alert('Greska: '+error.message); return; }
-    alert('Snimljeno!');
-  } catch(e){ alert('Greska: '+e.message); }
+    const { data, error } = await supabase.functions.invoke('send-notification', {
+      body: { athlete_id: adminData.id || null, type: 'admin', title: title, body: body, just_admin: true }
+    });
+    if (error){ alert('Greska: ' + error.message); return; }
+    alert('Test push poslat na tvoje uredjaje.');
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
 window.saveSetting = async function(key){
   let value = {};
   if (key === 'athlete_announcement') value = { title: document.getElementById('annTitle').value, text: document.getElementById('annText').value };
-  else if (key === 'motiv_quotes') value = { quotes: document.getElementById('motivQuotes').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean) };
+  else if (key === 'motiv_quotes') value = { quotes: (document.getElementById('motivQuotes').value || '').split('\n').filter(function(l){ return l.trim(); }) };
   else if (key === 'default_welcome') value = { text: document.getElementById('welcomeText').value };
   else if (key === 'points_legend') value = { text: document.getElementById('pointsLegend').value };
   try {
-    const { error } = await supabase.from('site_settings').upsert({ key: key, value: value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    const { error } = await supabase.from('site_settings').upsert({ key: key, value: value }, { onConflict: 'key' });
     if (error){ alert('Greska: ' + error.message); return; }
-    alert('Snimljeno!');
+    alert('Sacuvano.');
   } catch(e){ alert('Greska: ' + e.message); }
 };
 
-window.showPayoutDetails = async function(athleteId){
+window.saveAllTitles = async function(){
+  const titles = [
+    ['hero_subtitle', document.getElementById('t_hero').value],
+    ['challenges_section_title', document.getElementById('t_challenges').value],
+    ['links_section_title', document.getElementById('t_links').value],
+    ['links_subtitle', document.getElementById('t_links_sub').value],
+    ['feed_section_title', document.getElementById('t_feed').value],
+    ['achievements_section_title', document.getElementById('t_ach').value],
+    ['footer_help', document.getElementById('t_footer').value]
+  ];
   try {
-    const { data } = await supabase.from('athletes').select('username,full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone').eq('id', athleteId).maybeSingle();
-    if (!data) { alert('Atleta nije pronadjen'); return; }
-    let body = '<p style="font-size:14px;color:var(--text);font-weight:700">@' + data.username + ' · ' + data.full_name + '</p>';
-    body += '<p style="font-size:12px;color:var(--mute)">Email: ' + data.email + '</p>';
-    body += '<hr style="border:none;border-top:1px solid var(--border);margin:12px 0">';
-    if (!data.payout_full_name || !data.payout_account_number) {
-      body += '<p style="color:#ffb0b8">⚠️ Atleta jos nije uneo bankovne podatke!</p>';
-    } else {
-      const text = 'Ime: ' + data.payout_full_name + '\nRacun: ' + data.payout_account_number + '\nBanka: ' + (data.payout_bank_name || '-') + '\nTelefon: ' + (data.payout_phone || '-');
-      body += '<p><b>Pravo ime:</b> ' + data.payout_full_name + '</p>';
-      body += '<p><b>Broj racuna:</b> <code style="font-size:13px;color:var(--brand)">' + data.payout_account_number + '</code></p>';
-      if (data.payout_bank_name) body += '<p><b>Banka:</b> ' + data.payout_bank_name + '</p>';
-      if (data.payout_phone) body += '<p><b>Telefon:</b> <code>' + data.payout_phone + '</code></p>';
-      body += '<button class="btn ghost" onclick="navigator.clipboard.writeText(' + JSON.stringify(text) + ');this.textContent=\'Kopirano!\'" style="margin-top:10px">📋 Kopiraj sve</button>';
+    for (const [k, t] of titles){
+      await supabase.from('site_settings').upsert({ key: k, value: { text: t } }, { onConflict: 'key' });
     }
-    showModal('Bankovni podaci', body);
+    alert('Svi naslovi sacuvani.');
   } catch(e){ alert('Greska: ' + e.message); }
 };
 
-window.logout = async function(){
-  await supabase.auth.signOut();
-  location.href = '/login.html';
+window.showPayoutDetails = async function(id){
+  try {
+    const { data: a } = await supabase.from('athletes').select('full_name,payout_full_name,payout_account_number,payout_bank_name,payout_phone,payout_email').eq('id', id).maybeSingle();
+    if (!a){ alert('Atleta ne pronadjen.'); return; }
+    showModal('Bank info: ' + a.full_name,
+      '<div style="line-height:1.7">' +
+        '<div><b>Ime na racunu:</b> ' + escapeHtml(a.payout_full_name || '-') + '</div>' +
+        '<div><b>Broj racuna:</b> ' + escapeHtml(a.payout_account_number || '-') + '</div>' +
+        '<div><b>Banka:</b> ' + escapeHtml(a.payout_bank_name || '-') + '</div>' +
+        '<div><b>Telefon:</b> ' + escapeHtml(a.payout_phone || '-') + '</div>' +
+        '<div><b>Email:</b> ' + escapeHtml(a.payout_email || '-') + '</div>' +
+      '</div>');
+  } catch(e){ alert('Greska: ' + e.message); }
 };
 
-await loadOverview();
-loadApplications();
-loadAthletes();
+window.addCustomChallengeInit = function(){
+  // legacy alias if needed
+};
 
-document.getElementById('loading').classList.add('hidden');
-document.getElementById('app').style.display = 'grid';
+window.delScheduled = async function(id){
+  if (!confirm('Obrisi zakazanu?')) return;
+  try { await supabase.from('scheduled_notifications').delete().eq('id', id); loadScheduled(); }
+  catch(e){ alert('Greska: ' + e.message); }
+};
+
+// =====================================================================
+// INIT — pokreni sve odmah pri ulasku u admin
+// =====================================================================
+async function adminInit(){
+  setStatus('');
+  try {
+    await Promise.all([loadOverview(), loadApplications(), loadAthletes(), loadOrgPayouts()]);
+  } catch(e){ console.error('admin init err', e); }
+  // Poll za nove zahteve za isplatu — badge se update-uje svakih 30 sec
+  setInterval(loadOrgPayouts, 30000);
+}
+adminInit();
+
 </script>
 </body>
 </html>
