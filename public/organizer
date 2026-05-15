@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>VAMIT-5 · Organizer Dashboard</title>
+<style>
+:root{--bg:#05060a;--surface:rgba(20,24,42,0.85);--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--brand:#00f0ff;--brand2:#7a5bff;--brand3:#ff3b9a;--lime:#a6ff3b;--gold:#ffc24b;--red:#ff4d5e;--border:rgba(255,255,255,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.4),transparent 60%),radial-gradient(700px 400px at 70% 80%,rgba(255,194,75,0.25),transparent 60%)}
+.loading{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:1000;padding:20px;text-align:center}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status{color:var(--dim);font-size:13px;font-family:monospace;margin-top:14px}
+.err{margin-top:14px;padding:10px 14px;background:rgba(255,77,94,0.08);border:1px solid rgba(255,77,94,0.3);border-radius:8px;color:#ffb0b8;font-size:12px;display:none;max-width:360px;word-break:break-word}
+.err.show{display:block}
+.reset-btn{margin-top:10px;padding:9px 16px;border-radius:8px;background:rgba(255,255,255,0.06);border:1px solid var(--border);color:var(--text);font-family:inherit;font-size:12px;cursor:pointer;display:none}
+.reset-btn.show{display:inline-block}
+.loading.hidden{display:none}
+
+.app{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:20px 18px 80px}
+.topbar{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,var(--gold),var(--brand3));text-align:center;line-height:38px;font-weight:900;font-size:14px;color:#fff}
+.brand b{font-size:14px;font-weight:900}
+.brand small{display:block;font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em;margin-top:1px}
+.user-chip{margin-left:auto;display:flex;align-items:center;gap:10px;padding:6px 14px;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,0.03)}
+.user-chip .name{font-size:12.5px;font-weight:700}
+.btn{padding:9px 14px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:12px;background:rgba(255,255,255,0.06);color:var(--text);border:1px solid var(--border)}
+.btn.red{background:rgba(255,77,94,0.1);border-color:rgba(255,77,94,0.3);color:#ffb0b8}
+.btn.brand{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none;font-weight:800}
+.btn.gold{background:linear-gradient(135deg,var(--gold),#ff8c42);color:#0a0c14;border:none;font-weight:800}
+
+.hero{padding:24px;border-radius:18px;background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(20px);margin-bottom:18px}
+.hero h1{font-size:22px;font-weight:900;margin-bottom:6px}
+.hero p{color:var(--dim);font-size:13.5px;line-height:1.5}
+.hero .promo{display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,rgba(255,194,75,0.2),rgba(255,59,154,0.1));border:1px solid rgba(255,194,75,0.4);font-size:13px;font-weight:800;color:var(--gold);margin-top:10px;font-family:monospace;letter-spacing:0.1em}
+
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+.kpi .ic{font-size:18px;margin-bottom:8px}
+.kpi .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:5px}
+.kpi .v{font-size:24px;font-weight:900}
+
+.card{padding:22px;border-radius:18px;background:var(--surface);border:1px solid var(--border);backdrop-filter:blur(18px);margin-bottom:16px;overflow-x:auto}
+.card-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.card-head h2{font-size:15px;font-weight:800}
+.card-head .badge{padding:3px 9px;border-radius:99px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.25);color:var(--brand);font-size:10px;font-weight:800}
+
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+th{text-align:left;padding:10px 12px;font-size:10.5px;text-transform:uppercase;letter-spacing:0.1em;color:var(--mute);font-weight:700;border-bottom:1px solid var(--border)}
+td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase}
+.tag.pending{background:rgba(255,194,75,0.12);color:var(--gold)}
+.tag.confirmed{background:rgba(166,255,59,0.12);color:var(--lime)}
+.tag.refunded,.tag.rejected{background:rgba(255,77,94,0.12);color:#ffb0b8}
+.tag.paid{background:rgba(0,240,255,0.12);color:var(--brand)}
+.empty{text-align:center;padding:30px;color:var(--mute);font-size:12.5px}
+
+.po-l{font-size:11px;color:var(--mute);font-weight:700;text-transform:uppercase;letter-spacing:0.1em;display:block;margin-bottom:6px}
+.po-i{width:100%;padding:11px 14px;border-radius:9px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;outline:none}
+.po-i:focus{border-color:var(--brand)}
+
+.payout-cta{padding:24px;border-radius:16px;background:linear-gradient(135deg,rgba(255,194,75,0.15),rgba(255,59,154,0.08));border:2px solid rgba(255,194,75,0.4);text-align:center}
+.payout-cta h3{font-size:18px;font-weight:900;margin-bottom:6px}
+.payout-cta .amount{font-size:36px;font-weight:900;color:var(--gold);letter-spacing:-0.02em;margin:14px 0}
+.payout-cta .btn-payout{padding:14px 32px;font-size:14px;font-weight:900}
+
+@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}.card{padding:16px}}
+</style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div>
+    <div class="spinner"></div>
+    <div class="status" id="loadStatus">Ucitavanje...</div>
+    <div class="err" id="loadErr"></div>
+    <button class="reset-btn" id="resetBtn" onclick="localStorage.clear();sessionStorage.clear();location.href='/login.html'">Resetuj i idi na login</button>
+  </div>
+</div>
+
+<div class="app" id="app" style="display:none">
+  <div class="topbar">
+    <div class="brand"><div class="mark">EVENT</div><div><b>VAMIT-5 ORGANIZER</b><small>Dashboard</small></div></div>
+    <div class="user-chip"><span class="name" id="orgName">...</span></div>
+    <button class="btn red" onclick="logout()">Logout</button>
+  </div>
+
+  <div class="hero">
+    <h1>Zdravo, <span style="background:linear-gradient(135deg,var(--gold),var(--brand3));-webkit-background-clip:text;-webkit-text-fill-color:transparent" id="orgFirstName">organizer</span>!</h1>
+    <p>Pratiš sve prijave preko tvog event-a u realnom vremenu. Dobijaš <b style="color:var(--lime)" id="orgPct">30%</b> od svake prodaje koja se desila preko tvog promo koda.</p>
+    <div class="promo" id="orgPromo">PROMO_KOD</div>
+  </div>
+
+  <div class="kpi-row">
+    <div class="kpi"><div class="ic">👥</div><div class="l">Ukupno prijavljenih</div><div class="v" id="kpiTotal">0</div></div>
+    <div class="kpi"><div class="ic">⏳</div><div class="l">Na trial-u</div><div class="v" id="kpiTrial">0</div></div>
+    <div class="kpi"><div class="ic">✅</div><div class="l">Platili karticom</div><div class="v" id="kpiPaid">0</div></div>
+    <div class="kpi"><div class="ic">💰</div><div class="l">Tvoja zarada (€)</div><div class="v" id="kpiEarn">0</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>👥 Klijenti preko tvog event-a</h2><span class="badge" id="custBadge">0</span></div>
+    <table><thead><tr><th>Datum</th><th>Email klijenta</th><th>Iznos</th><th>Tvoja provizija</th><th>Status</th></tr></thead>
+      <tbody id="custBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
+  </div>
+
+  <div class="card payout-cta" id="payoutCard">
+    <h3>💸 Tvoja zarada za isplatu</h3>
+    <div style="color:var(--dim);font-size:13px">Iznos od potvrdenih prodaja (status: platio karticom)</div>
+    <div class="amount" id="availableAmount">€0.00</div>
+    <button class="btn gold btn-payout" id="requestPayoutBtn" onclick="requestPayout()">📤 Zatraži isplatu sada</button>
+    <div style="margin-top:10px;font-size:11.5px;color:var(--mute)">Isplata se vrši u roku od 3 radna dana na bankovne podatke ispod.</div>
+    <div id="payoutMsg" style="margin-top:10px;font-size:13px"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>📜 Istorija zahteva za isplatu</h2></div>
+    <table><thead><tr><th>Datum</th><th>Iznos</th><th>Status</th><th>Datum isplate</th></tr></thead>
+      <tbody id="payoutsBody"><tr><td colspan="4" class="empty">Nemaš zahteva.</td></tr></tbody></table>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>🏦 Bankovni podaci za isplate</h2><button class="btn brand" onclick="savePayout()">💾 Snimi</button></div>
+    <div style="padding:12px 14px;border-radius:10px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);color:var(--gold);font-size:12.5px;margin-bottom:14px;line-height:1.5">
+      Isplata ide na tvoj racun. Sva polja su obavezna.
+    </div>
+    <div style="display:grid;gap:10px">
+      <div><label class="po-l">Puno ime (kao u banci)</label><input id="po_name" class="po-i" placeholder="Marko Marković"></div>
+      <div><label class="po-l">Broj racuna</label><input id="po_account" class="po-i" placeholder="265-1234567890123-12"></div>
+      <div><label class="po-l">Banka</label><input id="po_bank" class="po-i" placeholder="Raiffeisen / NLB / OTP..."></div>
+      <div><label class="po-l">Email (backup za Wise/PayPal)</label><input id="po_email" type="email" class="po-i"></div>
+      <div><label class="po-l">Telefon</label><input id="po_phone" class="po-i" placeholder="+381 60 ..."></div>
+    </div>
+    <div id="po_status" style="margin-top:10px;font-size:12.5px;text-align:center;color:var(--dim)"></div>
+  </div>
+</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, {
+  auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+});
+
+const $status = document.getElementById('loadStatus');
+const $err = document.getElementById('loadErr');
+const $reset = document.getElementById('resetBtn');
+const setStatus = function(t){ console.log('[org]', t); $status.textContent = t; };
+const showFatal = function(msg){ $err.textContent = msg; $err.classList.add('show'); $reset.classList.add('show'); };
+
+setStatus('Provera tokena...');
+if (window.location.hash.indexOf('access_token=') > -1) { await new Promise(function(r){ setTimeout(r, 800); }); }
+
+async function waitForSession(ms){
+  return Promise.race([
+    supabase.auth.getSession().then(function(r){ return r.data.session; }).catch(function(){ return null; }),
+    new Promise(function(r){ setTimeout(function(){ r(null); }, ms); })
+  ]);
+}
+let session = await waitForSession(4000);
+if (!session) {
+  session = await new Promise(function(resolve){
+    const t = setTimeout(function(){ resolve(null); }, 3000);
+    const sub = supabase.auth.onAuthStateChange(function(event, s){
+      if (s && s.user){ clearTimeout(t); sub.data.subscription.unsubscribe(); resolve(s); }
+      if (event === 'INITIAL_SESSION' && !s){ clearTimeout(t); sub.data.subscription.unsubscribe(); resolve(null); }
+    });
+  });
+}
+if (!session) { location.replace('/login.html'); throw new Error('No session'); }
+
+setStatus('Provera organizatora...');
+let organizer = null;
+try {
+  const { data, error } = await supabase.from('organizers').select('*').eq('email', session.user.email).maybeSingle();
+  if (error) throw new Error(error.message);
+  organizer = data;
+} catch(e) { showFatal('Greska baze: ' + e.message); throw e; }
+
+if (!organizer) { showFatal('Nisi organizator. Kontaktiraj admin-a na athletes@vamit-5.com'); throw new Error('Not organizer'); }
+
+const firstName = (organizer.full_name || '').split(' ')[0];
+document.getElementById('orgName').textContent = organizer.full_name;
+document.getElementById('orgFirstName').textContent = firstName || 'organizer';
+document.getElementById('orgPromo').textContent = organizer.promo_code;
+document.getElementById('orgPct').textContent = (organizer.commission_pct * 100).toFixed(0) + '%';
+
+// Pre-fill payout fields
+if (organizer.payout_full_name) document.getElementById('po_name').value = organizer.payout_full_name;
+if (organizer.payout_account_number) document.getElementById('po_account').value = organizer.payout_account_number;
+if (organizer.payout_bank_name) document.getElementById('po_bank').value = organizer.payout_bank_name;
+if (organizer.payout_email) document.getElementById('po_email').value = organizer.payout_email;
+if (organizer.payout_phone) document.getElementById('po_phone').value = organizer.payout_phone;
+
+// Load customers (sales linked to this organizer via promo_code/organizer_id)
+async function loadCustomers(){
+  try {
+    const { data, error } = await supabase.from('sales').select('*').eq('organizer_id', organizer.id).order('created_at', { ascending: false }).limit(200);
+    if (error) throw error;
+    const body = document.getElementById('custBody');
+    let total = 0, trial = 0, paid = 0, earn = 0, availablePayout = 0;
+    (data || []).forEach(function(s){
+      total++;
+      if (s.status === 'pending') trial++;
+      if (s.status === 'confirmed') { paid++; earn += (s.organizer_commission_cents || 0); availablePayout += (s.organizer_commission_cents || 0); }
+    });
+    document.getElementById('kpiTotal').textContent = total;
+    document.getElementById('kpiTrial').textContent = trial;
+    document.getElementById('kpiPaid').textContent = paid;
+    document.getElementById('kpiEarn').textContent = (earn/100).toFixed(2);
+    document.getElementById('availableAmount').textContent = '€' + (availablePayout/100).toFixed(2);
+    document.getElementById('custBadge').textContent = total;
+    window.availablePayoutCents = availablePayout;
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Nemas jos prijavljenih. Cekamo prve QR skenove na tvom event-u.</td></tr>'; return; }
+    body.innerHTML = data.map(function(s){
+      const ago = new Date(s.created_at).toLocaleString('sr',{ day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+      const com = ((s.organizer_commission_cents || 0)/100).toFixed(2);
+      return '<tr><td>' + ago + '</td>' +
+        '<td><b>' + (s.customer_email || '—') + '</b></td>' +
+        '<td>' + ((s.gross_amount_cents || 0)/100).toFixed(2) + ' €</td>' +
+        '<td style="color:var(--gold);font-weight:800">€' + com + '</td>' +
+        '<td><span class="tag ' + s.status + '">' + (s.status === 'pending' ? 'na trial-u' : s.status === 'confirmed' ? 'platio karticom' : s.status) + '</span></td></tr>';
+    }).join('');
+  } catch(e){ document.getElementById('custBody').innerHTML = '<tr><td colspan="5" class="empty">Greska: ' + e.message + '</td></tr>'; }
+}
+
+async function loadPayouts(){
+  try {
+    const { data } = await supabase.from('organizer_payout_requests').select('*').eq('organizer_id', organizer.id).order('requested_at', { ascending: false });
+    const body = document.getElementById('payoutsBody');
+    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="4" class="empty">Nemaš zahteva za isplatu.</td></tr>'; return; }
+    body.innerHTML = data.map(function(p){
+      return '<tr><td>' + new Date(p.requested_at).toLocaleString('sr') + '</td>' +
+        '<td>€' + ((p.amount_cents || 0)/100).toFixed(2) + '</td>' +
+        '<td><span class="tag ' + p.status + '">' + p.status + '</span></td>' +
+        '<td>' + (p.paid_at ? new Date(p.paid_at).toLocaleString('sr') : '—') + '</td></tr>';
+    }).join('');
+  } catch(e){ console.error(e); }
+}
+
+window.requestPayout = async function(){
+  const cents = window.availablePayoutCents || 0;
+  if (cents <= 0) { document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Nemaš sredstava za isplatu. Cekaj da kupci plate karticom.</span>'; return; }
+  if (!organizer.payout_full_name || !organizer.payout_account_number){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Prvo unesi bankovne podatke dole!</span>'; return; }
+  if (!confirm('Zatraziti isplatu od €' + (cents/100).toFixed(2) + ' na ' + organizer.payout_account_number + '?')) return;
+  try {
+    const { error } = await supabase.from('organizer_payout_requests').insert({
+      organizer_id: organizer.id, amount_cents: cents, status: 'pending'
+    });
+    if (error){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Greska: ' + error.message + '</span>'; return; }
+    document.getElementById('payoutMsg').innerHTML = '<span style="color:var(--lime)">✓ Zahtev poslat! Admin obraduje u roku od 3 radna dana.</span>';
+    loadPayouts();
+  } catch(e){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Greska: ' + e.message + '</span>'; }
+};
+
+window.savePayout = async function(){
+  const data = {
+    payout_full_name: document.getElementById('po_name').value || null,
+    payout_account_number: document.getElementById('po_account').value || null,
+    payout_bank_name: document.getElementById('po_bank').value || null,
+    payout_email: document.getElementById('po_email').value || null,
+    payout_phone: document.getElementById('po_phone').value || null
+  };
+  if (!data.payout_full_name || !data.payout_account_number){ document.getElementById('po_status').textContent = 'Ime i broj racuna su obavezni!'; document.getElementById('po_status').style.color = '#ffb0b8'; return; }
+  try {
+    const { error } = await supabase.from('organizers').update(data).eq('id', organizer.id);
+    if (error){ document.getElementById('po_status').textContent = 'Greska: ' + error.message; document.getElementById('po_status').style.color = '#ffb0b8'; return; }
+    Object.assign(organizer, data);
+    document.getElementById('po_status').textContent = '✓ Snimljeno!';
+    document.getElementById('po_status').style.color = 'var(--lime)';
+  } catch(e){ document.getElementById('po_status').textContent = 'Greska: ' + e.message; }
+};
+
+window.logout = async function(){ await supabase.auth.signOut(); location.href = '/login.html'; };
+
+await loadCustomers();
+await loadPayouts();
+
+document.getElementById('loading').classList.add('hidden');
+document.getElementById('app').style.display = 'block';
+</script>
+</body>
+</html>
