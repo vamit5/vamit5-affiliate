@@ -103,7 +103,12 @@ if (window.location.hash.indexOf('access_token=') > -1 || window.location.hash.i
         supabase.from('admins').select('id').eq('email', session.user.email).maybeSingle(),
         new Promise(function(r){ setTimeout(function(){ r({ data: null }); }, 2000); })
       ]);
-      location.replace(admin ? '/admin.html' : '/dashboard.html');
+      if (admin) { location.replace('/admin.html'); return; }
+      const { data: org } = await Promise.race([
+        supabase.from('organizers').select('id').eq('email', session.user.email).maybeSingle(),
+        new Promise(function(r){ setTimeout(function(){ r({ data: null }); }, 2000); })
+      ]);
+      location.replace(org ? '/organizer.html' : '/dashboard.html');
     }
   } catch (e) { console.log('[login] auto-redirect skipped', e); }
 })();
@@ -171,7 +176,9 @@ window.verifyCode = async function(){
       try { localStorage.removeItem('v5_otp_email'); } catch(e){}
       showSuccess('Uspesno! Preusmeravam...');
       const adm = await supabase.from('admins').select('id').eq('email', savedEmail).maybeSingle();
-      setTimeout(function(){ location.replace(adm.data ? '/admin.html' : '/dashboard.html'); }, 600);
+      if (adm.data) { setTimeout(function(){ location.replace('/admin.html'); }, 600); return; }
+      const org = await supabase.from('organizers').select('id').eq('email', savedEmail).maybeSingle();
+      setTimeout(function(){ location.replace(org.data ? '/organizer.html' : '/dashboard.html'); }, 600);
     }
   } catch(err) {
     showError('Greska: ' + (err.message || JSON.stringify(err)));
