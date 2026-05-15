@@ -234,15 +234,29 @@ td{padding:10px 11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-ali
       </div>
 
       <div class="section" id="sec-qr">
+        <!-- EVENT QR PACK — za eventove sa organizatorom (30%) -->
+        <div class="card" style="margin-bottom:14px;border-color:rgba(255,194,75,0.35)">
+          <div class="card-head"><h2>🎪 EVENT QR Pack (organizator dobija 30%)</h2></div>
+          <div style="padding:12px;border-radius:10px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12.5px;color:var(--dim);margin-bottom:12px;line-height:1.6">
+            <b style="color:var(--gold)">Kad ides na event</b> (Tour de Fruska, Beograd Maraton...) — unesi promo kod tog organizatora, sistem pravi <b>poseban QR za svaku atletu</b>. Kupac koji skenira: atleta dobija svoj %, organizator dobija 30%, oboje vide prijavu u svom dashboardu.
+            <br><b style="color:var(--gold)">Pre upotrebe:</b> organizator mora postojati u bazi (insert u organizers + Stripe promotion code sa istim kodom).
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+            <input id="eventOrgCode" placeholder="Promo kod organizatora (npr. TOURDEFRUSKA)" style="padding:10px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--gold);font-family:inherit;font-size:13px;flex:1;min-width:200px;text-transform:uppercase">
+            <button class="btn brand" style="background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14" onclick="generateEventPack()">🎯 Generisi Event QR Pack</button>
+          </div>
+          <div id="eventPackGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px"></div>
+        </div>
+
+        <!-- STANDARD QR — atleta individualno (Instagram/social) -->
         <div class="card">
-          <div class="card-head"><h2>📱 QR kodovi za atlete (Event 7-dana FREE trial)</h2></div>
+          <div class="card-head"><h2>📱 Standardni QR kodovi za atlete (Instagram + Event)</h2></div>
           <div style="padding:14px;border-radius:11px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:13px;color:var(--dim);margin-bottom:14px;line-height:1.6">
-            Svaki atleta dobija svoj jedinstveni link i QR kod. Kad kupac skenira QR, automatski se belezi atleta kao izvor prodaje.
-            <br><b style="color:var(--brand)">URL pattern:</b> <code>https://vamit5-affiliate.vercel.app/r/USERNAME/event</code>
-            <br><b style="color:var(--brand)">Slug "event"</b> mora postojati u products tabeli (sa Stripe Payment Link-om i commission_override = 0.20).
+            <b style="color:var(--brand)">Bez organizatora.</b> Atleta dobija 2 QR-a:
+            <br>• <b style="color:var(--gold)">Event (gold)</b> — 7-dana FREE trial (za samostalni event ili WhatsApp pozive)
+            <br>• <b style="color:var(--brand)">Monthly (cyan)</b> — Instagram, redovne prodaje (kartica odmah)
           </div>
           <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-            <input id="qrSlug" placeholder="Slug paketa (event, 12mo, ...)" value="event" style="padding:9px 12px;border-radius:8px;background:#0a0c14;color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:13px;flex:1;min-width:160px">
             <button class="btn brand" onclick="generateAllQR()">🎯 Generisi QR za sve atlete</button>
             <button class="btn ghost" onclick="window.print()">🖨️ Print sve</button>
           </div>
@@ -726,6 +740,53 @@ window.generateAllQR = async function(){
     });
   } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8;padding:20px">Greska: ' + e.message + '</div>'; }
 };
+
+// =====================================================================
+// EVENT QR PACK — pravi QR po atleti za odredjenog organizatora (30%)
+// =====================================================================
+window.generateEventPack = async function(){
+  const orgCode = (document.getElementById('eventOrgCode').value || '').trim().toUpperCase();
+  const grid = document.getElementById('eventPackGrid');
+  if (!orgCode){ grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px">Unesi promo kod organizatora prvo (npr. TOURDEFRUSKA).</div>'; return; }
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mute);padding:20px">Provera organizatora...</div>';
+  try {
+    const { data: org } = await supabase.from('organizers').select('id,full_name,promo_code,commission_pct').eq('promo_code', orgCode).maybeSingle();
+    if (!org){
+      grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px;background:rgba(255,77,94,0.1);border:1px solid rgba(255,77,94,0.35);border-radius:10px">Organizator sa kodom <b>'+orgCode+'</b> ne postoji u bazi.<br><br>Prvi korak: dodaj ga u Supabase (SQL):<br><code style="display:block;margin-top:8px;padding:8px;background:#0a0c14;border-radius:6px;font-size:11px">insert into public.organizers (email, full_name, promo_code) values (\'organizer@gmail.com\', \'Marko Petrovic\', \''+orgCode+'\');</code><br>I dodaj <b>'+orgCode+'</b> kao Promotion code u Stripe Dashboard.</div>';
+      return;
+    }
+    const { data: athletes } = await supabase.from('athletes').select('id,username,full_name,promo_code').not('promo_code','is',null).order('full_name');
+    if (!athletes || !athletes.length){ grid.innerHTML = '<div style="grid-column:1/-1;color:#ffb0b8;padding:14px">Nijedan atleta nema promo kod.</div>'; return; }
+
+    const EVENT_LINK = 'https://buy.stripe.com/8x2bJ0fAwfPwgd90sSeEo0s';
+    grid.innerHTML =
+      '<div style="grid-column:1/-1;padding:12px;background:rgba(166,255,59,0.08);border:1px solid rgba(166,255,59,0.3);border-radius:10px;color:#b5ffb0;font-size:13px;margin-bottom:6px">' +
+        '✓ Organizator: <b>' + org.full_name + '</b> · kod: <b>' + org.promo_code + '</b> · provizija: <b>' + Math.round((org.commission_pct||0.3)*100) + '%</b>' +
+      '</div>';
+    athletes.forEach(function(a){
+      const eventUrl = EVENT_LINK + '?prefilled_promo_code=' + orgCode + '&client_reference_id=' + a.promo_code;
+      const qrEvent = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(eventUrl) + '&color=ffc24b&bgcolor=0a0c14&qzone=2';
+      const card = document.createElement('div');
+      card.style.cssText = 'padding:14px;border-radius:14px;background:#0a0c14;border:1px solid rgba(255,194,75,0.35);page-break-inside:avoid';
+      card.innerHTML =
+        '<div style="text-align:center;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">' +
+          '<div style="font-size:14px;font-weight:800;color:var(--brand)">' + a.full_name + '</div>' +
+          '<div style="font-size:10.5px;color:var(--mute);font-family:monospace;margin-top:3px">@' + a.username + ' · <b style="color:var(--gold)">' + a.promo_code + '</b></div>' +
+          '<div style="font-size:10px;color:var(--gold);margin-top:6px;font-weight:700">🎪 ' + org.full_name + '</div>' +
+        '</div>' +
+        '<div style="text-align:center">' +
+          '<div style="font-size:10.5px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">🎯 EVENT QR · 7d FREE</div>' +
+          '<img src="' + qrEvent + '" style="width:100%;border-radius:8px;background:#fff">' +
+          '<a href="' + qrEvent + '&download=1" download="qr-' + orgCode + '-' + a.username + '.png" class="btn" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:11px;background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14">⬇ Download</a>' +
+        '</div>' +
+        '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border);font-size:9px;color:var(--mute);font-family:monospace;line-height:1.5;word-break:break-all">' +
+          eventUrl +
+        '</div>';
+      grid.appendChild(card);
+    });
+  } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8;padding:20px">Greska: ' + e.message + '</div>'; }
+};
+
 window.loadProducts = async function(){
   try {
     const { data, error } = await supabase.from('products').select('*').order('display_order');
