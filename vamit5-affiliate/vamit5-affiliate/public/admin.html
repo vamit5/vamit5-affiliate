@@ -686,33 +686,46 @@ window.loadCustomers = async function(){
 };
 
 window.generateAllQR = async function(){
-  const slug = document.getElementById('qrSlug').value || 'event';
   const grid = document.getElementById('qrGrid');
   grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mute);padding:20px">Ucitavanje atleta...</div>';
   try {
-    const { data: athletes } = await supabase.from('athletes').select('id,username,full_name,invite_code').order('full_name');
-    if (!athletes || !athletes.length){ grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--mute);padding:20px">Nema atleta. Odobri prijave prvo.</div>'; return; }
-    const SITE = 'https://vamit5-affiliate.vercel.app';
+    const { data: athletes } = await supabase.from('athletes').select('id,username,full_name,promo_code').not('promo_code','is',null).order('full_name');
+    if (!athletes || !athletes.length){ grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#ffb0b8;padding:20px">Nijedan atleta nema promo_code! Pokreni SQL prvo da bi se promo kodovi mapirali.</div>'; return; }
+    const EVENT_LINK = 'https://buy.stripe.com/8x2bJ0fAwfPwgd90sSeEo0s';
+    const MONTHLY_LINK = 'https://buy.stripe.com/eVq3cuewseLsgd94J8eEo0q';
     grid.innerHTML = '';
     athletes.forEach(function(a){
-      const url = SITE + '/r/' + a.username + '/' + slug;
-      const qrSrc = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(url) + '&color=00f0ff&bgcolor=0a0c14&qzone=2';
+      const eventUrl = EVENT_LINK + '?prefilled_promo_code=' + a.promo_code;
+      const monthlyUrl = MONTHLY_LINK + '?prefilled_promo_code=' + a.promo_code;
+      const qrEvent = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(eventUrl) + '&color=ffc24b&bgcolor=0a0c14&qzone=2';
+      const qrMonthly = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data=' + encodeURIComponent(monthlyUrl) + '&color=00f0ff&bgcolor=0a0c14&qzone=2';
       const card = document.createElement('div');
-      card.style.cssText = 'padding:14px;border-radius:14px;background:#0a0c14;border:1px solid var(--border);text-align:center;break-inside:avoid;page-break-inside:avoid';
+      card.style.cssText = 'padding:14px;border-radius:14px;background:#0a0c14;border:1px solid var(--border);page-break-inside:avoid';
       card.innerHTML =
-        '<div style="font-size:14px;font-weight:800;color:var(--brand);margin-bottom:4px">VAMIT-5</div>' +
-        '<div style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px">7 dana FREE</div>' +
-        '<img src="' + qrSrc + '" alt="QR" style="width:180px;height:180px;border-radius:11px;display:block;margin:0 auto;background:#fff">' +
-        '<div style="margin-top:12px;font-size:13px;font-weight:700">' + a.full_name + '</div>' +
-        '<div style="font-size:10.5px;color:var(--mute);font-family:monospace;margin-top:3px;word-break:break-all">@' + a.username + '</div>' +
-        '<div style="font-size:10px;color:var(--mute);font-family:monospace;margin-top:8px;padding:6px 8px;background:rgba(255,255,255,0.03);border-radius:6px;word-break:break-all">' + url + '</div>' +
-        '<button class="btn ghost" style="margin-top:10px;width:100%" onclick="navigator.clipboard.writeText(\'' + url + '\');this.textContent=\'Kopirano!\';setTimeout(()=>this.textContent=\'Kopiraj URL\',1500)">Kopiraj URL</button>' +
-        '<a href="' + qrSrc + '&download=1" download="qr-' + a.username + '.png" class="btn brand" style="margin-top:6px;display:block;text-decoration:none;text-align:center">⬇ Download QR PNG</a>';
+        '<div style="text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border)">' +
+          '<div style="font-size:14px;font-weight:800;color:var(--brand)">' + a.full_name + '</div>' +
+          '<div style="font-size:10.5px;color:var(--mute);font-family:monospace;margin-top:3px">@' + a.username + ' · promo: <b style="color:var(--gold)">' + a.promo_code + '</b></div>' +
+        '</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' +
+          '<div style="text-align:center">' +
+            '<div style="font-size:10.5px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">🎯 EVENT (7d FREE)</div>' +
+            '<img src="' + qrEvent + '" style="width:100%;border-radius:8px;background:#fff">' +
+            '<a href="' + qrEvent + '&download=1" download="qr-event-' + a.username + '.png" class="btn brand" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:10px">⬇ Event QR</a>' +
+          '</div>' +
+          '<div style="text-align:center">' +
+            '<div style="font-size:10.5px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">📱 IG/MEDIA</div>' +
+            '<img src="' + qrMonthly + '" style="width:100%;border-radius:8px;background:#fff">' +
+            '<a href="' + qrMonthly + '&download=1" download="qr-monthly-' + a.username + '.png" class="btn brand" style="margin-top:6px;display:block;text-decoration:none;text-align:center;font-size:10px">⬇ Monthly QR</a>' +
+          '</div>' +
+        '</div>' +
+        '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:9.5px;color:var(--mute);font-family:monospace;line-height:1.5;word-break:break-all">' +
+          '<div><b style="color:var(--gold)">EVENT:</b> ' + eventUrl + '</div>' +
+          '<div style="margin-top:4px"><b style="color:var(--brand)">IG:</b> ' + monthlyUrl + '</div>' +
+        '</div>';
       grid.appendChild(card);
     });
-  } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8">Greska: ' + e.message + '</div>'; }
+  } catch(e){ grid.innerHTML = '<div style="color:#ffb0b8;padding:20px">Greska: ' + e.message + '</div>'; }
 };
-
 window.loadProducts = async function(){
   try {
     const { data, error } = await supabase.from('products').select('*').order('display_order');
