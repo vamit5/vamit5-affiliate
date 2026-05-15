@@ -429,8 +429,11 @@ const $reset = document.getElementById('resetBtn');
 const setStatus = function(t){ console.log('[admin]', t); $status.textContent = t; };
 const showFatal = function(msg){
   console.error('[admin] FATAL:', msg);
-  $err.textContent = msg; $err.classList.add('show');
-  $reset.classList.add('show');
+  if ($err){ $err.textContent = msg; $err.classList.add('show'); }
+  if ($reset) $reset.classList.add('show');
+  // Skloni spinner ali ostavi loading box vidljiv sa error porukom
+  const sp = document.querySelector('.loading .spinner');
+  if (sp) sp.style.display = 'none';
 };
 
 setStatus('Provera tokena...');
@@ -722,10 +725,19 @@ window.deleteOrganizer = async function(id, name){
 // ISPLATE — zahtevi od organizatora + stare mesecne isplate
 // =====================================================================
 window.loadOrgPayouts = async function(){
+  const body = document.getElementById('orgPayoutsBody');
+  if (!body) return; // user nije na payouts tabu jos
   try {
-    const { data, error } = await supabase.from('organizer_payout_requests').select('*, organizers(full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').order('requested_at',{ ascending: false });
+    let data = null, error = null;
+    // Try sa join-om
+    let res = await supabase.from('organizer_payout_requests').select('*, organizers(full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').order('requested_at',{ ascending: false });
+    data = res.data; error = res.error;
+    // Ako join puca, probaj bez njega
+    if (error && error.message && error.message.indexOf('relation') > -1){
+      const res2 = await supabase.from('organizer_payout_requests').select('*').order('requested_at',{ ascending: false });
+      data = res2.data; error = res2.error;
+    }
     if (error) throw error;
-    const body = document.getElementById('orgPayoutsBody');
     const pending = (data || []).filter(function(p){ return p.status === 'pending'; });
     const badge = document.getElementById('payoutBadge');
     const orgCount = document.getElementById('orgPayoutCount');
@@ -1109,17 +1121,39 @@ window.delScheduled = async function(id){
 };
 
 // =====================================================================
-// INIT — pokreni sve odmah pri ulasku u admin
+// INIT — pokreni sve odmah pri ulasku u admin (svaka funkcija nezavisno)
 // =====================================================================
+function hideLoading(){
+  const el = document.getElementById('loading');
+  if (el) el.classList.add('hidden');
+}
+
 async function adminInit(){
   setStatus('');
-  try {
-    await Promise.all([loadOverview(), loadApplications(), loadAthletes(), loadOrgPayouts()]);
-  } catch(e){ console.error('admin init err', e); }
+  // KRITICNO: skloni fullscreen loading overlay ODMAH
+  hideLoading();
+  // Pokreni svaku funkciju zasebno — jedna greska ne sme da zaustavi ostale
+  const tasks = [
+    ['loadOverview', typeof loadOverview === 'function' ? loadOverview : null],
+    ['loadApplications', typeof loadApplications === 'function' ? loadApplications : null],
+    ['loadAthletes', typeof loadAthletes === 'function' ? loadAthletes : null],
+    ['loadOrgPayouts', typeof loadOrgPayouts === 'function' ? loadOrgPayouts : null]
+  ];
+  for (const [name, fn] of tasks){
+    if (!fn) continue;
+    try { await fn(); } catch(e){ console.error('[admin] ' + name + ' err:', e); }
+  }
   // Poll za nove zahteve za isplatu — badge se update-uje svakih 30 sec
-  setInterval(loadOrgPayouts, 30000);
+  setInterval(function(){ try { loadOrgPayouts(); } catch(e){} }, 30000);
 }
-adminInit();
+
+// Uvek skloni spinner posle 2 sekunde, čak i ako nešto pukne
+setTimeout(hideLoading, 2000);
+
+adminInit().catch(function(e){
+  console.error('[admin] init catastrophic err:', e);
+  hideLoading();
+});
 
 </script>
 </body>
