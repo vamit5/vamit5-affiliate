@@ -247,19 +247,50 @@ async function loadPayouts(){
 }
 
 window.requestPayout = async function(){
-  const cents = window.availablePayoutCents || 0;
-  if (cents <= 0) { document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Nemaš sredstava za isplatu. Cekaj da kupci plate karticom.</span>'; return; }
-  if (!organizer.payout_full_name || !organizer.payout_account_number){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Prvo unesi bankovne podatke dole!</span>'; return; }
+  const msg = document.getElementById('payoutMsg');
+  // CHECK 1: vec ima pending zahtev?
+  const { data: pend } = await supabase.from('organizer_payout_requests').select('id,amount_cents').eq('organizer_id', organizer.id).eq('status','pending').limit(1);
+  if (pend && pend.length){
+    msg.innerHTML = '<span style="color:#ffb0b8">⚠ Vec si poslao zahtev za €'+((pend[0].amount_cents||0)/100).toFixed(2)+'. Cekaj odgovor admin-a. Ne mozes poslati novi.</span>';
+    return;
+  }
+  // CHECK 2: stvarno neisplaceno (refresh iz baze, ne iz cache-a)
+  const { data: s } = await supabase.from('sales').select('organizer_commission_cents,organizer_paid_at,status').eq('organizer_id', organizer.id).eq('status','confirmed').is('organizer_paid_at', null);
+  const cents = (s||[]).reduce(function(a,x){return a+(x.organizer_commission_cents||0);},0);
+  if (cents < 100){ msg.innerHTML = '<span style="color:#ffb0b8">Nemaš ništa za isplatu (min €1). Cekaj nove placene prijave.</span>'; return; }
+  // CHECK 3: bank info
+  if (!organizer.payout_full_name || !organizer.payout_account_number){ msg.innerHTML = '<span style="color:#ffb0b8">Prvo unesi bankovne podatke dole!</span>'; return; }
   if (!confirm('Zatraziti isplatu od €' + (cents/100).toFixed(2) + ' na ' + organizer.payout_account_number + '?')) return;
   try {
     const { error } = await supabase.from('organizer_payout_requests').insert({
       organizer_id: organizer.id, amount_cents: cents, status: 'pending'
     });
-    if (error){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Greska: ' + error.message + '</span>'; return; }
-    document.getElementById('payoutMsg').innerHTML = '<span style="color:var(--lime)">✓ Zahtev poslat! Admin obraduje u roku od 3 radna dana.</span>';
+    if (error){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: ' + error.message + '</span>'; return; }
+    msg.innerHTML = '<span style="color:var(--lime)">✓ Zahtev poslat €'+(cents/100).toFixed(2)+'! Admin obraduje. Ne mozes poslati novi dok ovaj ne bude obrađen.</span>';
+    // Disable button immediately to prevent spam
+    const btn = document.getElementById('requestPayoutBtn');
+    if (btn){ btn.disabled = true; btn.style.opacity='0.5'; btn.textContent='⏳ Zahtev poslat · čeka admin'; }
     loadPayouts();
-  } catch(e){ document.getElementById('payoutMsg').innerHTML = '<span style="color:#ffb0b8">Greska: ' + e.message + '</span>'; }
+  } catch(e){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: ' + e.message + '</span>'; }
 };
+
+// Check pending on load + after each refresh — disables button if vec ima pending
+async function checkPendingPayoutStatus(){
+  try {
+    const { data: pend } = await supabase.from('organizer_payout_requests').select('id,amount_cents').eq('organizer_id', organizer.id).eq('status','pending').limit(1);
+    const btn = document.getElementById('requestPayoutBtn');
+    const msg = document.getElementById('payoutMsg');
+    if (!btn) return;
+    if (pend && pend.length){
+      btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+      btn.textContent = '⏳ Zahtev €'+((pend[0].amount_cents||0)/100).toFixed(2)+' poslat · čeka admin';
+      if (msg && !msg.innerHTML.includes('Zahtev poslat')) msg.innerHTML = '<span style="color:#ffc24b">⏳ Vec si zatrazio. Cekaj odgovor admin-a.</span>';
+    } else {
+      btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
+      btn.textContent = '📤 Zatraži isplatu sada';
+    }
+  } catch(e){}
+}
 
 window.savePayout = async function(){
   const data = {
@@ -282,17 +313,18 @@ window.savePayout = async function(){
 window.logout = async function(){ await supabase.auth.signOut(); location.href = '/login.html'; };
 
 window.refreshNow = async function(){
-  try { await loadCustomers(); await loadPayouts(); } catch(e){ console.error('refresh', e); }
+  try { await loadCustomers(); await loadPayouts(); await checkPendingPayoutStatus(); } catch(e){ console.error('refresh', e); }
 };
 
 await loadCustomers();
 await loadPayouts();
+await checkPendingPayoutStatus();
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
 
-// Auto-refresh svakih 30 sekundi
-setInterval(function(){ try { loadCustomers(); loadPayouts(); } catch(e){} }, 30000);
+// Auto-refresh svakih 30 sekundi (incl. pending status check)
+setInterval(function(){ try { loadCustomers(); loadPayouts(); checkPendingPayoutStatus(); } catch(e){} }, 30000);
 </script>
 </body>
 </html>
