@@ -827,34 +827,45 @@ window.savePayout = async function(){
   }
 };
 
-// ============ ATHLETE PAYOUT REQUEST ============
+// ============ ATHLETE PAYOUT REQUEST (sa pending check) ============
 async function loadAthletePayoutInfo(){
   try {
-    // Saberi sve neisplacene provizije iz sales tabele
-    const { data: sales } = await supabase.from('sales')
-      .select('commission_cents, athlete_paid_at, status')
-      .eq('athlete_id', athlete.id)
-      .eq('status', 'confirmed')
-      .is('athlete_paid_at', null);
-    const unpaid = (sales||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
-    const cnt = (sales||[]).length;
+    const [salesRes, pendReqRes, allReqsRes] = await Promise.all([
+      supabase.from('sales').select('commission_cents').eq('athlete_id', athlete.id).eq('status','confirmed').is('athlete_paid_at', null),
+      supabase.from('athlete_payout_requests').select('id,amount_cents,requested_at').eq('athlete_id', athlete.id).eq('status','pending').limit(1).maybeSingle(),
+      supabase.from('athlete_payout_requests').select('*').eq('athlete_id', athlete.id).order('requested_at',{ascending:false}).limit(10)
+    ]);
+    const unpaid = (salesRes.data||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
+    const cnt = (salesRes.data||[]).length;
+    const pendReq = pendReqRes.data;
     const amtEl = document.getElementById('ath_unpaid_amount');
     const cntEl = document.getElementById('ath_unpaid_count');
     const btn = document.getElementById('ath_request_btn');
+    const msgEl = document.getElementById('ath_request_msg');
     if (amtEl) amtEl.textContent = '€' + (unpaid/100).toFixed(2);
     if (cntEl) cntEl.textContent = cnt + ' prijava ceka isplatu';
     if (btn){
-      if (unpaid < 100){ btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; btn.textContent = 'Min. €1 da bi se zatrazila isplata'; }
-      else { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; btn.textContent = '📤 Zatraži isplatu sada (€' + (unpaid/100).toFixed(2) + ')'; }
+      if (pendReq){
+        btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+        btn.textContent = '⏳ Zahtev poslat €' + ((pendReq.amount_cents||0)/100).toFixed(2) + ' · čeka admin';
+        if (msgEl) msgEl.innerHTML = '<span style="color:#ffc24b">⏳ Vec si zatrazio. Cekaj odgovor admin-a (nije moguce poslati novi).</span>';
+      } else if (unpaid < 100){
+        btn.disabled = true; btn.style.opacity='0.5'; btn.style.cursor='not-allowed';
+        btn.textContent = unpaid === 0 ? '✓ Sve isplaceno' : 'Min. €1 za isplatu';
+        if (msgEl) msgEl.innerHTML = unpaid === 0 ? '<span style="color:#b5ffb0">✓ Nema neisplacenih provizija.</span>' : '';
+      } else {
+        btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
+        btn.textContent = '📤 Zatraži isplatu sada (€' + (unpaid/100).toFixed(2) + ')';
+        if (msgEl && !msgEl.innerHTML.includes('Zahtev poslat')) msgEl.innerHTML = '';
+      }
     }
-    // Istorija zahteva
-    const { data: reqs } = await supabase.from('athlete_payout_requests').select('*').eq('athlete_id', athlete.id).order('requested_at', { ascending: false }).limit(10);
     const tbody = document.getElementById('ath_payout_history');
     if (tbody){
-      if (!reqs || !reqs.length){ tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--mute);padding:14px">Nema zahteva.</td></tr>'; }
+      const reqs = allReqsRes.data || [];
+      if (!reqs.length) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--mute);padding:14px">Nema zahteva.</td></tr>';
       else tbody.innerHTML = reqs.map(function(r){
-        const tagBg = r.status==='paid'?'rgba(166,255,59,0.15);color:#b5ffb0':(r.status==='rejected'?'rgba(255,77,94,0.15);color:#ffb0b8':'rgba(255,194,75,0.15);color:#ffc24b');
-        return '<tr><td>'+new Date(r.requested_at).toLocaleDateString('sr',{day:'2-digit',month:'short'})+'</td><td><b>€'+((r.amount_cents||0)/100).toFixed(2)+'</b></td><td><span style="padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;background:'+tagBg+'">'+r.status.toUpperCase()+'</span></td></tr>';
+        const bg = r.status==='paid'?'rgba(166,255,59,0.15);color:#b5ffb0':(r.status==='rejected'?'rgba(255,77,94,0.15);color:#ffb0b8':'rgba(255,194,75,0.15);color:#ffc24b');
+        return '<tr><td>'+new Date(r.requested_at).toLocaleDateString('sr',{day:'2-digit',month:'short'})+'</td><td><b>€'+((r.amount_cents||0)/100).toFixed(2)+'</b></td><td><span style="padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;background:'+bg+'">'+r.status.toUpperCase()+'</span></td></tr>';
       }).join('');
     }
   } catch(e){ console.error('loadAthletePayoutInfo', e); }
@@ -862,36 +873,39 @@ async function loadAthletePayoutInfo(){
 
 window.requestAthletePayout = async function(){
   const msg = document.getElementById('ath_request_msg');
+  // CHECK 1: pending vec postoji?
+  const { data: pend } = await supabase.from('athlete_payout_requests').select('id,amount_cents').eq('athlete_id', athlete.id).eq('status','pending').limit(1);
+  if (pend && pend.length){
+    msg.innerHTML = '<span style="color:#ffb0b8">⚠ Vec si poslao zahtev. Cekaj da admin obradi prethodni.</span>';
+    loadAthletePayoutInfo(); return;
+  }
+  // CHECK 2: bank info
   if (!athlete.payout_full_name || !athlete.payout_account_number){
     msg.innerHTML = '<span style="color:#ffb0b8">⚠ Prvo unesi ime i broj racuna ispod, pa snimi.</span>';
     return;
   }
+  // CHECK 3: real unpaid amount
+  const { data: sales } = await supabase.from('sales').select('commission_cents').eq('athlete_id', athlete.id).eq('status','confirmed').is('athlete_paid_at', null);
+  const unpaid = (sales||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
+  if (unpaid < 100){
+    msg.innerHTML = '<span style="color:#ffb0b8">Nemaš ništa za isplatu (min €1).</span>';
+    loadAthletePayoutInfo(); return;
+  }
+  if (!confirm('Zatraziti isplatu od €' + (unpaid/100).toFixed(2) + ' na racun ' + athlete.payout_account_number + '?')) return;
   try {
-    // Re-fetch unpaid to ensure exact amount
-    const { data: sales } = await supabase.from('sales')
-      .select('commission_cents')
-      .eq('athlete_id', athlete.id)
-      .eq('status', 'confirmed')
-      .is('athlete_paid_at', null);
-    const unpaid = (sales||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
-    if (unpaid < 100){ msg.innerHTML = '<span style="color:#ffb0b8">Nemaš dovoljno (min €1).</span>'; return; }
-    if (!confirm('Zatraziti isplatu od €' + (unpaid/100).toFixed(2) + ' na ' + athlete.payout_account_number + '?')) return;
     const { error } = await supabase.from('athlete_payout_requests').insert({
-      athlete_id: athlete.id,
-      amount_cents: unpaid,
-      bank_full_name: athlete.payout_full_name,
-      bank_account_number: athlete.payout_account_number,
-      bank_name: athlete.payout_bank_name,
-      bank_phone: athlete.payout_phone
+      athlete_id: athlete.id, amount_cents: unpaid,
+      bank_full_name: athlete.payout_full_name, bank_account_number: athlete.payout_account_number,
+      bank_name: athlete.payout_bank_name, bank_phone: athlete.payout_phone
     });
     if (error){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: '+error.message+'</span>'; return; }
-    msg.innerHTML = '<span style="color:#b5ffb0">✓ Zahtev poslat. Admin obrađuje, isplata stiže na racun.</span>';
+    msg.innerHTML = '<span style="color:#b5ffb0">✓ Zahtev poslat €'+(unpaid/100).toFixed(2)+'. Admin obrađuje, isplata stiže na racun.</span>';
     loadAthletePayoutInfo();
   } catch(e){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: '+e.message+'</span>'; }
 };
 
-// Pokreni odmah
-try { loadAthletePayoutInfo(); } catch(e){}
+// Auto-refresh isplate svakih 30 sec da se vidi status promene
+try { loadAthletePayoutInfo(); setInterval(loadAthletePayoutInfo, 30000); } catch(e){}
 // Pre-fill payout fields (safe — only if elements exist)
 try {
   if (document.getElementById('po_name')) {
