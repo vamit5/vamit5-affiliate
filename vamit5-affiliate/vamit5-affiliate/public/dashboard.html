@@ -264,10 +264,14 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <div id="customersList" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
 
-    <div class="card" id="payout-card">
-      <div class="card-head"><h2><span class="em">💸</span>Bankovni podaci za isplate</h2></div>
-      <div style="padding:14px;border-radius:11px;background:rgba(255,194,75,0.08);border:1px solid rgba(255,194,75,0.25);font-size:12.5px;color:var(--gold);margin-bottom:14px;line-height:1.5">
-        Isplate se vrše <b>20. u mesecu</b> na tvoj bankovni racun (npr. 265-1234567890123-12).
+    <div class="card" id="payout-card" style="border:2px solid rgba(255,194,75,0.4);background:linear-gradient(135deg,rgba(255,194,75,0.04),rgba(20,24,42,0.6))">
+      <div class="card-head"><h2><span class="em">💸</span>Isplata</h2></div>
+      <div style="text-align:center;padding:18px 14px 14px;border-radius:11px;background:rgba(166,255,59,0.06);border:1px solid rgba(166,255,59,0.25);margin-bottom:14px">
+        <div style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Neisplaceno trenutno</div>
+        <div id="ath_unpaid_amount" style="font-size:36px;font-weight:900;color:var(--green);letter-spacing:-0.02em">€0.00</div>
+        <div id="ath_unpaid_count" style="font-size:11.5px;color:var(--mute);margin-top:2px">0 prijava ceka isplatu</div>
+        <button class="btn" id="ath_request_btn" onclick="requestAthletePayout()" style="margin-top:14px;padding:13px 32px;font-size:14px;font-weight:900;background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14;border:none;border-radius:11px;cursor:pointer">📤 Zatraži isplatu sada</button>
+        <div id="ath_request_msg" style="margin-top:10px;font-size:12.5px"></div>
       </div>
       <div style="display:grid;gap:10px">
         <div><label class="po-l">Puno ime (kao u banci)</label><input id="po_name" class="po-i" placeholder="Marko Petrović"></div>
@@ -275,8 +279,13 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
         <div><label class="po-l">Banka</label><input id="po_bank" class="po-i" placeholder="Raiffeisen / NLB / OTP / Komercijalna..."></div>
         <div><label class="po-l">Telefon</label><input id="po_phone" class="po-i" placeholder="+381 60 ..."></div>
       </div>
-      <button class="btn" onclick="savePayout()" style="margin-top:14px;width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none;font-weight:800;padding:13px">💾 Snimi podatke</button>
+      <button class="btn" onclick="savePayout()" style="margin-top:14px;width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#0a0c14;border:none;font-weight:800;padding:13px">💾 Snimi bankovne podatke</button>
       <div id="po_status" style="margin-top:10px;font-size:12px;color:var(--dim);text-align:center"></div>
+
+      <div style="margin-top:18px">
+        <h3 style="font-size:13px;color:var(--mute);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Istorija zahteva</h3>
+        <table style="font-size:11.5px"><thead><tr><th>Datum</th><th>Iznos €</th><th>Status</th></tr></thead><tbody id="ath_payout_history"><tr><td colspan="3" style="text-align:center;color:var(--mute);padding:14px">Nema zahteva.</td></tr></tbody></table>
+      </div>
     </div>
 
     <div class="card">
@@ -805,13 +814,84 @@ window.savePayout = async function(){
       document.getElementById('po_status').style.color = '#ffb0b8';
       return;
     }
-    document.getElementById('po_status').textContent = '✓ Snimljeno! Prima isplate od 20. u mesecu.';
+    document.getElementById('po_status').textContent = '✓ Snimljeno!';
     document.getElementById('po_status').style.color = 'var(--lime)';
+    // Update athlete object so request payout uses fresh bank info
+    athlete.payout_full_name = data.payout_full_name;
+    athlete.payout_account_number = data.payout_account_number;
+    athlete.payout_bank_name = data.payout_bank_name;
+    athlete.payout_phone = data.payout_phone;
   } catch(e){
     document.getElementById('po_status').textContent = 'Greska: ' + e.message;
     document.getElementById('po_status').style.color = '#ffb0b8';
   }
 };
+
+// ============ ATHLETE PAYOUT REQUEST ============
+async function loadAthletePayoutInfo(){
+  try {
+    // Saberi sve neisplacene provizije iz sales tabele
+    const { data: sales } = await supabase.from('sales')
+      .select('commission_cents, athlete_paid_at, status')
+      .eq('athlete_id', athlete.id)
+      .eq('status', 'confirmed')
+      .is('athlete_paid_at', null);
+    const unpaid = (sales||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
+    const cnt = (sales||[]).length;
+    const amtEl = document.getElementById('ath_unpaid_amount');
+    const cntEl = document.getElementById('ath_unpaid_count');
+    const btn = document.getElementById('ath_request_btn');
+    if (amtEl) amtEl.textContent = '€' + (unpaid/100).toFixed(2);
+    if (cntEl) cntEl.textContent = cnt + ' prijava ceka isplatu';
+    if (btn){
+      if (unpaid < 100){ btn.disabled = true; btn.style.opacity = '0.5'; btn.style.cursor = 'not-allowed'; btn.textContent = 'Min. €1 da bi se zatrazila isplata'; }
+      else { btn.disabled = false; btn.style.opacity = '1'; btn.style.cursor = 'pointer'; btn.textContent = '📤 Zatraži isplatu sada (€' + (unpaid/100).toFixed(2) + ')'; }
+    }
+    // Istorija zahteva
+    const { data: reqs } = await supabase.from('athlete_payout_requests').select('*').eq('athlete_id', athlete.id).order('requested_at', { ascending: false }).limit(10);
+    const tbody = document.getElementById('ath_payout_history');
+    if (tbody){
+      if (!reqs || !reqs.length){ tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--mute);padding:14px">Nema zahteva.</td></tr>'; }
+      else tbody.innerHTML = reqs.map(function(r){
+        const tagBg = r.status==='paid'?'rgba(166,255,59,0.15);color:#b5ffb0':(r.status==='rejected'?'rgba(255,77,94,0.15);color:#ffb0b8':'rgba(255,194,75,0.15);color:#ffc24b');
+        return '<tr><td>'+new Date(r.requested_at).toLocaleDateString('sr',{day:'2-digit',month:'short'})+'</td><td><b>€'+((r.amount_cents||0)/100).toFixed(2)+'</b></td><td><span style="padding:3px 8px;border-radius:5px;font-size:10px;font-weight:700;background:'+tagBg+'">'+r.status.toUpperCase()+'</span></td></tr>';
+      }).join('');
+    }
+  } catch(e){ console.error('loadAthletePayoutInfo', e); }
+}
+
+window.requestAthletePayout = async function(){
+  const msg = document.getElementById('ath_request_msg');
+  if (!athlete.payout_full_name || !athlete.payout_account_number){
+    msg.innerHTML = '<span style="color:#ffb0b8">⚠ Prvo unesi ime i broj racuna ispod, pa snimi.</span>';
+    return;
+  }
+  try {
+    // Re-fetch unpaid to ensure exact amount
+    const { data: sales } = await supabase.from('sales')
+      .select('commission_cents')
+      .eq('athlete_id', athlete.id)
+      .eq('status', 'confirmed')
+      .is('athlete_paid_at', null);
+    const unpaid = (sales||[]).reduce(function(s,x){ return s + (x.commission_cents||0); }, 0);
+    if (unpaid < 100){ msg.innerHTML = '<span style="color:#ffb0b8">Nemaš dovoljno (min €1).</span>'; return; }
+    if (!confirm('Zatraziti isplatu od €' + (unpaid/100).toFixed(2) + ' na ' + athlete.payout_account_number + '?')) return;
+    const { error } = await supabase.from('athlete_payout_requests').insert({
+      athlete_id: athlete.id,
+      amount_cents: unpaid,
+      bank_full_name: athlete.payout_full_name,
+      bank_account_number: athlete.payout_account_number,
+      bank_name: athlete.payout_bank_name,
+      bank_phone: athlete.payout_phone
+    });
+    if (error){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: '+error.message+'</span>'; return; }
+    msg.innerHTML = '<span style="color:#b5ffb0">✓ Zahtev poslat. Admin obrađuje, isplata stiže na racun.</span>';
+    loadAthletePayoutInfo();
+  } catch(e){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: '+e.message+'</span>'; }
+};
+
+// Pokreni odmah
+try { loadAthletePayoutInfo(); } catch(e){}
 // Pre-fill payout fields (safe — only if elements exist)
 try {
   if (document.getElementById('po_name')) {
