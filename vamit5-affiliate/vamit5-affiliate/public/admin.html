@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="sr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VAMIT-5 · Admin</title>
 <link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
 <style>
@@ -15,21 +14,19 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-grad
 .spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 14px}
 @keyframes spin{to{transform:rotate(360deg)}}
 .app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-aside{background:rgba(20,24,42,0.85);border-right:1px solid var(--border);padding:18px;backdrop-filter:blur(12px);display:flex;flex-direction:column}
+aside{background:rgba(20,24,42,0.85);border-right:1px solid var(--border);padding:18px;display:flex;flex-direction:column}
 aside .logo{display:flex;align-items:center;gap:10px;margin-bottom:20px}
 aside .logo .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#00f0ff,#7a5bff);text-align:center;line-height:34px;font-weight:900;font-size:12px;color:#0a0c14}
-aside .logo b{font-size:14px;font-weight:900;letter-spacing:0.04em}
 aside nav button{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 12px;border-radius:8px;background:transparent;color:var(--dim);border:none;font-family:inherit;font-size:13px;text-align:left;cursor:pointer;margin-bottom:4px}
 aside nav button:hover{background:rgba(255,255,255,0.04);color:var(--text)}
 aside nav button.active{background:rgba(0,240,255,0.1);color:var(--brand);font-weight:700}
 .badge{background:var(--red);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:700}
 aside .meta{margin-top:auto;padding-top:14px;border-top:1px solid var(--border);font-size:11px;color:var(--mute);font-family:monospace;word-break:break-all}
 aside .logout-btn{margin-top:10px;width:100%;padding:8px;background:rgba(255,77,94,0.15);border:1px solid rgba(255,77,94,0.3);color:#ffb0b8;border-radius:8px;cursor:pointer;font-family:inherit;font-size:12px}
-main{padding:24px;overflow-y:auto;max-width:100%}
+main{padding:24px;overflow-y:auto}
 h1{font-size:22px;font-weight:800;margin-bottom:18px}
-.section{display:none}
-.section.active{display:block}
-.card{background:rgba(20,24,42,0.6);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;backdrop-filter:blur(8px)}
+.section{display:none}.section.active{display:block}
+.card{background:rgba(20,24,42,0.6);border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px}
 .card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
 .card-head h2{font-size:15px;font-weight:800}
 table{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -43,7 +40,6 @@ td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--dim)}
 .btn.gold{background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}
 input,select,textarea{background:#0a0c14;color:var(--text);border:1px solid var(--border);padding:9px 12px;border-radius:8px;font-family:inherit;font-size:13px;outline:none}
-input:focus,select:focus{border-color:var(--brand)}
 .tag{display:inline-block;padding:3px 8px;border-radius:5px;font-size:10.5px;font-weight:700;text-transform:uppercase}
 .tag.confirmed,.tag.approved,.tag.paid{background:rgba(166,255,59,0.15);color:#b5ffb0}
 .tag.pending{background:rgba(255,194,75,0.15);color:#ffc24b}
@@ -53,440 +49,265 @@ input:focus,select:focus{border-color:var(--brand)}
 .kpi .label{font-size:10.5px;color:var(--mute);text-transform:uppercase;margin-bottom:6px}
 .kpi .value{font-size:22px;font-weight:800;color:var(--brand)}
 .debt-card{padding:14px;border-radius:12px;background:rgba(10,12,20,0.5);border:1.5px solid;margin-bottom:12px}
-.debt-card .head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap;margin-bottom:10px}
-.debt-card .name{font-size:16px;font-weight:800;color:var(--brand)}
-.debt-card .total{font-size:22px;font-weight:900;color:var(--green)}
-.bank-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:10px;font-size:11.5px}
-code{cursor:pointer}
-@media (max-width:780px){.app{grid-template-columns:1fr}aside nav{display:flex;overflow-x:auto;gap:6px}aside nav button{flex:0 0 auto;margin-bottom:0}aside .meta,aside .logo{display:none}.bank-info{grid-template-columns:1fr}}
+.bank-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin:10px 0;font-size:11.5px}
+code{cursor:pointer;color:var(--brand)}
+@media(max-width:780px){.app{grid-template-columns:1fr}aside nav{display:flex;overflow-x:auto;gap:6px}aside nav button{flex:0 0 auto}aside .meta,aside .logo{display:none}.bank-info{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <div class="loading" id="loading"><div><div class="spinner"></div><div id="loadStatus">Učitavanje...</div><div id="loadErr" style="color:#ffb0b8;margin-top:10px;font-size:12px"></div></div></div>
-
 <div class="app">
-  <aside>
-    <div class="logo"><div class="mark">V5</div><b>ADMIN</b></div>
-    <nav>
-      <button class="active" data-section="overview">Overview</button>
-      <button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
-      <button data-section="athletes">Atlete</button>
-      <button data-section="organizers">Organizatori</button>
-      <button data-section="customers">Klijenti</button>
-      <button data-section="sales">Prodaje</button>
-      <button data-section="debts">💰 Dugovanja <span class="badge" id="debtsBadge" style="display:none;background:var(--gold);color:#0a0c14">0</span></button>
-      <button data-section="reports">📊 Izvestaji</button>
-      <button data-section="payouts">Zahtevi <span class="badge" id="payoutBadge" style="display:none">0</span></button>
-    </nav>
-    <div class="meta" id="adminEmail">...</div>
-    <button class="logout-btn" onclick="logout()">Logout</button>
-  </aside>
+<aside>
+<div class="logo"><div class="mark">V5</div><b>ADMIN</b></div>
+<nav>
+<button class="active" data-section="overview">Overview</button>
+<button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
+<button data-section="athletes">Atlete</button>
+<button data-section="organizers">Organizatori</button>
+<button data-section="customers">Klijenti</button>
+<button data-section="sales">Prodaje</button>
+<button data-section="debts">💰 Dugovanja <span class="badge" id="debtsBadge" style="display:none;background:var(--gold);color:#0a0c14">0</span></button>
+<button data-section="reports">📊 Izvestaji</button>
+<button data-section="events">📅 Eventi</button>
+<button data-section="payouts">Zahtevi <span class="badge" id="payoutBadge" style="display:none">0</span></button>
+</nav>
+<div class="meta" id="adminEmail">...</div>
+<button class="logout-btn" onclick="logout()">Logout</button>
+</aside>
+<main>
+<h1 id="sectionTitle">Overview</h1>
 
-  <main>
-    <h1 id="sectionTitle">Overview</h1>
+<div class="section active" id="sec-overview">
+<div class="kpi-grid">
+<div class="kpi"><div class="label">Atleta</div><div class="value" id="kpiAthletes">-</div></div>
+<div class="kpi"><div class="label">Organizatora</div><div class="value" id="kpiOrgs">-</div></div>
+<div class="kpi"><div class="label">Prodaje (mesec)</div><div class="value" id="kpiSales">-</div></div>
+<div class="kpi"><div class="label">Bruto € (mesec)</div><div class="value" id="kpiGross">-</div></div>
+<div class="kpi"><div class="label">Dugovanje €</div><div class="value" id="kpiDebt" style="color:var(--gold)">-</div></div>
+</div>
+<div class="card"><div class="card-head"><h2>Aktivnost</h2></div><table><thead><tr><th>Vreme</th><th>Atleta</th><th>Naslov</th></tr></thead><tbody id="activityBody"><tr><td colspan="3" class="empty">...</td></tr></tbody></table></div>
+</div>
 
-    <div class="section active" id="sec-overview">
-      <div class="kpi-grid">
-        <div class="kpi"><div class="label">Atleta</div><div class="value" id="kpiAthletes">-</div></div>
-        <div class="kpi"><div class="label">Organizatora</div><div class="value" id="kpiOrgs">-</div></div>
-        <div class="kpi"><div class="label">Prodaje (mesec)</div><div class="value" id="kpiSales">-</div></div>
-        <div class="kpi"><div class="label">Bruto € (mesec)</div><div class="value" id="kpiGross">-</div></div>
-        <div class="kpi"><div class="label">Dugovanje €</div><div class="value" id="kpiDebt" style="color:var(--gold)">-</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Aktivnost (zadnjih 20)</h2></div>
-        <table><thead><tr><th>Vreme</th><th>Atleta</th><th>Naslov</th></tr></thead><tbody id="activityBody"><tr><td colspan="3" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
+<div class="section" id="sec-applications">
+<div class="card"><div class="card-head"><h2>Aplikacije</h2><button class="btn ghost" onclick="loadApplications()">Refresh</button></div>
+<table><thead><tr><th>Datum</th><th>Ime</th><th>Email</th><th>Status</th><th>Akcije</th></tr></thead><tbody id="appsBody"><tr><td colspan="5" class="empty">...</td></tr></tbody></table></div>
+</div>
 
-    <div class="section" id="sec-applications">
-      <div class="card">
-        <div class="card-head"><h2>Aplikacije</h2><button class="btn ghost" onclick="loadApplications()">Refresh</button></div>
-        <table><thead><tr><th>Datum</th><th>Ime</th><th>Email</th><th>Status</th><th>Akcije</th></tr></thead><tbody id="appsBody"><tr><td colspan="5" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
+<div class="section" id="sec-athletes">
+<div class="card"><div class="card-head"><h2>Atlete</h2><button class="btn ghost" onclick="loadAthletes()">Refresh</button></div>
+<table><thead><tr><th>Ime</th><th>Username</th><th>Email</th><th>Tier</th><th>Promo</th><th>Poeni</th></tr></thead><tbody id="athletesBody"><tr><td colspan="6" class="empty">...</td></tr></tbody></table></div>
+</div>
 
-    <div class="section" id="sec-athletes">
-      <div class="card">
-        <div class="card-head"><h2>Atlete</h2><button class="btn ghost" onclick="loadAthletes()">Refresh</button></div>
-        <table><thead><tr><th>Ime</th><th>Username</th><th>Email</th><th>Tier</th><th>Promo</th><th>Poeni</th></tr></thead><tbody id="athletesBody"><tr><td colspan="6" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
+<div class="section" id="sec-organizers">
+<div class="card"><div class="card-head"><h2>🎪 Dodaj organizatora</h2></div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
+<input id="orgName" placeholder="Puno ime"><input id="orgEmail" type="email" placeholder="Email">
+<input id="orgPromoCode" placeholder="Promo kod" style="text-transform:uppercase"><input id="orgCommission" type="number" value="30" placeholder="%">
+</div>
+<button class="btn brand" onclick="addOrganizer()">+ Dodaj</button>
+</div>
+<div class="card"><div class="card-head"><h2>Organizatori</h2></div>
+<table><thead><tr><th>Ime</th><th>Email</th><th>Promo</th><th>%</th><th>Prijave</th><th></th></tr></thead><tbody id="organizersBody"><tr><td colspan="6" class="empty">...</td></tr></tbody></table></div>
+</div>
 
-    <div class="section" id="sec-organizers">
-      <div class="card">
-        <div class="card-head"><h2>🎪 Dodaj organizatora</h2></div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:10px">
-          <input id="orgName" placeholder="Puno ime">
-          <input id="orgEmail" type="email" placeholder="Email za login">
-          <input id="orgPromoCode" placeholder="Promo kod (UPPERCASE)" style="text-transform:uppercase">
-          <input id="orgCommission" type="number" min="0" max="100" value="30" placeholder="Provizija %">
-        </div>
-        <button class="btn brand" onclick="addOrganizer()">+ Dodaj organizatora</button>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>Postojeci organizatori</h2></div>
-        <table><thead><tr><th>Ime</th><th>Email</th><th>Promo</th><th>%</th><th>Prijave</th><th>Akcije</th></tr></thead><tbody id="organizersBody"><tr><td colspan="6" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
+<div class="section" id="sec-customers">
+<div class="card"><div class="card-head"><h2>Klijenti</h2><button class="btn ghost" onclick="loadCustomers()">Refresh</button></div>
+<table><thead><tr><th>Datum</th><th>Email</th><th>Atleta</th><th>Bruto €</th><th>Status</th></tr></thead><tbody id="customersBody"><tr><td colspan="5" class="empty">...</td></tr></tbody></table></div>
+</div>
 
-    <div class="section" id="sec-customers">
-      <div class="card">
-        <div class="card-head"><h2>Klijenti</h2><button class="btn ghost" onclick="loadCustomers()">Refresh</button></div>
-        <table><thead><tr><th>Datum</th><th>Email</th><th>Atleta</th><th>Bruto €</th><th>Status</th></tr></thead><tbody id="customersBody"><tr><td colspan="5" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
+<div class="section" id="sec-sales">
+<div class="card"><div class="card-head"><h2>Prodaje <span id="salesCount" style="color:var(--mute);font-size:12px"></span></h2><button class="btn ghost" onclick="loadSales()">Refresh</button></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px">
+<select id="fAthlete" onchange="loadSales()"><option value="">Svaki atleta</option></select>
+<select id="fOrg" onchange="loadSales()"><option value="">Svaki event</option><option value="__none__">Bez eventa</option></select>
+<select id="fStatus" onchange="loadSales()"><option value="">Svi statusi</option><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="refunded">Refunded</option></select>
+<input id="fEmail" placeholder="Email..." oninput="debLoad()"><input id="fFrom" type="date" onchange="loadSales()"><input id="fTo" type="date" onchange="loadSales()">
+</div>
+<div style="overflow-x:auto"><table><thead><tr><th>Vreme</th><th>Kupac</th><th>Atleta</th><th>Event</th><th>Bruto €</th><th>Atl €</th><th>Org €</th><th>Status</th><th></th></tr></thead><tbody id="salesBody"><tr><td colspan="9" class="empty">...</td></tr></tbody></table></div>
+</div>
+</div>
 
-    <div class="section" id="sec-sales">
-      <div class="card">
-        <div class="card-head"><h2>Prodaje <span id="salesCount" style="color:var(--mute);font-weight:400;font-size:12px"></span></h2><button class="btn ghost" onclick="loadSales()">Refresh</button></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px">
-          <select id="fAthlete" onchange="loadSales()"><option value="">Svaki atleta</option></select>
-          <select id="fOrg" onchange="loadSales()"><option value="">Svaki event</option><option value="__none__">Bez eventa</option></select>
-          <select id="fStatus" onchange="loadSales()"><option value="">Svi statusi</option><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="refunded">Refunded</option></select>
-          <input id="fEmail" placeholder="Email..." oninput="debLoad()">
-          <input id="fFrom" type="date" onchange="loadSales()">
-          <input id="fTo" type="date" onchange="loadSales()">
-        </div>
-        <div style="overflow-x:auto"><table><thead><tr><th>Vreme</th><th>Kupac</th><th>Atleta</th><th>Event</th><th>Bruto €</th><th>Atl €</th><th>Org €</th><th>Status</th><th></th></tr></thead><tbody id="salesBody"><tr><td colspan="9" class="empty">Učitavanje...</td></tr></tbody></table></div>
-      </div>
-    </div>
+<div class="section" id="sec-debts">
+<div class="card" style="border-color:rgba(255,194,75,0.4)">
+<div class="card-head"><h2>💰 Stanje dugovanja <span id="debtsRefreshTime" style="color:var(--mute);font-weight:400;font-size:12px"></span></h2><button class="btn gold" onclick="loadDebts()">🔄 Refresh sada</button></div>
+<div class="kpi-grid">
+<div class="kpi"><div class="label">Atletama €</div><div class="value" id="debtAth">-</div></div>
+<div class="kpi"><div class="label">Organizatorima €</div><div class="value" id="debtOrg" style="color:var(--gold)">-</div></div>
+<div class="kpi"><div class="label">UKUPNO €</div><div class="value" id="debtTotal" style="color:var(--green)">-</div></div>
+</div>
+</div>
+<div class="card"><div class="card-head"><h2>👤 Atlete</h2></div><div id="debtsAthletes"><div class="empty">Klikni Refresh.</div></div></div>
+<div class="card"><div class="card-head"><h2>🎪 Organizatori</h2></div><div id="debtsOrgs"><div class="empty">Klikni Refresh.</div></div></div>
+</div>
 
-    <div class="section" id="sec-debts">
-      <div class="card" style="border-color:rgba(255,194,75,0.4)">
-        <div class="card-head">
-          <h2>💰 Stanje dugovanja <span id="debtsRefreshTime" style="color:var(--mute);font-weight:400;font-size:12px"></span></h2>
-          <button class="btn gold" onclick="loadDebts()">🔄 Refresh sada</button>
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><div class="label">Atletama €</div><div class="value" id="debtAth">-</div></div>
-          <div class="kpi"><div class="label">Organizatorima €</div><div class="value" id="debtOrg" style="color:var(--gold)">-</div></div>
-          <div class="kpi"><div class="label">UKUPNO €</div><div class="value" id="debtTotal" style="color:var(--green)">-</div></div>
-        </div>
-        <div style="padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:12px;color:var(--dim);line-height:1.5;margin-top:6px">Sortirano po <b>najstarijoj neisplacenoj prijavi</b> (najhitnije na vrhu). Klik "✓ Označi placeno" markira sve njegove neisplacene kao izmirene.</div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>👤 Atlete</h2></div>
-        <div id="debtsAthletes"><div class="empty">Klikni Refresh.</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>🎪 Organizatori</h2></div>
-        <div id="debtsOrgs"><div class="empty">Klikni Refresh.</div></div>
-      </div>
-    </div>
+<div class="section" id="sec-reports">
+<div class="card"><div class="card-head"><h2>📊 Zarada po atleti — period</h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px">
+<select id="repAthlete"><option value="">Izaberi atletu</option></select>
+<input id="repAthFrom" type="date"><input id="repAthTo" type="date">
+<button class="btn brand" onclick="loadAthleteReport()">Prikazi</button>
+</div>
+<div id="repAthleteResult"><div class="empty">Izaberi atletu i period.</div></div>
+</div>
+<div class="card"><div class="card-head"><h2>📊 Zarada po organizatoru — period</h2></div>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px">
+<select id="repOrg"><option value="">Izaberi</option></select>
+<input id="repOrgFrom" type="date"><input id="repOrgTo" type="date">
+<button class="btn brand" onclick="loadOrgReport()">Prikazi</button>
+</div>
+<div id="repOrgResult"><div class="empty">Izaberi organizatora i period.</div></div>
+</div>
+</div>
 
-    <div class="section" id="sec-reports">
-      <div class="card">
-        <div class="card-head"><h2>📊 Zarada po atleti — period</h2></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px">
-          <select id="repAthlete"><option value="">Izaberi atletu...</option></select>
-          <input id="repAthFrom" type="date">
-          <input id="repAthTo" type="date">
-          <button class="btn brand" onclick="loadAthleteReport()">Prikazi</button>
-        </div>
-        <div id="repAthleteResult"><div class="empty">Izaberi atletu i period.</div></div>
-      </div>
-      <div class="card">
-        <div class="card-head"><h2>📊 Zarada po organizatoru — period</h2></div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:12px">
-          <select id="repOrg"><option value="">Izaberi...</option></select>
-          <input id="repOrgFrom" type="date">
-          <input id="repOrgTo" type="date">
-          <button class="btn brand" onclick="loadOrgReport()">Prikazi</button>
-        </div>
-        <div id="repOrgResult"><div class="empty">Izaberi organizatora i period.</div></div>
-      </div>
-    </div>
+<div class="section" id="sec-events">
+<div class="card" style="border-color:rgba(255,194,75,0.4)">
+<div class="card-head"><h2>📅 Eventi — stvarno vreme <span id="eventsTime" style="color:var(--mute);font-weight:400;font-size:12px"></span></h2><button class="btn gold" onclick="loadEvents()">🔄 Refresh sada</button></div>
+<div style="padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:12px;color:var(--dim);line-height:1.5">Pregled svih eventa (organizatora) — broj prijava, status, ukupna bruto i koliko duguješ svakom.</div>
+</div>
+<div id="eventsList"><div class="empty">Klikni Refresh.</div></div>
+</div>
 
-    <div class="section" id="sec-payouts">
-      <div class="card" style="border-color:rgba(255,194,75,0.35)">
-        <div class="card-head"><h2>🎪 Zahtevi za isplatu od organizatora</h2><button class="btn ghost" onclick="loadOrgPayouts()">Refresh</button></div>
-        <table><thead><tr><th>Datum</th><th>Organizator</th><th>Iznos €</th><th>Bank info</th><th>Status</th><th></th></tr></thead><tbody id="orgPayoutsBody"><tr><td colspan="6" class="empty">Učitavanje...</td></tr></tbody></table>
-      </div>
-    </div>
-  </main>
+<div class="section" id="sec-payouts">
+<div class="card" style="border-color:rgba(255,194,75,0.35)">
+<div class="card-head"><h2>🎪 Zahtevi — Organizatori</h2><button class="btn ghost" onclick="loadOrgPayouts()">Refresh</button></div>
+<table><thead><tr><th>Datum</th><th>Organizator</th><th>Iznos €</th><th>Bank info</th><th>Status</th><th></th></tr></thead><tbody id="orgPayoutsBody"><tr><td colspan="6" class="empty">...</td></tr></tbody></table>
+</div>
+<div class="card" style="border-color:rgba(0,240,255,0.35)">
+<div class="card-head"><h2>👤 Zahtevi — Atlete</h2><button class="btn ghost" onclick="loadAthPayouts()">Refresh</button></div>
+<div style="padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:12px;color:var(--dim);line-height:1.5;margin-bottom:12px">Atleta klikne "Zatraži isplatu" u dashboardu → ovde se pojavljuje. <b>Verifikuje se automatski:</b> sistem provera da li atleta zaista ima toliko neisplacenog. Kolona "Stvarno €" pokazuje pravi iznos. Klik "✓ Plaćeno" markira sve njegove neisplacene kao izmirene.</div>
+<table><thead><tr><th>Datum</th><th>Atleta</th><th>Trazi €</th><th>Stvarno €</th><th>Bank info</th><th>Status</th><th></th></tr></thead><tbody id="athPayoutsBody"><tr><td colspan="7" class="empty">...</td></tr></tbody></table>
+</div>
+</div>
+
+</main>
 </div>
 
 <script src="/config.js"></script>
 <script>
 setTimeout(function(){var el=document.getElementById('loading');if(el)el.classList.add('hidden');},5000);
-window.addEventListener('error',function(e){console.error('[admin]',e.error||e.message);var el=document.getElementById('loadErr');if(el)el.textContent='JS greska: '+(e.message||'');});
+window.addEventListener('error',function(e){var el=document.getElementById('loadErr');if(el)el.textContent='JS:'+(e.message||'');});
 </script>
 <script type="module">
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { flowType: 'implicit', detectSessionInUrl: true, persistSession: true, autoRefreshToken: true } });
-
-function $(id){ return document.getElementById(id); }
-function hideLoading(){ var el=$('loading'); if(el)el.classList.add('hidden'); }
-function fmtDT(s){ if(!s)return '-'; return new Date(s).toLocaleString('sr',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
-function daysSince(date){ return Math.floor((Date.now()-new Date(date).getTime())/86400000); }
-window.logout = async function(){ try{await supabase.auth.signOut();}catch(e){} location.replace('/login.html'); };
-window.copyTxt = function(t,ev){ navigator.clipboard.writeText(t); if(ev&&ev.target){var el=ev.target;var orig=el.innerHTML;el.innerHTML='✓';setTimeout(function(){el.innerHTML=orig;},1000);} };
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { flowType:'implicit', detectSessionInUrl:true, persistSession:true, autoRefreshToken:true } });
+function $(id){return document.getElementById(id);}
+function hide(){var el=$('loading');if(el)el.classList.add('hidden');}
+function fmtDT(s){if(!s)return '-';return new Date(s).toLocaleString('sr',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function days(d){return Math.floor((Date.now()-new Date(d).getTime())/86400000);}
+window.logout=async function(){try{await supabase.auth.signOut();}catch(e){}location.replace('/login.html');};
+window.copyTxt=function(t,ev){navigator.clipboard.writeText(t);if(ev&&ev.target){var el=ev.target,o=el.innerHTML;el.innerHTML='✓';setTimeout(function(){el.innerHTML=o;},1000);}};
 
 // AUTH
-let session = null;
-try { const r = await Promise.race([supabase.auth.getSession(), new Promise(function(rs){setTimeout(function(){rs({data:{session:null}});},4000);})]); session = r.data&&r.data.session; } catch(e){}
-if (!session){ hideLoading(); location.replace('/login.html'); throw new Error('No session'); }
-let adminData = null;
-try { const r = await supabase.from('admins').select('*').eq('email', session.user.email).maybeSingle(); adminData = r.data; } catch(e){ $('loadErr').textContent='DB:'+e.message; throw e; }
-if (!adminData){ alert('Nisi admin'); location.replace('/dashboard.html'); throw new Error('Not admin'); }
-$('adminEmail').textContent = adminData.email;
-hideLoading();
+let session=null;
+try{const r=await Promise.race([supabase.auth.getSession(),new Promise(function(rs){setTimeout(function(){rs({data:{session:null}});},4000);})]);session=r.data&&r.data.session;}catch(e){}
+if(!session){hide();location.replace('/login.html');throw new Error('No session');}
+let adminData=null;
+try{const r=await supabase.from('admins').select('*').eq('email',session.user.email).maybeSingle();adminData=r.data;}catch(e){$('loadErr').textContent='DB:'+e.message;throw e;}
+if(!adminData){alert('Nisi admin');location.replace('/dashboard.html');throw new Error('Not admin');}
+$('adminEmail').textContent=adminData.email;hide();
 
 // NAV
-document.querySelectorAll('aside nav button').forEach(function(b){
-  b.addEventListener('click', function(){
-    const sec = b.getAttribute('data-section');
-    document.querySelectorAll('aside nav button').forEach(function(x){x.classList.remove('active');});
-    b.classList.add('active');
-    document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-    $('sec-'+sec).classList.add('active');
-    $('sectionTitle').textContent = b.textContent.trim().replace(/\s+\d+$/,'');
-    if(sec==='applications')loadApplications();
-    if(sec==='athletes')loadAthletes();
-    if(sec==='organizers')loadOrganizers();
-    if(sec==='customers')loadCustomers();
-    if(sec==='sales'){initSalesFilters();loadSales();}
-    if(sec==='debts')loadDebts();
-    if(sec==='reports')initReportFilters();
-    if(sec==='payouts')loadOrgPayouts();
-  });
-});
+document.querySelectorAll('aside nav button').forEach(function(b){b.addEventListener('click',function(){
+  const sec=b.getAttribute('data-section');
+  document.querySelectorAll('aside nav button').forEach(function(x){x.classList.remove('active');});
+  b.classList.add('active');
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  $('sec-'+sec).classList.add('active');
+  $('sectionTitle').textContent=b.textContent.trim().replace(/\s+\d+$/,'');
+  if(sec==='applications')loadApplications();
+  if(sec==='athletes')loadAthletes();
+  if(sec==='organizers')loadOrganizers();
+  if(sec==='customers')loadCustomers();
+  if(sec==='sales'){initSalesFilters();loadSales();}
+  if(sec==='debts')loadDebts();
+  if(sec==='reports')initReportFilters();
+  if(sec==='events')loadEvents();
+  if(sec==='payouts'){loadOrgPayouts();loadAthPayouts();}
+});});
 
 async function loadOverview(){
-  try {
-    const startMonth = new Date(); startMonth.setDate(1); startMonth.setHours(0,0,0,0);
-    const [aR,oR,sR,actR] = await Promise.all([
+  try{
+    const sm=new Date();sm.setDate(1);sm.setHours(0,0,0,0);
+    const [a,o,s,act]=await Promise.all([
       supabase.from('athletes').select('id',{count:'exact',head:true}),
       supabase.from('organizers').select('id',{count:'exact',head:true}),
-      supabase.from('sales').select('gross_amount_cents,amount_cents,commission_cents,organizer_commission_cents,athlete_paid_at,organizer_paid_at,status').gte('created_at',startMonth.toISOString()),
+      supabase.from('sales').select('gross_amount_cents,amount_cents,commission_cents,organizer_commission_cents,athlete_paid_at,organizer_paid_at,status').gte('created_at',sm.toISOString()),
       supabase.from('activity').select('*, athletes(full_name)').order('created_at',{ascending:false}).limit(20)
     ]);
-    $('kpiAthletes').textContent = aR.count||0;
-    $('kpiOrgs').textContent = oR.count||0;
-    const arr = sR.data||[];
-    $('kpiSales').textContent = arr.length;
-    const gross = arr.reduce(function(s,x){return s+(x.gross_amount_cents||x.amount_cents||0);},0);
-    $('kpiGross').textContent = (gross/100).toFixed(2);
-    const debt = arr.reduce(function(s,x){if(x.status!=='confirmed')return s; let v=0; if(!x.athlete_paid_at)v+=(x.commission_cents||0); if(!x.organizer_paid_at)v+=(x.organizer_commission_cents||0); return s+v;},0);
-    $('kpiDebt').textContent = (debt/100).toFixed(2);
-    const acts = actR.data||[];
-    $('activityBody').innerHTML = acts.length ? acts.map(function(a){return '<tr><td>'+fmtDT(a.created_at)+'</td><td>'+esc((a.athletes&&a.athletes.full_name)||'-')+'</td><td>'+(a.title||'')+'</td></tr>';}).join('') : '<tr><td colspan="3" class="empty">Nema aktivnosti.</td></tr>';
-  } catch(e){ console.error(e); }
+    $('kpiAthletes').textContent=a.count||0;$('kpiOrgs').textContent=o.count||0;
+    const arr=s.data||[];$('kpiSales').textContent=arr.length;
+    $('kpiGross').textContent=(arr.reduce(function(s,x){return s+(x.gross_amount_cents||x.amount_cents||0);},0)/100).toFixed(2);
+    const debt=arr.reduce(function(s,x){if(x.status!=='confirmed')return s;let v=0;if(!x.athlete_paid_at)v+=(x.commission_cents||0);if(!x.organizer_paid_at)v+=(x.organizer_commission_cents||0);return s+v;},0);
+    $('kpiDebt').textContent=(debt/100).toFixed(2);
+    const acts=act.data||[];
+    $('activityBody').innerHTML=acts.length?acts.map(function(a){return '<tr><td>'+fmtDT(a.created_at)+'</td><td>'+esc((a.athletes&&a.athletes.full_name)||'-')+'</td><td>'+(a.title||'')+'</td></tr>';}).join(''):'<tr><td colspan="3" class="empty">-</td></tr>';
+  }catch(e){console.error(e);}
 }
 
-window.loadApplications = async function(){
-  try {
-    const { data } = await supabase.from('applications').select('*').order('created_at',{ascending:false});
-    const pending = (data||[]).filter(function(a){return a.status==='pending';});
-    if(pending.length){$('appBadge').style.display='';$('appBadge').textContent=pending.length;}else{$('appBadge').style.display='none';}
-    $('appsBody').innerHTML = (data||[]).length ? data.map(function(a){
-      const act = a.status==='pending' ? '<button class="btn green" onclick="approveApp(\''+a.id+'\',\''+esc(a.email)+'\',\''+esc(a.full_name)+'\')">✓</button> <button class="btn red" onclick="rejectApp(\''+a.id+'\')">✗</button>' : '<small>'+esc(a.status)+'</small>';
-      return '<tr><td>'+fmtDT(a.created_at)+'</td><td>'+esc(a.full_name)+'</td><td>'+esc(a.email)+'</td><td><span class="tag '+a.status+'">'+a.status+'</span></td><td>'+act+'</td></tr>';
-    }).join('') : '<tr><td colspan="5" class="empty">Nema aplikacija.</td></tr>';
-  } catch(e){ $('appsBody').innerHTML='<tr><td colspan="5" class="empty">'+e.message+'</td></tr>'; }
+window.loadApplications=async function(){
+  try{const {data}=await supabase.from('applications').select('*').order('created_at',{ascending:false});
+    const pen=(data||[]).filter(function(a){return a.status==='pending';});
+    if(pen.length){$('appBadge').style.display='';$('appBadge').textContent=pen.length;}else $('appBadge').style.display='none';
+    $('appsBody').innerHTML=(data||[]).length?data.map(function(a){const act=a.status==='pending'?'<button class="btn green" onclick="approveApp(\''+a.id+'\',\''+esc(a.email)+'\',\''+esc(a.full_name)+'\')">✓</button> <button class="btn red" onclick="rejectApp(\''+a.id+'\')">✗</button>':'<small>'+esc(a.status)+'</small>';return '<tr><td>'+fmtDT(a.created_at)+'</td><td>'+esc(a.full_name)+'</td><td>'+esc(a.email)+'</td><td><span class="tag '+a.status+'">'+a.status+'</span></td><td>'+act+'</td></tr>';}).join(''):'<tr><td colspan="5" class="empty">Nema.</td></tr>';
+  }catch(e){$('appsBody').innerHTML='<tr><td colspan="5" class="empty">'+e.message+'</td></tr>';}
 };
-window.approveApp = async function(id,email,name){
-  if(!confirm('Odobri '+name+'?'))return;
-  const username = name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'-').replace(/-+/g,'-').replace(/^-|-$/g,'');
-  try{ const {data,error}=await supabase.functions.invoke('approve-application',{body:{application_id:id,username:username}}); if(error){alert(error.message);return;} alert('Odobreno: '+(data&&data.magic_link||'')); loadApplications(); }catch(e){alert(e.message);}
-};
-window.rejectApp = async function(id){
-  const r=prompt('Razlog:'); if(r===null)return;
-  try{ await supabase.from('applications').update({status:'rejected',rejection_reason:r,reviewed_at:new Date().toISOString()}).eq('id',id); loadApplications(); }catch(e){alert(e.message);}
-};
+window.approveApp=async function(id,email,name){if(!confirm('Odobri '+name+'?'))return;const u=name.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'-');try{const{data,error}=await supabase.functions.invoke('approve-application',{body:{application_id:id,username:u}});if(error){alert(error.message);return;}alert('OK '+(data&&data.magic_link||''));loadApplications();}catch(e){alert(e.message);}};
+window.rejectApp=async function(id){const r=prompt('Razlog:');if(r===null)return;try{await supabase.from('applications').update({status:'rejected',rejection_reason:r,reviewed_at:new Date().toISOString()}).eq('id',id);loadApplications();}catch(e){alert(e.message);}};
 
-window.loadAthletes = async function(){
-  try {
-    const { data } = await supabase.from('athletes').select('*').order('full_name');
-    $('athletesBody').innerHTML = (data||[]).length ? data.map(function(a){return '<tr><td><b>'+esc(a.full_name)+'</b></td><td>@'+esc(a.username)+'</td><td>'+esc(a.email)+'</td><td><span class="tag '+(a.tier||'')+'">'+esc(a.tier||'recruit').toUpperCase()+'</span></td><td><b style="color:var(--gold)">'+esc(a.promo_code||'-')+'</b></td><td>'+(a.xp||0)+'</td></tr>';}).join('') : '<tr><td colspan="6" class="empty">Nema.</td></tr>';
-  } catch(e){ $('athletesBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>'; }
-};
+window.loadAthletes=async function(){try{const{data}=await supabase.from('athletes').select('*').order('full_name');$('athletesBody').innerHTML=(data||[]).length?data.map(function(a){return '<tr><td><b>'+esc(a.full_name)+'</b></td><td>@'+esc(a.username)+'</td><td>'+esc(a.email)+'</td><td><span class="tag '+(a.tier||'')+'">'+esc(a.tier||'recruit').toUpperCase()+'</span></td><td><b style="color:var(--gold)">'+esc(a.promo_code||'-')+'</b></td><td>'+(a.xp||0)+'</td></tr>';}).join(''):'<tr><td colspan="6" class="empty">Nema.</td></tr>';}catch(e){$('athletesBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>';}};
 
-window.loadOrganizers = async function(){
-  try {
-    const { data, error } = await supabase.from('organizers').select('*').order('created_at',{ascending:false});
-    if(error)throw error;
-    if(!data||!data.length){$('organizersBody').innerHTML='<tr><td colspan="6" class="empty">Nema organizatora.</td></tr>';return;}
-    const counts = await Promise.all(data.map(function(o){return supabase.from('sales').select('id',{count:'exact',head:true}).eq('organizer_id',o.id);}));
-    $('organizersBody').innerHTML = data.map(function(o,i){
-      return '<tr><td><b>'+esc(o.full_name)+'</b></td><td>'+esc(o.email)+'</td><td><b style="color:var(--gold)">'+esc(o.promo_code)+'</b></td><td>'+Math.round((o.commission_pct||0.3)*100)+'%</td><td>'+(counts[i].count||0)+'</td><td><button class="btn red" onclick="delOrg(\''+o.id+'\',\''+esc(o.full_name)+'\')">Obriši</button></td></tr>';
-    }).join('');
-  } catch(e){ $('organizersBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>'; }
-};
-window.addOrganizer = async function(){
-  const name=$('orgName').value.trim(),email=$('orgEmail').value.trim().toLowerCase(),code=$('orgPromoCode').value.trim().toUpperCase(),pct=parseFloat($('orgCommission').value||'30')/100;
-  if(!name||!email||!code){alert('Popuni sva 3 polja');return;}
-  if(!email.includes('@')){alert('Email');return;}
-  try{ const {error}=await supabase.from('organizers').insert({full_name:name,email:email,promo_code:code,commission_pct:pct}); if(error){alert(error.message);return;} $('orgName').value='';$('orgEmail').value='';$('orgPromoCode').value='';$('orgCommission').value='30'; alert('Dodato. Posalji mu login link.'); loadOrganizers(); }catch(e){alert(e.message);}
-};
-window.delOrg = async function(id,name){ if(!confirm('Obrisi "'+name+'"?'))return; try{await supabase.from('organizers').delete().eq('id',id); loadOrganizers();}catch(e){alert(e.message);} };
+window.loadOrganizers=async function(){try{const{data,error}=await supabase.from('organizers').select('*').order('created_at',{ascending:false});if(error)throw error;if(!data||!data.length){$('organizersBody').innerHTML='<tr><td colspan="6" class="empty">Nema.</td></tr>';return;}const c=await Promise.all(data.map(function(o){return supabase.from('sales').select('id',{count:'exact',head:true}).eq('organizer_id',o.id);}));$('organizersBody').innerHTML=data.map(function(o,i){return '<tr><td><b>'+esc(o.full_name)+'</b></td><td>'+esc(o.email)+'</td><td><b style="color:var(--gold)">'+esc(o.promo_code)+'</b></td><td>'+Math.round((o.commission_pct||0.3)*100)+'%</td><td>'+(c[i].count||0)+'</td><td><button class="btn red" onclick="delOrg(\''+o.id+'\',\''+esc(o.full_name)+'\')">×</button></td></tr>';}).join('');}catch(e){$('organizersBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>';}};
+window.addOrganizer=async function(){const n=$('orgName').value.trim(),e=$('orgEmail').value.trim().toLowerCase(),c=$('orgPromoCode').value.trim().toUpperCase(),p=parseFloat($('orgCommission').value||'30')/100;if(!n||!e||!c){alert('Sva polja');return;}try{const{error}=await supabase.from('organizers').insert({full_name:n,email:e,promo_code:c,commission_pct:p});if(error){alert(error.message);return;}$('orgName').value='';$('orgEmail').value='';$('orgPromoCode').value='';$('orgCommission').value='30';alert('Dodat');loadOrganizers();}catch(x){alert(x.message);}};
+window.delOrg=async function(id,n){if(!confirm('Obrisi "'+n+'"?'))return;try{await supabase.from('organizers').delete().eq('id',id);loadOrganizers();}catch(e){alert(e.message);}};
 
-window.loadCustomers = async function(){
-  try {
-    const { data } = await supabase.from('sales').select('*, athletes(full_name,username)').order('created_at',{ascending:false}).limit(200);
-    $('customersBody').innerHTML = (data||[]).length ? data.map(function(s){const a=s.athletes||{};return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>@'+esc(a.username||'?')+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+s.status+'">'+s.status+'</span></td></tr>';}).join('') : '<tr><td colspan="5" class="empty">Nema.</td></tr>';
-  } catch(e){ $('customersBody').innerHTML='<tr><td colspan="5" class="empty">'+e.message+'</td></tr>'; }
-};
+window.loadCustomers=async function(){try{const{data}=await supabase.from('sales').select('*, athletes(full_name,username)').order('created_at',{ascending:false}).limit(200);$('customersBody').innerHTML=(data||[]).length?data.map(function(s){const a=s.athletes||{};return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>@'+esc(a.username||'?')+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+s.status+'">'+s.status+'</span></td></tr>';}).join(''):'<tr><td colspan="5" class="empty">Nema.</td></tr>';}catch(e){$('customersBody').innerHTML='<tr><td colspan="5" class="empty">'+e.message+'</td></tr>';}};
 
-let _fInit=false,_deb=null;
-window.debLoad = function(){clearTimeout(_deb);_deb=setTimeout(loadSales,300);};
-async function initSalesFilters(){
-  if(_fInit)return;_fInit=true;
-  try{
-    const [a,o]=await Promise.all([supabase.from('athletes').select('id,username,full_name').order('full_name'),supabase.from('organizers').select('id,full_name,promo_code').order('full_name')]);
-    (a.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' (@'+x.username+')';$('fAthlete').appendChild(op);});
-    (o.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' · '+x.promo_code;$('fOrg').appendChild(op);});
-  }catch(e){}
-}
-window.loadSales = async function(){
-  try {
-    let q = supabase.from('sales').select('*, athletes(username,full_name), organizers(promo_code)').order('created_at',{ascending:false}).limit(300);
-    const fA=$('fAthlete').value,fO=$('fOrg').value,fS=$('fStatus').value,fE=$('fEmail').value.trim(),fF=$('fFrom').value,fT=$('fTo').value;
-    if(fA)q=q.eq('athlete_id',fA);
-    if(fO==='__none__')q=q.is('organizer_id',null); else if(fO)q=q.eq('organizer_id',fO);
-    if(fS)q=q.eq('status',fS);
-    if(fE)q=q.ilike('customer_email','%'+fE+'%');
-    if(fF)q=q.gte('created_at',fF+'T00:00:00');
-    if(fT)q=q.lte('created_at',fT+'T23:59:59');
-    const {data,error}=await q;
-    if(error)throw error;
-    $('salesCount').textContent='('+(data&&data.length||0)+')';
-    if(!data||!data.length){$('salesBody').innerHTML='<tr><td colspan="9" class="empty">Nema.</td></tr>';return;}
-    $('salesBody').innerHTML = data.map(function(s){
-      const a=s.athletes||{},org=s.organizers;
-      const lbl = org ? '<span class="tag" style="background:rgba(255,194,75,0.15);color:#ffc24b">🎪 '+esc(org.promo_code)+'</span>' : '<span class="tag" style="background:rgba(0,240,255,0.1);color:#00f0ff">📱 DIREKT</span>';
-      return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>@'+esc(a.username||'?')+'</td><td>'+lbl+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td>'+((s.commission_cents||0)/100).toFixed(2)+'</td><td>'+((s.organizer_commission_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+s.status+'">'+s.status+'</span></td><td><button class="btn red" style="padding:4px 8px;font-size:10px" onclick="delSale(\''+s.id+'\')">×</button></td></tr>';
-    }).join('');
-  } catch(e){ $('salesBody').innerHTML='<tr><td colspan="9" class="empty">'+e.message+'</td></tr>'; }
-};
-window.delSale = async function(id){ if(!confirm('Obrisi?'))return; try{await supabase.from('sales').delete().eq('id',id);loadSales();}catch(e){alert(e.message);} };
+let _fI=false,_deb=null;
+window.debLoad=function(){clearTimeout(_deb);_deb=setTimeout(loadSales,300);};
+async function initSalesFilters(){if(_fI)return;_fI=true;try{const[a,o]=await Promise.all([supabase.from('athletes').select('id,username,full_name').order('full_name'),supabase.from('organizers').select('id,full_name,promo_code').order('full_name')]);(a.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' (@'+x.username+')';$('fAthlete').appendChild(op);});(o.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' · '+x.promo_code;$('fOrg').appendChild(op);});}catch(e){}}
+window.loadSales=async function(){try{let q=supabase.from('sales').select('*, athletes(username,full_name), organizers(promo_code)').order('created_at',{ascending:false}).limit(300);const fA=$('fAthlete').value,fO=$('fOrg').value,fS=$('fStatus').value,fE=$('fEmail').value.trim(),fF=$('fFrom').value,fT=$('fTo').value;if(fA)q=q.eq('athlete_id',fA);if(fO==='__none__')q=q.is('organizer_id',null);else if(fO)q=q.eq('organizer_id',fO);if(fS)q=q.eq('status',fS);if(fE)q=q.ilike('customer_email','%'+fE+'%');if(fF)q=q.gte('created_at',fF+'T00:00:00');if(fT)q=q.lte('created_at',fT+'T23:59:59');const{data,error}=await q;if(error)throw error;$('salesCount').textContent='('+(data&&data.length||0)+')';if(!data||!data.length){$('salesBody').innerHTML='<tr><td colspan="9" class="empty">Nema.</td></tr>';return;}$('salesBody').innerHTML=data.map(function(s){const a=s.athletes||{},org=s.organizers;const l=org?'<span class="tag" style="background:rgba(255,194,75,0.15);color:#ffc24b">🎪 '+esc(org.promo_code)+'</span>':'<span class="tag" style="background:rgba(0,240,255,0.1);color:#00f0ff">📱 DIREKT</span>';return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>@'+esc(a.username||'?')+'</td><td>'+l+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td>'+((s.commission_cents||0)/100).toFixed(2)+'</td><td>'+((s.organizer_commission_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+s.status+'">'+s.status+'</span></td><td><button class="btn red" style="padding:4px 8px;font-size:10px" onclick="delSale(\''+s.id+'\')">×</button></td></tr>';}).join('');}catch(e){$('salesBody').innerHTML='<tr><td colspan="9" class="empty">'+e.message+'</td></tr>';}};
+window.delSale=async function(id){if(!confirm('Obrisi?'))return;try{await supabase.from('sales').delete().eq('id',id);loadSales();}catch(e){alert(e.message);}};
 
 // DUGOVANJA
-window.loadDebts = async function(){
-  $('debtsAthletes').innerHTML='<div class="empty">Učitavanje...</div>';
-  $('debtsOrgs').innerHTML='<div class="empty">Učitavanje...</div>';
-  try {
-    const { data, error } = await supabase.from('sales').select('*, athletes(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone), organizers(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').eq('status','confirmed').order('created_at',{ascending:true});
-    if(error)throw error;
-    const byA={},byO={}; let tA=0,tO=0;
-    (data||[]).forEach(function(s){
-      if(s.athletes && !s.athlete_paid_at && (s.commission_cents||0)>0){
-        const k=s.athlete_id; if(!byA[k])byA[k]={p:s.athletes,sales:[],total:0,oldest:s.created_at};
-        byA[k].sales.push(s); byA[k].total+=s.commission_cents; tA+=s.commission_cents;
-      }
-      if(s.organizers && !s.organizer_paid_at && (s.organizer_commission_cents||0)>0){
-        const k=s.organizer_id; if(!byO[k])byO[k]={p:s.organizers,sales:[],total:0,oldest:s.created_at};
-        byO[k].sales.push(s); byO[k].total+=s.organizer_commission_cents; tO+=s.organizer_commission_cents;
-      }
-    });
-    $('debtAth').textContent=(tA/100).toFixed(2);
-    $('debtOrg').textContent=(tO/100).toFixed(2);
-    $('debtTotal').textContent=((tA+tO)/100).toFixed(2);
+window.loadDebts=async function(){
+  $('debtsAthletes').innerHTML='<div class="empty">...</div>';$('debtsOrgs').innerHTML='<div class="empty">...</div>';
+  try{const{data,error}=await supabase.from('sales').select('*, athletes(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone), organizers(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').eq('status','confirmed').order('created_at',{ascending:true});if(error)throw error;
+    const byA={},byO={};let tA=0,tO=0;
+    (data||[]).forEach(function(s){if(s.athletes&&!s.athlete_paid_at&&(s.commission_cents||0)>0){const k=s.athlete_id;if(!byA[k])byA[k]={p:s.athletes,sales:[],total:0,oldest:s.created_at};byA[k].sales.push(s);byA[k].total+=s.commission_cents;tA+=s.commission_cents;}if(s.organizers&&!s.organizer_paid_at&&(s.organizer_commission_cents||0)>0){const k=s.organizer_id;if(!byO[k])byO[k]={p:s.organizers,sales:[],total:0,oldest:s.created_at};byO[k].sales.push(s);byO[k].total+=s.organizer_commission_cents;tO+=s.organizer_commission_cents;}});
+    $('debtAth').textContent=(tA/100).toFixed(2);$('debtOrg').textContent=(tO/100).toFixed(2);$('debtTotal').textContent=((tA+tO)/100).toFixed(2);
     $('debtsRefreshTime').textContent='· '+fmtDT(new Date());
-    const totalDebtors=Object.keys(byA).length+Object.keys(byO).length;
-    if(totalDebtors){$('debtsBadge').style.display='';$('debtsBadge').textContent=totalDebtors;}else{$('debtsBadge').style.display='none';}
-    $('debtsAthletes').innerHTML=renderDebts(byA,'athlete')||'<div class="empty">✓ Nista ne duguješ atletama.</div>';
-    $('debtsOrgs').innerHTML=renderDebts(byO,'organizer')||'<div class="empty">✓ Nista ne duguješ organizatorima.</div>';
-  } catch(e){ $('debtsAthletes').innerHTML='<div class="empty">'+e.message+'</div>'; $('debtsOrgs').innerHTML='<div class="empty">'+e.message+'</div>'; }
+    const td=Object.keys(byA).length+Object.keys(byO).length;
+    if(td){$('debtsBadge').style.display='';$('debtsBadge').textContent=td;}else $('debtsBadge').style.display='none';
+    $('debtsAthletes').innerHTML=rd(byA,'athlete')||'<div class="empty">✓ Nista atletama.</div>';
+    $('debtsOrgs').innerHTML=rd(byO,'organizer')||'<div class="empty">✓ Nista organizatorima.</div>';
+  }catch(e){$('debtsAthletes').innerHTML='<div class="empty">'+e.message+'</div>';$('debtsOrgs').innerHTML='<div class="empty">'+e.message+'</div>';}
 };
-function renderDebts(byKey,type){
-  const items=Object.entries(byKey).sort(function(a,b){return new Date(a[1].oldest)-new Date(b[1].oldest);});
-  if(!items.length)return '';
-  return items.map(function(pair){
-    const k=pair[0],info=pair[1],p=info.person||info.p,dys=daysSince(info.oldest);
-    const border=dys>=30?'rgba(255,77,94,0.5)':(dys>=14?'rgba(255,194,75,0.5)':'rgba(166,255,59,0.4)');
-    const rows=info.sales.map(function(s){
-      const lbl=s.organizers?'🎪 '+esc(s.organizers.promo_code):'📱 direkt';
-      const amt=type==='athlete'?s.commission_cents:s.organizer_commission_cents;
-      return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+lbl+'</td><td><b>'+((amt||0)/100).toFixed(2)+' €</b></td></tr>';
-    }).join('');
-    return '<div class="debt-card" style="border-color:'+border+'">'+
-      '<div class="head"><div><div class="name">'+esc(p.full_name)+'</div><div style="font-size:11.5px;color:var(--mute);margin-top:2px">'+esc(p.email)+' · <b style="color:var(--gold)">'+esc(p.promo_code||'-')+'</b></div></div>'+
-      '<div style="text-align:right"><div class="total">'+(info.total/100).toFixed(2)+' €</div><div style="font-size:11px;color:var(--mute)">najstarije: '+fmtDT(info.oldest)+' ('+dys+'d)</div></div></div>'+
-      '<div class="bank-info">'+
-        '<div><b>Ime:</b> '+esc(p.payout_full_name||'-')+'</div>'+
-        '<div><b>IBAN:</b> '+(p.payout_account_number?'<code style="color:var(--brand)" onclick="copyTxt(\''+esc(p.payout_account_number)+'\',event)" title="Kopiraj">'+esc(p.payout_account_number)+' 📋</code>':'<span style="color:#ff8a3b">nema</span>')+'</div>'+
-        '<div><b>Banka:</b> '+esc(p.payout_bank_name||'-')+'</div>'+
-        '<div><b>Tel:</b> '+esc(p.payout_phone||'-')+'</div>'+
-      '</div>'+
-      '<details style="margin-bottom:10px"><summary style="cursor:pointer;color:var(--brand);font-size:12px">Detalji ('+info.sales.length+' prijava)</summary><table style="margin-top:8px;font-size:11.5px"><thead><tr><th>Datum</th><th>Kupac</th><th>Izvor</th><th>Iznos</th></tr></thead><tbody>'+rows+'</tbody></table></details>'+
-      '<button class="btn green" onclick="markPaid(\''+type+'\',\''+k+'\','+info.total+')">✓ Označi sve plaćeno ('+(info.total/100).toFixed(2)+' €)</button>'+
-    '</div>';
-  }).join('');
-}
-window.markPaid = async function(type,id,amt){
-  if(!confirm('Označiti SVE neisplacene kao plaćene ('+(amt/100).toFixed(2)+' €)?\nPrethodno uradi bankovni transfer.'))return;
-  try {
-    const note=prompt('Napomena (opciono):','')||null;
-    const col=type==='athlete'?'athlete_paid_at':'organizer_paid_at';
-    const ncol=type==='athlete'?'athlete_paid_note':'organizer_paid_note';
-    const icol=type==='athlete'?'athlete_id':'organizer_id';
-    const upd={}; upd[col]=new Date().toISOString(); upd[ncol]=note;
-    const { error } = await supabase.from('sales').update(upd).eq(icol,id).is(col,null).eq('status','confirmed');
-    if(error){alert(error.message);return;}
-    alert('Plaćeno označeno.'); loadDebts();
-  } catch(e){alert(e.message);}
-};
+function rd(by,type){const its=Object.entries(by).sort(function(a,b){return new Date(a[1].oldest)-new Date(b[1].oldest);});if(!its.length)return '';return its.map(function(pr){const k=pr[0],info=pr[1],p=info.p,dy=days(info.oldest);const bc=dy>=30?'rgba(255,77,94,0.5)':(dy>=14?'rgba(255,194,75,0.5)':'rgba(166,255,59,0.4)');const rows=info.sales.map(function(s){const l=s.organizers?'🎪 '+esc(s.organizers.promo_code):'📱 direkt';const a=type==='athlete'?s.commission_cents:s.organizer_commission_cents;return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+l+'</td><td><b>'+((a||0)/100).toFixed(2)+' €</b></td></tr>';}).join('');return '<div class="debt-card" style="border-color:'+bc+'"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px"><div><div style="font-size:16px;font-weight:800;color:var(--brand)">'+esc(p.full_name)+'</div><div style="font-size:11.5px;color:var(--mute)">'+esc(p.email)+' · <b style="color:var(--gold)">'+esc(p.promo_code||'-')+'</b></div></div><div style="text-align:right"><div style="font-size:22px;font-weight:900;color:var(--green)">'+(info.total/100).toFixed(2)+' €</div><div style="font-size:11px;color:var(--mute)">najstarije: '+fmtDT(info.oldest)+' ('+dy+'d)</div></div></div><div class="bank-info"><div><b>Ime:</b> '+esc(p.payout_full_name||'-')+'</div><div><b>IBAN:</b> '+(p.payout_account_number?'<code onclick="copyTxt(\''+esc(p.payout_account_number)+'\',event)">'+esc(p.payout_account_number)+' 📋</code>':'<span style="color:#ff8a3b">nema</span>')+'</div><div><b>Banka:</b> '+esc(p.payout_bank_name||'-')+'</div><div><b>Tel:</b> '+esc(p.payout_phone||'-')+'</div></div><details style="margin-bottom:10px"><summary style="cursor:pointer;color:var(--brand);font-size:12px">Detalji ('+info.sales.length+')</summary><table style="margin-top:8px;font-size:11.5px"><thead><tr><th>Datum</th><th>Kupac</th><th>Izvor</th><th>Iznos</th></tr></thead><tbody>'+rows+'</tbody></table></details><button class="btn green" onclick="markPaid(\''+type+'\',\''+k+'\','+info.total+')">✓ Označi plaćeno ('+(info.total/100).toFixed(2)+' €)</button></div>';}).join('');}
+window.markPaid=async function(type,id,amt){if(!confirm('Plaćeno '+(amt/100).toFixed(2)+' €? Prvo bankovni transfer.'))return;try{const note=prompt('Napomena:','')||null;const col=type==='athlete'?'athlete_paid_at':'organizer_paid_at',nc=type==='athlete'?'athlete_paid_note':'organizer_paid_note',ic=type==='athlete'?'athlete_id':'organizer_id';const u={};u[col]=new Date().toISOString();u[nc]=note;const{error}=await supabase.from('sales').update(u).eq(ic,id).is(col,null).eq('status','confirmed');if(error){alert(error.message);return;}alert('OK');loadDebts();}catch(e){alert(e.message);}};
 
-// IZVESTAJI po periodu
-let _repInit=false;
-async function initReportFilters(){
-  if(_repInit)return;_repInit=true;
-  try{
-    const [a,o]=await Promise.all([supabase.from('athletes').select('id,full_name,username').order('full_name'),supabase.from('organizers').select('id,full_name,promo_code').order('full_name')]);
-    (a.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' (@'+x.username+')';$('repAthlete').appendChild(op);});
-    (o.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' · '+x.promo_code;$('repOrg').appendChild(op);});
-    const today=new Date().toISOString().split('T')[0],past=new Date(Date.now()-30*86400000).toISOString().split('T')[0];
-    $('repAthFrom').value=past;$('repAthTo').value=today;$('repOrgFrom').value=past;$('repOrgTo').value=today;
-  }catch(e){}
-}
-window.loadAthleteReport = async function(){
-  const id=$('repAthlete').value; if(!id){$('repAthleteResult').innerHTML='<div class="empty">Izaberi.</div>';return;}
-  const f=$('repAthFrom').value,t=$('repAthTo').value; if(!f||!t){alert('Period');return;}
-  try{ const {data,error}=await supabase.from('sales').select('*, organizers(promo_code,full_name)').eq('athlete_id',id).gte('created_at',f+'T00:00:00').lte('created_at',t+'T23:59:59').order('created_at',{ascending:false}); if(error)throw error; renderRep($('repAthleteResult'),data||[],'athlete'); }catch(e){$('repAthleteResult').innerHTML='<div class="empty">'+e.message+'</div>';}
-};
-window.loadOrgReport = async function(){
-  const id=$('repOrg').value; if(!id){$('repOrgResult').innerHTML='<div class="empty">Izaberi.</div>';return;}
-  const f=$('repOrgFrom').value,t=$('repOrgTo').value; if(!f||!t){alert('Period');return;}
-  try{ const {data,error}=await supabase.from('sales').select('*, athletes(username,full_name)').eq('organizer_id',id).gte('created_at',f+'T00:00:00').lte('created_at',t+'T23:59:59').order('created_at',{ascending:false}); if(error)throw error; renderRep($('repOrgResult'),data||[],'organizer'); }catch(e){$('repOrgResult').innerHTML='<div class="empty">'+e.message+'</div>';}
-};
-function renderRep(container,sales,type){
-  if(!sales.length){container.innerHTML='<div class="empty">Nema u tom periodu.</div>';return;}
-  let tG=0,tC=0,paid=0,unp=0;
-  sales.forEach(function(s){tG+=(s.gross_amount_cents||s.amount_cents||0);const c=type==='athlete'?(s.commission_cents||0):(s.organizer_commission_cents||0);tC+=c;const ip=type==='athlete'?!!s.athlete_paid_at:!!s.organizer_paid_at;if(ip)paid+=c;else unp+=c;});
-  const kpi='<div class="kpi-grid" style="margin-bottom:14px"><div class="kpi"><div class="label">Prodaja</div><div class="value">'+sales.length+'</div></div><div class="kpi"><div class="label">Bruto €</div><div class="value">'+(tG/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Zaradio €</div><div class="value" style="color:var(--green)">'+(tC/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Isplaceno €</div><div class="value">'+(paid/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Duguje se €</div><div class="value" style="color:var(--gold)">'+(unp/100).toFixed(2)+'</div></div></div>';
-  const rows=sales.map(function(s){const ip=type==='athlete'?!!s.athlete_paid_at:!!s.organizer_paid_at;const amt=type==='athlete'?(s.commission_cents||0):(s.organizer_commission_cents||0);const o=type==='athlete'?(s.organizers?'🎪 '+esc(s.organizers.promo_code):'📱 direkt'):'@'+esc((s.athletes&&s.athletes.username)||'?');return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+o+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td><b>'+(amt/100).toFixed(2)+'</b></td><td>'+(ip?'<span class="tag paid">isplaceno</span>':'<span class="tag pending">duguje</span>')+'</td></tr>';}).join('');
-  container.innerHTML=kpi+'<div style="overflow-x:auto"><table><thead><tr><th>Vreme</th><th>Kupac</th><th>'+(type==='athlete'?'Event':'Atleta')+'</th><th>Bruto €</th><th>Provizija €</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
-}
+// IZVESTAJI
+let _rI=false;
+async function initReportFilters(){if(_rI)return;_rI=true;try{const[a,o]=await Promise.all([supabase.from('athletes').select('id,full_name,username').order('full_name'),supabase.from('organizers').select('id,full_name,promo_code').order('full_name')]);(a.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' (@'+x.username+')';$('repAthlete').appendChild(op);});(o.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' · '+x.promo_code;$('repOrg').appendChild(op);});const t=new Date().toISOString().split('T')[0],p=new Date(Date.now()-30*86400000).toISOString().split('T')[0];$('repAthFrom').value=p;$('repAthTo').value=t;$('repOrgFrom').value=p;$('repOrgTo').value=t;}catch(e){}}
+window.loadAthleteReport=async function(){const id=$('repAthlete').value;if(!id){$('repAthleteResult').innerHTML='<div class="empty">Izaberi.</div>';return;}const f=$('repAthFrom').value,t=$('repAthTo').value;try{const{data,error}=await supabase.from('sales').select('*, organizers(promo_code)').eq('athlete_id',id).gte('created_at',f+'T00:00:00').lte('created_at',t+'T23:59:59').order('created_at',{ascending:false});if(error)throw error;rr($('repAthleteResult'),data||[],'athlete');}catch(e){$('repAthleteResult').innerHTML='<div class="empty">'+e.message+'</div>';}};
+window.loadOrgReport=async function(){const id=$('repOrg').value;if(!id){$('repOrgResult').innerHTML='<div class="empty">Izaberi.</div>';return;}const f=$('repOrgFrom').value,t=$('repOrgTo').value;try{const{data,error}=await supabase.from('sales').select('*, athletes(username,full_name)').eq('organizer_id',id).gte('created_at',f+'T00:00:00').lte('created_at',t+'T23:59:59').order('created_at',{ascending:false});if(error)throw error;rr($('repOrgResult'),data||[],'organizer');}catch(e){$('repOrgResult').innerHTML='<div class="empty">'+e.message+'</div>';}};
+function rr(c,sl,t){if(!sl.length){c.innerHTML='<div class="empty">Nema u periodu.</div>';return;}let tG=0,tC=0,p=0,u=0;sl.forEach(function(s){tG+=(s.gross_amount_cents||s.amount_cents||0);const co=t==='athlete'?(s.commission_cents||0):(s.organizer_commission_cents||0);tC+=co;const ip=t==='athlete'?!!s.athlete_paid_at:!!s.organizer_paid_at;if(ip)p+=co;else u+=co;});const k='<div class="kpi-grid" style="margin-bottom:14px"><div class="kpi"><div class="label">Prodaja</div><div class="value">'+sl.length+'</div></div><div class="kpi"><div class="label">Bruto €</div><div class="value">'+(tG/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Zaradio €</div><div class="value" style="color:var(--green)">'+(tC/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Isplaceno €</div><div class="value">'+(p/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Duguje €</div><div class="value" style="color:var(--gold)">'+(u/100).toFixed(2)+'</div></div></div>';const rows=sl.map(function(s){const ip=t==='athlete'?!!s.athlete_paid_at:!!s.organizer_paid_at;const a=t==='athlete'?(s.commission_cents||0):(s.organizer_commission_cents||0);const o=t==='athlete'?(s.organizers?'🎪 '+esc(s.organizers.promo_code):'📱 direkt'):'@'+esc((s.athletes&&s.athletes.username)||'?');return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+o+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td><b>'+(a/100).toFixed(2)+'</b></td><td>'+(ip?'<span class="tag paid">isplaceno</span>':'<span class="tag pending">duguje</span>')+'</td></tr>';}).join('');c.innerHTML=k+'<div style="overflow-x:auto"><table><thead><tr><th>Vreme</th><th>Kupac</th><th>'+(t==='athlete'?'Event':'Atleta')+'</th><th>Bruto €</th><th>Provizija €</th><th>Status</th></tr></thead><tbody>'+rows+'</tbody></table></div>';}
 
-window.loadOrgPayouts = async function(){
-  try {
-    let { data, error } = await supabase.from('organizer_payout_requests').select('*, organizers(full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').order('requested_at',{ascending:false});
-    if(error){const r2=await supabase.from('organizer_payout_requests').select('*').order('requested_at',{ascending:false});data=r2.data;error=r2.error;}
-    if(error)throw error;
-    const pending=(data||[]).filter(function(p){return p.status==='pending';});
-    if(pending.length){$('payoutBadge').style.display='';$('payoutBadge').textContent=pending.length;}else{$('payoutBadge').style.display='none';}
-    if(!data||!data.length){$('orgPayoutsBody').innerHTML='<tr><td colspan="6" class="empty">Nema.</td></tr>';return;}
-    $('orgPayoutsBody').innerHTML = data.map(function(p){
-      const o=p.organizers||{};
-      const bank=(o.payout_full_name||o.payout_account_number)?'<small style="color:var(--mute);line-height:1.5">'+(o.payout_full_name?'<b>'+esc(o.payout_full_name)+'</b><br>':'')+(o.payout_account_number?esc(o.payout_account_number)+'<br>':'')+(o.payout_bank_name?esc(o.payout_bank_name):'')+'</small>':'<small style="color:#ff8a3b">Bez bank info</small>';
-      const isPen=p.status==='pending';
-      const act=isPen?'<button class="btn green" onclick="payPaid(\''+p.id+'\')">✓ Plaćeno</button> <button class="btn red" onclick="payReject(\''+p.id+'\')">Odbij</button>':'<small style="color:var(--mute)">'+(p.paid_at?fmtDT(p.paid_at):'')+'</small>';
-      return '<tr><td>'+fmtDT(p.requested_at)+'</td><td><b>'+esc(o.full_name||'?')+'</b><br><small>'+esc(o.email||'')+'</small></td><td><b>'+((p.amount_cents||0)/100).toFixed(2)+'</b></td><td>'+bank+'</td><td><span class="tag '+p.status+'">'+p.status+'</span></td><td>'+act+'</td></tr>';
-    }).join('');
-  } catch(e){ $('orgPayoutsBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>'; }
-};
-window.payPaid = async function(id){ if(!confirm('Označiti kao plaćeno?'))return; try{await supabase.from('organizer_payout_requests').update({status:'paid',paid_at:new Date().toISOString()}).eq('id',id);loadOrgPayouts();}catch(e){alert(e.message);} };
-window.payReject = async function(id){ const r=prompt('Razlog:'); if(r===null)return; try{await supabase.from('organizer_payout_requests').update({status:'rejected',notes:r||null}).eq('id',id);loadOrgPayouts();}catch(e){alert(e.message);} };
+// EVENTI
+window.loadEvents=async function(){const c=$('eventsList');c.innerHTML='<div class="empty">...</div>';try{const{data:orgs}=await supabase.from('organizers').select('*').order('created_at',{ascending:false});const{data:sales}=await supabase.from('sales').select('*, athletes(full_name,username)').order('created_at',{ascending:false});if(!orgs||!orgs.length){c.innerHTML='<div class="empty">Nema organizatora.</div>';return;}$('eventsTime').textContent='· '+fmtDT(new Date());c.innerHTML=orgs.map(function(o){const es=(sales||[]).filter(function(s){return s.organizer_id===o.id;});const tot=es.length,co=es.filter(function(s){return s.status==='confirmed';}).length,pe=es.filter(function(s){return s.status==='pending';}).length,re=es.filter(function(s){return s.status==='refunded';}).length;const gr=es.reduce(function(s,x){return s+(x.gross_amount_cents||x.amount_cents||0);},0);const ow=es.filter(function(s){return !s.organizer_paid_at && s.status==='confirmed';}).reduce(function(s,x){return s+(x.organizer_commission_cents||0);},0);const rows=es.slice(0,15).map(function(s){const a=s.athletes||{};return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>@'+esc(a.username||'?')+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td><b>'+((s.organizer_commission_cents||0)/100).toFixed(2)+'</b></td><td><span class="tag '+s.status+'">'+s.status+'</span></td></tr>';}).join('');return '<div class="card" style="border-color:rgba(255,194,75,0.3)"><div class="card-head"><h2>🎪 '+esc(o.full_name)+' <span style="color:var(--gold);font-size:12px">· '+esc(o.promo_code)+'</span></h2><small style="color:var(--mute)">'+esc(o.email)+'</small></div><div class="kpi-grid" style="margin-bottom:10px"><div class="kpi"><div class="label">Ukupno</div><div class="value">'+tot+'</div></div><div class="kpi"><div class="label">Placene</div><div class="value" style="color:var(--green)">'+co+'</div></div><div class="kpi"><div class="label">Trial</div><div class="value" style="color:var(--gold)">'+pe+'</div></div><div class="kpi"><div class="label">Refund</div><div class="value" style="color:var(--red)">'+re+'</div></div><div class="kpi"><div class="label">Bruto €</div><div class="value">'+(gr/100).toFixed(2)+'</div></div><div class="kpi"><div class="label">Duguješ €</div><div class="value" style="color:var(--gold)">'+(ow/100).toFixed(2)+'</div></div></div><details><summary style="cursor:pointer;color:var(--brand);font-size:12px">Detalji ('+es.length+')</summary><div style="overflow-x:auto"><table style="font-size:11.5px;margin-top:8px"><thead><tr><th>Vreme</th><th>Kupac</th><th>Atleta</th><th>Bruto €</th><th>Org €</th><th>Status</th></tr></thead><tbody>'+(rows||'<tr><td colspan="6" class="empty">-</td></tr>')+'</tbody></table></div></details></div>';}).join('');}catch(e){c.innerHTML='<div class="empty">'+e.message+'</div>';}};
+
+// ZAHTEVI ORG
+window.loadOrgPayouts=async function(){try{let{data,error}=await supabase.from('organizer_payout_requests').select('*, organizers(full_name,email,payout_full_name,payout_account_number,payout_bank_name,payout_phone)').order('requested_at',{ascending:false});if(error){const r=await supabase.from('organizer_payout_requests').select('*').order('requested_at',{ascending:false});data=r.data;error=r.error;}if(error)throw error;const pen=(data||[]).filter(function(p){return p.status==='pending';});if(pen.length){$('payoutBadge').style.display='';$('payoutBadge').textContent=pen.length;}else $('payoutBadge').style.display='none';if(!data||!data.length){$('orgPayoutsBody').innerHTML='<tr><td colspan="6" class="empty">Nema.</td></tr>';return;}$('orgPayoutsBody').innerHTML=data.map(function(p){const o=p.organizers||{};const b=(o.payout_full_name||o.payout_account_number)?'<small style="color:var(--mute);line-height:1.5">'+(o.payout_full_name?'<b>'+esc(o.payout_full_name)+'</b><br>':'')+(o.payout_account_number?'<code onclick="copyTxt(\''+esc(o.payout_account_number)+'\',event)">'+esc(o.payout_account_number)+' 📋</code><br>':'')+(o.payout_bank_name?esc(o.payout_bank_name):'')+'</small>':'<small style="color:#ff8a3b">Bez bank info</small>';const iP=p.status==='pending';const ac=iP?'<button class="btn green" onclick="payPaid(\''+p.id+'\')">✓</button> <button class="btn red" onclick="payRej(\''+p.id+'\')">✗</button>':'<small>'+(p.paid_at?fmtDT(p.paid_at):'')+'</small>';return '<tr><td>'+fmtDT(p.requested_at)+'</td><td><b>'+esc(o.full_name||'?')+'</b><br><small>'+esc(o.email||'')+'</small></td><td><b>'+((p.amount_cents||0)/100).toFixed(2)+'</b></td><td>'+b+'</td><td><span class="tag '+p.status+'">'+p.status+'</span></td><td>'+ac+'</td></tr>';}).join('');}catch(e){$('orgPayoutsBody').innerHTML='<tr><td colspan="6" class="empty">'+e.message+'</td></tr>';}};
+window.payPaid=async function(id){if(!confirm('Plaćeno?'))return;try{await supabase.from('organizer_payout_requests').update({status:'paid',paid_at:new Date().toISOString()}).eq('id',id);loadOrgPayouts();}catch(e){alert(e.message);}};
+window.payRej=async function(id){const r=prompt('Razlog:');if(r===null)return;try{await supabase.from('organizer_payout_requests').update({status:'rejected',notes:r||null}).eq('id',id);loadOrgPayouts();}catch(e){alert(e.message);}};
+
+// ZAHTEVI ATL
+window.loadAthPayouts=async function(){try{const{data,error}=await supabase.from('athlete_payout_requests').select('*, athletes(id,full_name,email,promo_code)').order('requested_at',{ascending:false});if(error)throw error;if(!data||!data.length){$('athPayoutsBody').innerHTML='<tr><td colspan="7" class="empty">Nema.</td></tr>';return;}const verif=await Promise.all(data.map(function(r){return supabase.from('sales').select('commission_cents').eq('athlete_id',r.athlete_id).eq('status','confirmed').is('athlete_paid_at',null);}));$('athPayoutsBody').innerHTML=data.map(function(r,i){const a=r.athletes||{};const act=(verif[i].data||[]).reduce(function(s,x){return s+(x.commission_cents||0);},0);const req=r.amount_cents||0,mm=r.status==='pending'&&Math.abs(req-act)>10;const aEl='<b style="color:'+(mm?'#ff8a3b':'var(--green)')+'">'+(act/100).toFixed(2)+'</b>'+(mm?' ⚠':'');const b=(r.bank_full_name||r.bank_account_number)?'<small style="color:var(--mute);line-height:1.5">'+(r.bank_full_name?'<b>'+esc(r.bank_full_name)+'</b><br>':'')+(r.bank_account_number?'<code onclick="copyTxt(\''+esc(r.bank_account_number)+'\',event)">'+esc(r.bank_account_number)+' 📋</code><br>':'')+(r.bank_name?esc(r.bank_name):'')+'</small>':'<small style="color:#ff8a3b">Bez info</small>';const iP=r.status==='pending';const ac=iP?'<button class="btn green" onclick="athPaid(\''+r.id+'\',\''+r.athlete_id+'\')">✓</button> <button class="btn red" onclick="athRej(\''+r.id+'\')">✗</button>':'<small>'+(r.paid_at?fmtDT(r.paid_at):'')+'</small>';return '<tr><td>'+fmtDT(r.requested_at)+'</td><td><b>'+esc(a.full_name||'?')+'</b><br><small>'+esc(a.email||'')+'</small></td><td><b>'+(req/100).toFixed(2)+'</b></td><td>'+aEl+'</td><td>'+b+'</td><td><span class="tag '+r.status+'">'+r.status+'</span></td><td>'+ac+'</td></tr>';}).join('');}catch(e){$('athPayoutsBody').innerHTML='<tr><td colspan="7" class="empty">'+e.message+'</td></tr>';}};
+window.athPaid=async function(rid,aid){if(!confirm('Plaćeno? Sve neisplacene atletine provizije ce biti izmirene.'))return;try{await supabase.from('athlete_payout_requests').update({status:'paid',paid_at:new Date().toISOString()}).eq('id',rid);await supabase.from('sales').update({athlete_paid_at:new Date().toISOString(),athlete_paid_note:'Via req '+rid}).eq('athlete_id',aid).is('athlete_paid_at',null).eq('status','confirmed');loadAthPayouts();try{loadDebts();}catch(e){}}catch(e){alert(e.message);}};
+window.athRej=async function(id){const r=prompt('Razlog:');if(r===null)return;try{await supabase.from('athlete_payout_requests').update({status:'rejected',notes:r||null}).eq('id',id);loadAthPayouts();}catch(e){alert(e.message);}};
 
 // INIT
-(async function(){
-  try { await loadOverview(); loadApplications(); loadDebts(); } catch(e){ console.error(e); }
-  setInterval(function(){ try{loadDebts();}catch(e){} try{loadOrgPayouts();}catch(e){} },60000);
-})();
+(async function(){try{await loadOverview();loadApplications();loadDebts();}catch(e){console.error(e);}setInterval(function(){try{loadDebts();}catch(e){}try{loadOrgPayouts();}catch(e){}try{loadAthPayouts();}catch(e){}},60000);})();
 </script>
 </body>
 </html>
