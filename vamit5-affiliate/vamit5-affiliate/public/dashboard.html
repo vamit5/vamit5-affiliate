@@ -265,7 +265,7 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
     </div>
 
     <div class="card" id="payout-card" style="border:2px solid rgba(255,194,75,0.4);background:linear-gradient(135deg,rgba(255,194,75,0.04),rgba(20,24,42,0.6))">
-      <div class="card-head"><h2><span class="em">💸</span>Isplata</h2></div>
+      <div class="card-head"><h2><span class="em">💸</span>Isplata <span id="ath_lastRefresh" style="color:var(--mute);font-weight:400;font-size:11px"></span></h2><button class="btn" onclick="loadAthletePayoutInfo()" style="padding:6px 12px;font-size:11px;background:rgba(0,240,255,0.15);border:1px solid rgba(0,240,255,0.3);color:var(--brand)">🔄 Refresh</button></div>
       <div style="text-align:center;padding:18px 14px 14px;border-radius:11px;background:rgba(166,255,59,0.06);border:1px solid rgba(166,255,59,0.25);margin-bottom:14px">
         <div style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Neisplaceno trenutno</div>
         <div id="ath_unpaid_amount" style="font-size:36px;font-weight:900;color:var(--green);letter-spacing:-0.02em">€0.00</div>
@@ -904,8 +904,16 @@ window.requestAthletePayout = async function(){
   } catch(e){ msg.innerHTML = '<span style="color:#ffb0b8">Greska: '+e.message+'</span>'; }
 };
 
-// Auto-refresh isplate svakih 30 sec da se vidi status promene
-try { loadAthletePayoutInfo(); setInterval(loadAthletePayoutInfo, 30000); } catch(e){}
+// Auto-refresh isplate + tim svakih 15 sec
+try {
+  loadAthletePayoutInfo();
+  setInterval(function(){
+    try { loadAthletePayoutInfo(); } catch(e){}
+    try { if (typeof window.loadTeam === 'function') window.loadTeam(); } catch(e){}
+    const lr = document.getElementById('ath_lastRefresh');
+    if (lr) lr.textContent = '· ' + new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  }, 15000);
+} catch(e){}
 // Pre-fill payout fields (safe — only if elements exist)
 try {
   if (document.getElementById('po_name')) {
