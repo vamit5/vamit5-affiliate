@@ -104,7 +104,8 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
   </div>
 
   <div class="card">
-    <div class="card-head"><h2>👥 Klijenti preko tvog event-a</h2><span class="badge" id="custBadge">0</span></div>
+    <div class="card-head"><h2>👥 Klijenti preko tvog event-a <span id="lastRefresh" style="color:var(--mute);font-weight:400;font-size:11.5px"></span></h2><div style="display:flex;gap:6px;align-items:center"><span class="badge" id="custBadge">0</span><button class="btn gold" onclick="refreshNow()" style="padding:6px 14px;font-size:11.5px">🔄 Refresh sada</button></div></div>
+    <div style="padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:11.5px;color:var(--dim);line-height:1.5;margin-bottom:10px">Sve prijave preko tvog promo koda — bez obzira koja atleta ih je doveo. Refresh sam azurira svakih 30 sekundi, ili klikni dugme za momentalno.</div>
     <table><thead><tr><th>Datum</th><th>Email klijenta</th><th>Iznos</th><th>Tvoja provizija</th><th>Status</th></tr></thead>
       <tbody id="custBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
   </div>
@@ -203,11 +204,13 @@ async function loadCustomers(){
     const { data, error } = await supabase.from('sales').select('*').eq('organizer_id', organizer.id).order('created_at', { ascending: false }).limit(200);
     if (error) throw error;
     const body = document.getElementById('custBody');
+    const lr = document.getElementById('lastRefresh');
+    if (lr) lr.textContent = '· refresh: ' + new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     let total = 0, trial = 0, paid = 0, earn = 0, availablePayout = 0;
     (data || []).forEach(function(s){
       total++;
       if (s.status === 'pending') trial++;
-      if (s.status === 'confirmed') { paid++; earn += (s.organizer_commission_cents || 0); availablePayout += (s.organizer_commission_cents || 0); }
+      if (s.status === 'confirmed') { paid++; earn += (s.organizer_commission_cents || 0); if(!s.organizer_paid_at) availablePayout += (s.organizer_commission_cents || 0); }
     });
     document.getElementById('kpiTotal').textContent = total;
     document.getElementById('kpiTrial').textContent = trial;
@@ -278,11 +281,18 @@ window.savePayout = async function(){
 
 window.logout = async function(){ await supabase.auth.signOut(); location.href = '/login.html'; };
 
+window.refreshNow = async function(){
+  try { await loadCustomers(); await loadPayouts(); } catch(e){ console.error('refresh', e); }
+};
+
 await loadCustomers();
 await loadPayouts();
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
+
+// Auto-refresh svakih 30 sekundi
+setInterval(function(){ try { loadCustomers(); loadPayouts(); } catch(e){} }, 30000);
 </script>
 </body>
 </html>
