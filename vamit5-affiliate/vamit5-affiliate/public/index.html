@@ -2,6 +2,9 @@
 <html lang="sr">
 <head>
 <meta charset="UTF-8" />
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
 <meta name="viewport" content="width=device-width,initial-scale=1.0" />
 <title>VAMIT-5 Athletes · Postani deo elite</title>
 <meta name="description" content="VAMIT-5 Athlete Affiliate Program — 4 nivoa, do 50% provizije, gamifikacija koja ne staje. Prijavi se danas." />
@@ -466,6 +469,11 @@ footer a{color:var(--brand);text-decoration:none;margin:0 8px}
 
 <script src="/config.js"></script>
 <script type="module">
+// Capture ref= from URL
+const urlParams = new URLSearchParams(window.location.search);
+const INVITE_CODE = urlParams.get("ref") || localStorage.getItem("v5_ref") || "";
+if (urlParams.get("ref")) localStorage.setItem("v5_ref", urlParams.get("ref"));
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
@@ -499,6 +507,8 @@ document.getElementById('applyForm').addEventListener('submit', async (e)=>{
   txt.innerHTML = '<span class="spinner"></span>Slanje...';
 
   const fd = new FormData(e.target);
+  // ?ref=INVITE_CODE u URL-u (od atlete koji poziva u tim) ide u referrer_invite_code
+  const urlRef = new URLSearchParams(window.location.search).get('ref');
   const payload = {
     full_name: fd.get('full_name'),
     email: fd.get('email'),
@@ -506,6 +516,7 @@ document.getElementById('applyForm').addEventListener('submit', async (e)=>{
     country: fd.get('country'),
     instagram_handle: fd.get('instagram_handle').replace(/^@/, ''),
     why_join: fd.get('why_join'),
+    referrer_invite_code: urlRef ? urlRef.toUpperCase().trim() : null,
   };
 
   try {
