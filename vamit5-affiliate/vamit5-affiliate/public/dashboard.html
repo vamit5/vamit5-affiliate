@@ -484,8 +484,11 @@ window.setPeriod = function(days, btn){
 };
 async function loadKPIs(){
   try {
+    const myPromo = (athlete.promo_code || '').toUpperCase();
     let clicksQ = supabase.from('clicks').select('id', { count:'exact', head:true }).eq('athlete_id', athlete.id);
-    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,cancelled_at,created_at').eq('athlete_id', athlete.id);
+    // FILTER PO PROMO CODE — vidim sve prijave sa mojim promo, bez obzira sto je u athlete_id polju
+    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,cancelled_at,created_at,athlete_id,promo_code')
+      .or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id);
     if (window.currentPeriodDays > 0) {
       const since = new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString();
       clicksQ = clicksQ.gte('created_at', since);
@@ -984,7 +987,10 @@ function renderAthCustomers(){
 }
 async function loadAthCustomers(){
   try {
-    const { data } = await supabase.from('sales').select('*, products(name,slug)').eq('athlete_id', athlete.id).order('created_at',{ ascending: false }).limit(200);
+    const myPromo = (athlete.promo_code || '').toUpperCase();
+    const { data } = await supabase.from('sales').select('*, products(name,slug)')
+      .or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id)
+      .order('created_at',{ ascending: false }).limit(200);
     window.allAthSales = data || [];
     // Inject filter buttons ako jos nisu
     if (!document.getElementById('afAll')) {
@@ -1002,11 +1008,16 @@ async function loadAthCustomers(){
 loadAthCustomers();
 setInterval(loadAthCustomers, 10000);
 
-// REALTIME — sales za ovog atletu
+// REALTIME — sales sa mojim promo kodom ILI athlete_id
 try {
+  const myPromo = (athlete.promo_code || '').toUpperCase();
   const chAth = supabase.channel('ath-sales-' + athlete.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'promo_code=eq.' + myPromo }, function(payload){
+      console.log('[realtime ath promo] sales:', payload.eventType);
+      loadKPIs(); loadAthCustomers();
+    })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'athlete_id=eq.' + athlete.id }, function(payload){
-      console.log('[realtime ath] sales:', payload.eventType);
+      console.log('[realtime ath id] sales:', payload.eventType);
       loadKPIs(); loadAthCustomers();
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'team_referrer_id=eq.' + athlete.id }, function(payload){
