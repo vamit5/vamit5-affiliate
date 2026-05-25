@@ -39,7 +39,10 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .hero p{color:var(--dim);font-size:13.5px;line-height:1.5}
 .hero .promo{display:inline-block;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,rgba(255,194,75,0.2),rgba(255,59,154,0.1));border:1px solid rgba(255,194,75,0.4);font-size:13px;font-weight:800;color:var(--gold);margin-top:10px;font-family:monospace;letter-spacing:0.1em}
 
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a6ff3b;box-shadow:0 0 8px #a6ff3b;animation:pulse 1.6s ease-in-out infinite;margin-right:6px;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+.tag.cancelled{background:rgba(255,77,94,0.18);color:#ffb0b8}
 .kpi{padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
 .kpi .ic{font-size:18px;margin-bottom:8px}
 .kpi .l{font-size:10.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.12em;font-weight:700;margin-bottom:5px}
@@ -70,6 +73,7 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
 .payout-cta .btn-payout{padding:14px 32px;font-size:14px;font-weight:900}
 
 @media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}.card{padding:16px}}
+@media(max-width:480px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -97,15 +101,17 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
   </div>
 
   <div class="kpi-row">
-    <div class="kpi"><div class="ic">👥</div><div class="l">Ukupno prijavljenih</div><div class="v" id="kpiTotal">0</div></div>
-    <div class="kpi"><div class="ic">⏳</div><div class="l">Na trial-u</div><div class="v" id="kpiTrial">0</div></div>
-    <div class="kpi"><div class="ic">✅</div><div class="l">Platili karticom</div><div class="v" id="kpiPaid">0</div></div>
-    <div class="kpi"><div class="ic">💰</div><div class="l">Tvoja zarada (€)</div><div class="v" id="kpiEarn">0</div></div>
+    <div class="kpi"><div class="ic">👥</div><div class="l">Ukupno prijava</div><div class="v" id="kpiTotal">0</div></div>
+    <div class="kpi"><div class="ic">⏳</div><div class="l">Na trial-u</div><div class="v" id="kpiTrial" style="color:#ffc24b">0</div></div>
+    <div class="kpi"><div class="ic">✅</div><div class="l">Aktivni (placeni)</div><div class="v" id="kpiPaid" style="color:#a6ff3b">0</div></div>
+    <div class="kpi"><div class="ic">❌</div><div class="l">Otkazali</div><div class="v" id="kpiCancel" style="color:#ff4d5e">0</div></div>
+    <div class="kpi"><div class="ic">💰</div><div class="l">Zarada (€)</div><div class="v" id="kpiEarn" style="color:#ffc24b">0</div></div>
   </div>
 
   <div class="card">
-    <div class="card-head"><h2>👥 Klijenti preko tvog event-a <span id="lastRefresh" style="color:var(--mute);font-weight:400;font-size:11.5px"></span></h2><div style="display:flex;gap:6px;align-items:center"><span class="badge" id="custBadge">0</span><button class="btn gold" onclick="refreshNow()" style="padding:6px 14px;font-size:11.5px">🔄 Refresh sada</button></div></div>
-    <div style="padding:10px;border-radius:8px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);font-size:11.5px;color:var(--dim);line-height:1.5;margin-bottom:10px">Sve prijave preko tvog promo koda — bez obzira koja atleta ih je doveo. Refresh sam azurira svakih 30 sekundi, ili klikni dugme za momentalno.</div>
+    <div class="card-head"><h2><span class="live-dot" id="liveDot"></span>Klijenti preko tvog event-a <span id="lastRefresh" style="color:var(--mute);font-weight:400;font-size:11.5px"></span></h2><div style="display:flex;gap:6px;align-items:center"><span class="badge" id="custBadge">0</span><button class="btn gold" onclick="refreshNow()" style="padding:6px 14px;font-size:11.5px">🔄 Refresh</button></div></div>
+    <div style="padding:10px;border-radius:8px;background:rgba(166,255,59,0.07);border:1px solid rgba(166,255,59,0.25);font-size:11.5px;color:var(--dim);line-height:1.5;margin-bottom:10px"><b style="color:#a6ff3b">🟢 LIVE.</b> Sve prijave preko tvog promo koda. Tabla se update-uje istovremeno kad neko skenira QR i plati — bez refresha. Otkazane subskripcije se prikazuju sa crvenim "OTKAZAO" tagom.</div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"><button class="btn" id="ftAll" onclick="setOrgFilter('all',this)" style="background:rgba(0,240,255,0.15);color:#00f0ff;border-color:rgba(0,240,255,0.4)">Sve</button><button class="btn" id="ftActive" onclick="setOrgFilter('active',this)">Aktivni</button><button class="btn" id="ftTrial" onclick="setOrgFilter('trial',this)">Trial</button><button class="btn" id="ftCancel" onclick="setOrgFilter('cancelled',this)">Otkazali</button></div>
     <table><thead><tr><th>Datum</th><th>Email klijenta</th><th>Iznos</th><th>Tvoja provizija</th><th>Status</th></tr></thead>
       <tbody id="custBody"><tr><td colspan="5" class="empty">Ucitavanje...</td></tr></tbody></table>
   </div>
@@ -198,37 +204,70 @@ if (organizer.payout_bank_name) document.getElementById('po_bank').value = organ
 if (organizer.payout_email) document.getElementById('po_email').value = organizer.payout_email;
 if (organizer.payout_phone) document.getElementById('po_phone').value = organizer.payout_phone;
 
-// Load customers (sales linked to this organizer via promo_code/organizer_id)
+// Filter state
+window.orgFilter = 'all';
+window.allOrgSales = [];
+window.setOrgFilter = function(f, btn){
+  window.orgFilter = f;
+  document.querySelectorAll('#ftAll,#ftActive,#ftTrial,#ftCancel').forEach(function(b){b.style.background='';b.style.color='';b.style.borderColor='';});
+  if (btn){ btn.style.background='rgba(0,240,255,0.15)'; btn.style.color='#00f0ff'; btn.style.borderColor='rgba(0,240,255,0.4)'; }
+  renderOrgSales();
+};
+
+function renderOrgSales(){
+  const body = document.getElementById('custBody');
+  const f = window.orgFilter || 'all';
+  const filtered = (window.allOrgSales || []).filter(function(s){
+    if (f === 'all') return true;
+    if (f === 'cancelled') return !!s.cancelled_at;
+    if (f === 'active') return s.status === 'confirmed' && !s.cancelled_at;
+    if (f === 'trial') return s.status === 'pending' && !s.cancelled_at;
+    return true;
+  });
+  if (!filtered.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Nema u ovom filteru.</td></tr>'; return; }
+  body.innerHTML = filtered.map(function(s){
+    const ago = new Date(s.created_at).toLocaleString('sr',{ day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+    const com = ((s.organizer_commission_cents || 0)/100).toFixed(2);
+    let statTag, statLbl;
+    if (s.cancelled_at){ statTag='cancelled'; statLbl='❌ OTKAZAO ' + new Date(s.cancelled_at).toLocaleDateString('sr',{day:'2-digit',month:'short'}); }
+    else if (s.status === 'confirmed'){ statTag='confirmed'; statLbl='✅ AKTIVAN'; }
+    else if (s.status === 'pending'){ statTag='pending'; statLbl='⏳ TRIAL'; }
+    else if (s.status === 'refunded'){ statTag='refunded'; statLbl='↩ REFUND'; }
+    else { statTag=s.status; statLbl=s.status; }
+    return '<tr><td>' + ago + '</td>' +
+      '<td><b>' + (s.customer_email || '—') + '</b></td>' +
+      '<td>' + ((s.gross_amount_cents || s.amount_cents || 0)/100).toFixed(2) + ' €</td>' +
+      '<td style="color:var(--gold);font-weight:800">€' + com + '</td>' +
+      '<td><span class="tag ' + statTag + '">' + statLbl + '</span></td></tr>';
+  }).join('');
+}
+
+// Load customers (sales linked to this organizer via organizer_id)
 async function loadCustomers(){
   try {
-    const { data, error } = await supabase.from('sales').select('*').eq('organizer_id', organizer.id).order('created_at', { ascending: false }).limit(200);
+    const { data, error } = await supabase.from('sales').select('*').eq('organizer_id', organizer.id).order('created_at', { ascending: false }).limit(500);
     if (error) throw error;
-    const body = document.getElementById('custBody');
+    window.allOrgSales = data || [];
     const lr = document.getElementById('lastRefresh');
-    if (lr) lr.textContent = '· refresh: ' + new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-    let total = 0, trial = 0, paid = 0, earn = 0, availablePayout = 0;
+    if (lr) lr.textContent = '· ' + new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    let total = 0, trial = 0, active = 0, cancelled = 0, earn = 0, availablePayout = 0;
     (data || []).forEach(function(s){
       total++;
-      if (s.status === 'pending') trial++;
-      if (s.status === 'confirmed') { paid++; earn += (s.organizer_commission_cents || 0); if(!s.organizer_paid_at) availablePayout += (s.organizer_commission_cents || 0); }
+      if (s.cancelled_at) cancelled++;
+      else if (s.status === 'pending') trial++;
+      else if (s.status === 'confirmed') active++;
+      if (s.status === 'confirmed' && !s.cancelled_at) { earn += (s.organizer_commission_cents || 0); if(!s.organizer_paid_at) availablePayout += (s.organizer_commission_cents || 0); }
     });
     document.getElementById('kpiTotal').textContent = total;
     document.getElementById('kpiTrial').textContent = trial;
-    document.getElementById('kpiPaid').textContent = paid;
+    document.getElementById('kpiPaid').textContent = active;
+    document.getElementById('kpiCancel').textContent = cancelled;
     document.getElementById('kpiEarn').textContent = (earn/100).toFixed(2);
     document.getElementById('availableAmount').textContent = '€' + (availablePayout/100).toFixed(2);
     document.getElementById('custBadge').textContent = total;
     window.availablePayoutCents = availablePayout;
-    if (!data || !data.length){ body.innerHTML = '<tr><td colspan="5" class="empty">Nemas jos prijavljenih. Cekamo prve QR skenove na tvom event-u.</td></tr>'; return; }
-    body.innerHTML = data.map(function(s){
-      const ago = new Date(s.created_at).toLocaleString('sr',{ day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
-      const com = ((s.organizer_commission_cents || 0)/100).toFixed(2);
-      return '<tr><td>' + ago + '</td>' +
-        '<td><b>' + (s.customer_email || '—') + '</b></td>' +
-        '<td>' + ((s.gross_amount_cents || 0)/100).toFixed(2) + ' €</td>' +
-        '<td style="color:var(--gold);font-weight:800">€' + com + '</td>' +
-        '<td><span class="tag ' + s.status + '">' + (s.status === 'pending' ? 'na trial-u' : s.status === 'confirmed' ? 'platio karticom' : s.status) + '</span></td></tr>';
-    }).join('');
+    if (!data || !data.length){ document.getElementById('custBody').innerHTML = '<tr><td colspan="5" class="empty">Nemas jos prijavljenih. Cekamo prve QR skenove.</td></tr>'; return; }
+    renderOrgSales();
   } catch(e){ document.getElementById('custBody').innerHTML = '<tr><td colspan="5" class="empty">Greska: ' + e.message + '</td></tr>'; }
 }
 
@@ -323,8 +362,21 @@ await checkPendingPayoutStatus();
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
 
-// Auto-refresh svakih 30 sekundi (incl. pending status check)
-setInterval(function(){ try { loadCustomers(); loadPayouts(); checkPendingPayoutStatus(); } catch(e){} }, 30000);
+// Auto-refresh svakih 10 sekundi (kao backup ako realtime ne radi)
+setInterval(function(){ try { loadCustomers(); loadPayouts(); checkPendingPayoutStatus(); } catch(e){} }, 10000);
+
+// REALTIME subscription — instant update kad neko skenira QR i plati
+try {
+  const ch = supabase.channel('org-sales-' + organizer.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'organizer_id=eq.' + organizer.id }, function(payload){
+      console.log('[realtime] sales change:', payload.eventType, payload.new || payload.old);
+      const dot = document.getElementById('liveDot');
+      if (dot) { dot.style.background = '#ffc24b'; dot.style.boxShadow = '0 0 12px #ffc24b'; setTimeout(function(){ dot.style.background='#a6ff3b'; dot.style.boxShadow='0 0 8px #a6ff3b'; }, 1200); }
+      loadCustomers();
+    })
+    .subscribe(function(status){ console.log('[realtime] org channel status:', status); });
+  window.addEventListener('beforeunload', function(){ try { ch.unsubscribe(); } catch(e){} });
+} catch(e){ console.error('[realtime] subscribe failed:', e); }
 </script>
 </body>
 </html>
