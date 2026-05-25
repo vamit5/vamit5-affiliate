@@ -44,7 +44,10 @@ input,select,textarea{background:#0a0c14;color:var(--text);border:1px solid var(
 .tag.confirmed,.tag.approved,.tag.paid{background:rgba(166,255,59,0.15);color:#b5ffb0}
 .tag.pending{background:rgba(255,194,75,0.15);color:#ffc24b}
 .tag.refunded,.tag.rejected{background:rgba(255,77,94,0.15);color:#ffb0b8}
-.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+.tag.cancelled{background:rgba(255,77,94,0.18);color:#ffb0b8}
+.live-dot-adm{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a6ff3b;box-shadow:0 0 8px #a6ff3b;animation:livepulseAdm 1.6s ease-in-out infinite;margin-right:6px;vertical-align:middle}
+@keyframes livepulseAdm{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px}
 .kpi{background:rgba(20,24,42,0.6);border:1px solid var(--border);border-radius:12px;padding:14px}
 .kpi .label{font-size:10.5px;color:var(--mute);text-transform:uppercase;margin-bottom:6px}
 .kpi .value{font-size:22px;font-weight:800;color:var(--brand)}
@@ -81,11 +84,13 @@ code{cursor:pointer;color:var(--brand)}
 <div class="kpi-grid">
 <div class="kpi"><div class="label">Atleta</div><div class="value" id="kpiAthletes">-</div></div>
 <div class="kpi"><div class="label">Organizatora</div><div class="value" id="kpiOrgs">-</div></div>
-<div class="kpi"><div class="label">Prodaje (mesec)</div><div class="value" id="kpiSales">-</div></div>
+<div class="kpi"><div class="label">⏳ Trial</div><div class="value" id="kpiTrial" style="color:var(--gold)">-</div></div>
+<div class="kpi"><div class="label">✅ Aktivni</div><div class="value" id="kpiActive" style="color:var(--green)">-</div></div>
+<div class="kpi"><div class="label">❌ Otkazali</div><div class="value" id="kpiCancelled" style="color:var(--red)">-</div></div>
 <div class="kpi"><div class="label">Bruto € (mesec)</div><div class="value" id="kpiGross">-</div></div>
 <div class="kpi"><div class="label">Dugovanje €</div><div class="value" id="kpiDebt" style="color:var(--gold)">-</div></div>
 </div>
-<div class="card"><div class="card-head"><h2>Aktivnost</h2></div><div id="activityList"><div class="empty">Učitavanje...</div></div></div>
+<div class="card"><div class="card-head"><h2><span class="live-dot-adm"></span>Aktivnost <span id="overTime" style="color:var(--mute);font-weight:400;font-size:11.5px"></span></h2><button class="btn ghost" onclick="loadOverview()">🔄</button></div><div id="activityList"><div class="empty">Učitavanje...</div></div></div>
 </div>
 
 <div class="section" id="sec-applications">
@@ -121,7 +126,7 @@ code{cursor:pointer;color:var(--brand)}
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px">
 <select id="fAthlete" onchange="loadSales()"><option value="">Svaki atleta</option></select>
 <select id="fOrg" onchange="loadSales()"><option value="">Svaki event</option><option value="__none__">Bez eventa</option></select>
-<select id="fStatus" onchange="loadSales()"><option value="">Svi statusi</option><option value="confirmed">Confirmed</option><option value="pending">Pending</option><option value="refunded">Refunded</option></select>
+<select id="fStatus" onchange="loadSales()"><option value="">Svi statusi</option><option value="active">✅ Aktivni</option><option value="trial">⏳ Trial</option><option value="cancelled">❌ Otkazali</option><option value="confirmed">Confirmed (raw)</option><option value="pending">Pending (raw)</option><option value="refunded">Refunded</option></select>
 <input id="fEmail" placeholder="Email..." oninput="debLoad()"><input id="fFrom" type="date" onchange="loadSales()"><input id="fTo" type="date" onchange="loadSales()">
 </div>
 <div style="overflow-x:auto"><table><thead><tr><th>Vreme</th><th>Kupac</th><th>Atleta</th><th>Event</th><th>Bruto €</th><th>Atl €</th><th>Org €</th><th>Status</th><th></th></tr></thead><tbody id="salesBody"><tr><td colspan="9" class="empty">...</td></tr></tbody></table></div>
@@ -227,24 +232,34 @@ document.querySelectorAll('aside nav button').forEach(function(b){b.addEventList
 // SELECT helper — koristi eksplicitne FK reference
 const SALES_SELECT = '*, athlete:athlete_id(id,username,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone), organizer:organizer_id(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone)';
 
-async function loadOverview(){
+window.loadOverview=async function(){
   try{
     const sm=new Date();sm.setDate(1);sm.setHours(0,0,0,0);
-    const [a,o,s,act]=await Promise.all([
+    const [a,o,sAll,sMonth,act]=await Promise.all([
       supabase.from('athletes').select('id',{count:'exact',head:true}),
       supabase.from('organizers').select('id',{count:'exact',head:true}),
-      supabase.from('sales').select('gross_amount_cents,amount_cents,commission_cents,organizer_commission_cents,athlete_paid_at,organizer_paid_at,status').gte('created_at',sm.toISOString()),
+      supabase.from('sales').select('status,cancelled_at'),
+      supabase.from('sales').select('gross_amount_cents,amount_cents,commission_cents,organizer_commission_cents,athlete_paid_at,organizer_paid_at,status,cancelled_at').gte('created_at',sm.toISOString()),
       supabase.from('activity').select('*').order('created_at',{ascending:false}).limit(20)
     ]);
     $('kpiAthletes').textContent=a.count||0;$('kpiOrgs').textContent=o.count||0;
-    const arr=s.data||[];$('kpiSales').textContent=arr.length;
+    const all=sAll.data||[];
+    let trial=0,active=0,cancelled=0;
+    all.forEach(function(x){
+      if(x.cancelled_at)cancelled++;
+      else if(x.status==='confirmed')active++;
+      else if(x.status==='pending')trial++;
+    });
+    $('kpiTrial').textContent=trial;$('kpiActive').textContent=active;$('kpiCancelled').textContent=cancelled;
+    const arr=sMonth.data||[];
     $('kpiGross').textContent=(arr.reduce(function(s,x){return s+(x.gross_amount_cents||x.amount_cents||0);},0)/100).toFixed(2);
-    const debt=arr.reduce(function(s,x){if(x.status!=='confirmed')return s;let v=0;if(!x.athlete_paid_at)v+=(x.commission_cents||0);if(!x.organizer_paid_at)v+=(x.organizer_commission_cents||0);return s+v;},0);
+    const debt=arr.reduce(function(s,x){if(x.status!=='confirmed'||x.cancelled_at)return s;let v=0;if(!x.athlete_paid_at)v+=(x.commission_cents||0);if(!x.organizer_paid_at)v+=(x.organizer_commission_cents||0);return s+v;},0);
     $('kpiDebt').textContent=(debt/100).toFixed(2);
     const acts=act.data||[];
+    if($('overTime'))$('overTime').textContent='· '+new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     $('activityList').innerHTML=acts.length?acts.map(function(a){return '<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px">'+fmtDT(a.created_at)+' · '+(a.title||'')+'</div>';}).join(''):'<div class="empty">Nema aktivnosti.</div>';
   }catch(e){console.error(e);$('activityList').innerHTML='<div class="empty">Greska: '+e.message+'</div>';}
-}
+};
 
 window.loadApplications=async function(){
   try{const {data}=await supabase.from('applications').select('*').order('created_at',{ascending:false});
@@ -290,18 +305,31 @@ let _fI=false,_deb=null;
 window.debLoad=function(){clearTimeout(_deb);_deb=setTimeout(loadSales,300);};
 async function initSalesFilters(){if(_fI)return;_fI=true;try{const[a,o]=await Promise.all([supabase.from('athletes').select('id,username,full_name').order('full_name'),supabase.from('organizers').select('id,full_name,promo_code').order('full_name')]);(a.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' (@'+x.username+')';$('fAthlete').appendChild(op);});(o.data||[]).forEach(function(x){const op=document.createElement('option');op.value=x.id;op.textContent=x.full_name+' · '+x.promo_code;$('fOrg').appendChild(op);});}catch(e){console.error(e);}}
 window.loadSales=async function(){
-  try{let q=supabase.from('sales').select(SALES_SELECT).order('created_at',{ascending:false}).limit(300);
+  try{let q=supabase.from('sales').select(SALES_SELECT).order('created_at',{ascending:false}).limit(500);
     const fA=$('fAthlete').value,fO=$('fOrg').value,fS=$('fStatus').value,fE=$('fEmail').value.trim(),fF=$('fFrom').value,fT=$('fTo').value;
     if(fA)q=q.eq('athlete_id',fA);
     if(fO==='__none__')q=q.is('organizer_id',null);else if(fO)q=q.eq('organizer_id',fO);
-    if(fS)q=q.eq('status',fS);
+    // Virtual statusi: active = confirmed && !cancelled; trial = pending && !cancelled; cancelled = cancelled_at NOT NULL
+    if(fS==='active'){q=q.eq('status','confirmed').is('cancelled_at',null);}
+    else if(fS==='trial'){q=q.eq('status','pending').is('cancelled_at',null);}
+    else if(fS==='cancelled'){q=q.not('cancelled_at','is',null);}
+    else if(fS){q=q.eq('status',fS);}
     if(fE)q=q.ilike('customer_email','%'+fE+'%');
     if(fF)q=q.gte('created_at',fF+'T00:00:00');
     if(fT)q=q.lte('created_at',fT+'T23:59:59');
     const{data,error}=await q;if(error)throw error;
-    $('salesCount').textContent='('+(data&&data.length||0)+')';
+    $('salesCount').textContent='('+(data&&data.length||0)+') · '+new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
     if(!data||!data.length){$('salesBody').innerHTML='<tr><td colspan="9" class="empty">Nema.</td></tr>';return;}
-    $('salesBody').innerHTML=data.map(function(s){const a=s.athlete||{},org=s.organizer;const l=org?'<span class="tag" style="background:rgba(255,194,75,0.15);color:#ffc24b">🎪 '+esc(org.promo_code)+'</span>':'<span class="tag" style="background:rgba(0,240,255,0.1);color:#00f0ff">📱 DIREKT</span>';return '<tr><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+esc(a.full_name||'?')+' <small style="color:var(--mute)">'+esc(a.promo_code||'')+'</small></td><td>'+l+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td>'+((s.commission_cents||0)/100).toFixed(2)+'</td><td>'+((s.organizer_commission_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+s.status+'">'+s.status+'</span></td><td><button class="btn red" style="padding:4px 8px;font-size:10px" onclick="delSale(\''+s.id+'\')">×</button></td></tr>';}).join('');
+    $('salesBody').innerHTML=data.map(function(s){
+      const a=s.athlete||{},org=s.organizer;
+      const l=org?'<span class="tag" style="background:rgba(255,194,75,0.15);color:#ffc24b">🎪 '+esc(org.promo_code)+'</span>':'<span class="tag" style="background:rgba(0,240,255,0.1);color:#00f0ff">📱 DIREKT</span>';
+      let statTag, statLbl;
+      if(s.cancelled_at){ statTag='cancelled'; statLbl='❌ OTKAZAO'; }
+      else if(s.status==='confirmed'){ statTag='confirmed'; statLbl='✅ AKTIVAN'; }
+      else if(s.status==='pending'){ statTag='pending'; statLbl='⏳ TRIAL'; }
+      else { statTag=s.status; statLbl=s.status; }
+      return '<tr style="'+(s.cancelled_at?'background:rgba(255,77,94,0.04)':'')+'"><td>'+fmtDT(s.created_at)+'</td><td>'+esc(s.customer_email||'-')+'</td><td>'+esc(a.full_name||'?')+' <small style="color:var(--mute)">'+esc(a.promo_code||'')+'</small></td><td>'+l+'</td><td>'+((s.gross_amount_cents||s.amount_cents||0)/100).toFixed(2)+'</td><td>'+((s.commission_cents||0)/100).toFixed(2)+'</td><td>'+((s.organizer_commission_cents||0)/100).toFixed(2)+'</td><td><span class="tag '+statTag+'">'+statLbl+'</span>'+(s.cancelled_at?'<br><small style="color:var(--mute);font-size:10px">'+fmtDT(s.cancelled_at)+'</small>':'')+'</td><td><button class="btn red" style="padding:4px 8px;font-size:10px" onclick="delSale(\''+s.id+'\')">×</button></td></tr>';
+    }).join('');
   }catch(e){$('salesBody').innerHTML='<tr><td colspan="9" class="empty">'+e.message+'</td></tr>';}
 };
 window.delSale=async function(id){if(!confirm('Obrisi?'))return;try{await supabase.from('sales').delete().eq('id',id);loadSales();}catch(e){alert(e.message);}};
@@ -353,7 +381,35 @@ window.athPaid=async function(rid,aid){
 window.athRej=async function(id){const r=prompt('Razlog:');if(r===null)return;try{await supabase.from('athlete_payout_requests').update({status:'rejected',notes:r||null}).eq('id',id);loadAthPayouts();}catch(e){alert(e.message);}};
 
 // INIT
-(async function(){try{await loadOverview();loadApplications();loadDebts();}catch(e){console.error(e);}setInterval(function(){try{loadDebts();}catch(e){}try{loadOrgPayouts();}catch(e){}try{loadAthPayouts();}catch(e){}},60000);})();
+(async function(){
+  try{await loadOverview();loadApplications();loadDebts();}catch(e){console.error(e);}
+  // Fast refresh za Overview (every 10s) + slower za debt/payouts (60s)
+  setInterval(function(){try{loadOverview();}catch(e){}},10000);
+  setInterval(function(){try{loadDebts();}catch(e){}try{loadOrgPayouts();}catch(e){}try{loadAthPayouts();}catch(e){}},60000);
+  // Refresh sekcije po promeni
+  setInterval(function(){
+    const active = document.querySelector('.section.active');
+    if (!active) return;
+    if (active.id === 'sec-sales' && typeof loadSales === 'function') { try { loadSales(); } catch(e){} }
+    if (active.id === 'sec-customers' && typeof loadCustomers === 'function') { try { loadCustomers(); } catch(e){} }
+    if (active.id === 'sec-events' && typeof loadEvents === 'function') { try { loadEvents(); } catch(e){} }
+  }, 10000);
+  // REALTIME subscription — admin vidi sve sale promene odmah
+  try {
+    const chAdm = supabase.channel('admin-sales-all')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, function(payload){
+        console.log('[realtime adm]', payload.eventType, payload.new && payload.new.id);
+        try { loadOverview(); } catch(e){}
+        const active = document.querySelector('.section.active');
+        if (!active) return;
+        if (active.id === 'sec-sales' && typeof loadSales === 'function') { try { loadSales(); } catch(e){} }
+        if (active.id === 'sec-customers' && typeof loadCustomers === 'function') { try { loadCustomers(); } catch(e){} }
+        if (active.id === 'sec-events' && typeof loadEvents === 'function') { try { loadEvents(); } catch(e){} }
+      })
+      .subscribe(function(status){ console.log('[realtime adm] status:', status); });
+    window.addEventListener('beforeunload', function(){ try { chAdm.unsubscribe(); } catch(e){} });
+  } catch(e){ console.error('[realtime adm] failed:', e); }
+})();
 </script>
 </body>
 </html>
