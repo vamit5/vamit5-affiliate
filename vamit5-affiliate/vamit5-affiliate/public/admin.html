@@ -73,6 +73,7 @@ code{cursor:pointer;color:var(--brand)}
 <button data-section="reports">📊 Izvestaji</button>
 <button data-section="events">📅 Eventi</button>
 <button data-section="payouts">Zahtevi <span class="badge" id="payoutBadge" style="display:none">0</span></button>
+<button data-section="notify">🔔 Notifikacije</button>
 </nav>
 <div class="meta" id="adminEmail">...</div>
 <button class="logout-btn" onclick="logout()">Logout</button>
@@ -171,6 +172,23 @@ code{cursor:pointer;color:var(--brand)}
 <div id="eventsList"><div class="empty">Klikni Refresh.</div></div>
 </div>
 
+<div class="section" id="sec-notify">
+<div class="card" style="border-color:rgba(0,240,255,0.35)">
+<div class="card-head"><h2>🔔 Pošalji push notifikaciju atletama</h2></div>
+<div style="padding:10px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);border-radius:8px;font-size:12px;color:var(--dim);margin-bottom:12px;line-height:1.5">Stiže na sve atlete koji su uključili notifikacije u svom dashboardu (klik na 🔔 banner).</div>
+<div style="display:grid;gap:10px">
+<input id="notifTitle" placeholder="Naslov (npr. 'Tour de Fruska danas')" style="font-weight:700">
+<textarea id="notifBody" placeholder="Tekst notifikacije..." rows="3" style="font-family:inherit;resize:vertical"></textarea>
+<input id="notifUrl" placeholder="URL (opciono — npr. /dashboard.html)">
+<select id="notifTier"><option value="">Svi atlete</option><option value="recruit">Samo REGRUT</option><option value="pro">Samo PRO</option><option value="commando">Samo COMMANDO</option><option value="elite">Samo ELITE</option></select>
+<button class="btn brand" onclick="sendNotif()">📤 Pošalji svima</button>
+</div>
+<div id="notifMsg" style="margin-top:10px;font-size:13px"></div>
+</div>
+<div class="card"><div class="card-head"><h2>Istorija</h2><button class="btn ghost" onclick="loadNotifHistory()">Refresh</button></div>
+<table><thead><tr><th>Datum</th><th>Naslov</th><th>Poslato (#)</th><th>Tier filter</th></tr></thead><tbody id="notifHistBody"><tr><td colspan="4" class="empty">Klikni Refresh.</td></tr></tbody></table></div>
+</div>
+
 <div class="section" id="sec-payouts">
 <div class="card" style="border-color:rgba(255,194,75,0.35)">
 <div class="card-head"><h2>🎪 Organizatori — zahtevi</h2><button class="btn ghost" onclick="loadOrgPayouts()">Refresh</button></div>
@@ -227,7 +245,33 @@ document.querySelectorAll('aside nav button').forEach(function(b){b.addEventList
   if(sec==='reports')initReportFilters();
   if(sec==='events')loadEvents();
   if(sec==='payouts'){loadOrgPayouts();loadAthPayouts();}
+  if(sec==='notify'){loadNotifHistory();}
 });});
+
+window.sendNotif=async function(){
+  const t=$('notifTitle').value.trim(), b=$('notifBody').value.trim(), u=$('notifUrl').value.trim(), tier=$('notifTier').value;
+  const msg=$('notifMsg');
+  if(!t||!b){msg.innerHTML='<span style="color:#ffb0b8">Naslov i tekst su obavezni!</span>';return;}
+  if(!confirm('Poslati notifikaciju "'+t+'" '+(tier?'samo '+tier:'SVIM atletama')+'?'))return;
+  msg.innerHTML='<span style="color:var(--brand)">Šaljem...</span>';
+  try{
+    const body={title:t, body:b};
+    if(u)body.url=u;
+    if(tier)body.target_tier=tier;
+    const{data,error}=await supabase.functions.invoke('send-bulk-notification',{body});
+    if(error){msg.innerHTML='<span style="color:#ffb0b8">Greška: '+error.message+'</span>';return;}
+    msg.innerHTML='<span style="color:var(--green)">✓ Poslato '+(data&&data.sent||0)+' atletama. '+(data&&data.failed?'(Failed: '+data.failed+')':'')+'</span>';
+    $('notifTitle').value='';$('notifBody').value='';$('notifUrl').value='';
+    try{loadNotifHistory();}catch(e){}
+  }catch(e){msg.innerHTML='<span style="color:#ffb0b8">Greška: '+e.message+'</span>';}
+};
+window.loadNotifHistory=async function(){
+  try{
+    const{data}=await supabase.from('notification_log').select('*').order('created_at',{ascending:false}).limit(50);
+    if(!data||!data.length){$('notifHistBody').innerHTML='<tr><td colspan="4" class="empty">Nema poslatih notifikacija (ili nema notification_log tabele).</td></tr>';return;}
+    $('notifHistBody').innerHTML=data.map(function(n){return '<tr><td>'+fmtDT(n.created_at)+'</td><td><b>'+esc(n.title||'')+'</b><br><small style="color:var(--mute)">'+esc(n.body||'')+'</small></td><td>'+(n.sent_count||0)+'</td><td>'+esc(n.target_tier||'svi')+'</td></tr>';}).join('');
+  }catch(e){$('notifHistBody').innerHTML='<tr><td colspan="4" class="empty">Nema istorije (potrebna notification_log tabela)</td></tr>';}
+};
 
 // SELECT helper — koristi eksplicitne FK reference
 const SALES_SELECT = '*, athlete:athlete_id(id,username,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone), organizer:organizer_id(id,full_name,email,promo_code,payout_full_name,payout_account_number,payout_bank_name,payout_phone)';
