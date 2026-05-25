@@ -70,6 +70,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .points-legend{margin-top:14px;padding:12px 14px;border-radius:11px;background:linear-gradient(135deg,rgba(255,194,75,0.08),rgba(255,59,154,0.05));border:1px solid rgba(255,194,75,0.2);font-size:12px;color:var(--gold);font-weight:600;line-height:1.5}
 
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.live-dot-ath{display:inline-block;width:8px;height:8px;border-radius:50%;background:#a6ff3b;box-shadow:0 0 8px #a6ff3b;animation:livepulse 1.6s ease-in-out infinite;margin-right:6px;vertical-align:middle}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.85)}}
+.tag.cancelled{background:rgba(255,77,94,0.18);color:#ffb0b8;padding:3px 8px;border-radius:5px;font-size:10px;font-weight:800;text-transform:uppercase}
 .kpi{padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border);transition:all .3s ease}
 .kpi:hover{transform:translateY(-2px);border-color:var(--border2)}
 .kpi .ic{font-size:18px;margin-bottom:8px}
@@ -237,11 +240,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       <button class="period-btn" data-days="0" onclick="setPeriod(0, this)">Sve</button>
     </div>
     <div class="kpi-row">
-      <div class="kpi"><div class="ic">👀</div><div class="l" id="kpiL1">Klikovi</div><div class="v" id="kpiClicks">0</div></div>
-      <div class="kpi"><div class="ic">💎</div><div class="l" id="kpiL2">Prodaje</div><div class="v" id="kpiSales">0</div></div>
-      <div class="kpi"><div class="ic">💸</div><div class="l" id="kpiL3">Zarada (€)</div><div class="v" id="kpiCommission">0</div></div>
-      <div class="kpi"><div class="ic">⚡</div><div class="l" id="kpiL4">Poeni</div><div class="v" id="kpiXP">0</div></div>
+      <div class="kpi"><div class="ic">✅</div><div class="l" id="kpiL1">Aktivni</div><div class="v" id="kpiSales" style="color:var(--lime)">0</div></div>
+      <div class="kpi"><div class="ic">⏳</div><div class="l" id="kpiL2">Trial</div><div class="v" id="kpiTrial" style="color:var(--gold)">0</div></div>
+      <div class="kpi"><div class="ic">❌</div><div class="l" id="kpiL3">Otkazali</div><div class="v" id="kpiCancel" style="color:var(--red)">0</div></div>
+      <div class="kpi"><div class="ic">💸</div><div class="l" id="kpiL4">Zarada (€)</div><div class="v" id="kpiCommission" style="color:var(--gold)">0</div></div>
     </div>
+    <div style="display:flex;gap:10px;align-items:center;font-size:11px;color:var(--mute);margin-top:-8px;margin-bottom:8px"><span class="live-dot-ath"></span>Live · klikovi: <b style="color:var(--text)" id="kpiClicks">0</b> · poeni: <b style="color:var(--text)" id="kpiXP">0</b><span id="lastRefreshAth" style="margin-left:auto"></span></div>
 
     <div class="row2">
       <div class="card">
@@ -481,7 +485,7 @@ window.setPeriod = function(days, btn){
 async function loadKPIs(){
   try {
     let clicksQ = supabase.from('clicks').select('id', { count:'exact', head:true }).eq('athlete_id', athlete.id);
-    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,created_at').eq('athlete_id', athlete.id);
+    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,cancelled_at,created_at').eq('athlete_id', athlete.id);
     if (window.currentPeriodDays > 0) {
       const since = new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString();
       clicksQ = clicksQ.gte('created_at', since);
@@ -489,18 +493,31 @@ async function loadKPIs(){
     }
     const [clicksR, salesR] = await Promise.all([clicksQ, salesQ]);
     document.getElementById('kpiClicks').textContent = (clicksR.count || 0).toLocaleString();
-    const sales = (salesR.data || []).filter(function(s){ return s.status === 'confirmed' || s.status === 'pending'; });
-    document.getElementById('kpiSales').textContent = sales.length;
-    const totalEarn = sales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0);
-    // Add team commission earnings for this period
-    let teamQ = supabase.from('sales').select('team_commission_cents,status,created_at').eq('team_referrer_id', athlete.id);
+    const all = salesR.data || [];
+    let active = 0, trial = 0, cancelled = 0;
+    all.forEach(function(s){
+      if (s.cancelled_at) cancelled++;
+      else if (s.status === 'confirmed') active++;
+      else if (s.status === 'pending') trial++;
+    });
+    document.getElementById('kpiSales').textContent = active;
+    if (document.getElementById('kpiTrial')) document.getElementById('kpiTrial').textContent = trial;
+    if (document.getElementById('kpiCancel')) document.getElementById('kpiCancel').textContent = cancelled;
+    // Earn = aktivne prodaje (NE racuna otkazane)
+    const earnSales = all.filter(function(s){ return (s.status === 'confirmed' || s.status === 'pending') && !s.cancelled_at; });
+    const totalEarn = earnSales.reduce(function(a,s){ return a + (s.commission_cents || 0); }, 0);
+    let teamQ = supabase.from('sales').select('team_commission_cents,status,cancelled_at,created_at').eq('team_referrer_id', athlete.id);
     if (window.currentPeriodDays > 0) teamQ = teamQ.gte('created_at', new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString());
     const teamR = await teamQ;
-    const teamEarn = (teamR.data || []).filter(function(s){ return s.status === 'confirmed' || s.status === 'pending'; }).reduce(function(a,s){ return a + (s.team_commission_cents || 0); }, 0);
+    const teamEarn = (teamR.data || []).filter(function(s){ return (s.status === 'confirmed' || s.status === 'pending') && !s.cancelled_at; }).reduce(function(a,s){ return a + (s.team_commission_cents || 0); }, 0);
     document.getElementById('kpiCommission').textContent = ((totalEarn + teamEarn) / 100).toFixed(2);
+    const lr = document.getElementById('lastRefreshAth');
+    if (lr) lr.textContent = '· ' + new Date().toLocaleTimeString('sr',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   } catch(e){ console.error('KPI', e); }
 }
 loadKPIs();
+// Auto-refresh KPI svakih 10s
+setInterval(function(){ try { loadKPIs(); } catch(e){} }, 10000);
 
 // --- DAILY CHALLENGES ---
 (async function(){
@@ -924,30 +941,81 @@ try {
   }
 } catch(e) { console.error('payout pre-fill', e); }
 
-// --- MOJI KLIJENTI ---
-(async function(){
+// --- MOJI KLIJENTI (sa Aktivni/Trial/Otkazali filterom + realtime) ---
+window.athFilter = 'all';
+window.setAthFilter = function(f, btn){
+  window.athFilter = f;
+  document.querySelectorAll('#afAll,#afActive,#afTrial,#afCancel').forEach(function(b){if(b){b.style.background='';b.style.color='';b.style.borderColor='';}});
+  if (btn){ btn.style.background='rgba(0,240,255,0.15)'; btn.style.color='#00f0ff'; btn.style.borderColor='rgba(0,240,255,0.4)'; }
+  renderAthCustomers();
+};
+function renderAthCustomers(){
+  const list = document.getElementById('customersList');
+  const badge = document.getElementById('customersBadge');
+  if (!list) return;
+  const f = window.athFilter || 'all';
+  const data = window.allAthSales || [];
+  const filtered = data.filter(function(s){
+    if (f === 'all') return true;
+    if (f === 'cancelled') return !!s.cancelled_at;
+    if (f === 'active') return s.status === 'confirmed' && !s.cancelled_at;
+    if (f === 'trial') return s.status === 'pending' && !s.cancelled_at;
+    return true;
+  });
+  if (badge) badge.textContent = data.length;
+  if (!filtered.length){ list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--mute);font-size:12.5px">Nema u ovom filteru.</div>'; return; }
+  list.innerHTML = '';
+  filtered.forEach(function(s){
+    const p = s.products || {};
+    const email = s.customer_email || '—';
+    const myCom = ((s.commission_cents || 0)/100).toFixed(2);
+    let stColor, stText;
+    if (s.cancelled_at){ stColor='#ff4d5e'; stText='❌ otkazao ' + new Date(s.cancelled_at).toLocaleDateString('sr',{day:'2-digit',month:'short'}); }
+    else if (s.status === 'confirmed'){ stColor='var(--lime)'; stText='✓ aktivan'; }
+    else if (s.status === 'pending'){ stColor='var(--gold)'; stText='⏳ na trial-u'; }
+    else { stColor='#ffb0b8'; stText=s.status; }
+    const div = document.createElement('div');
+    div.style.cssText = 'display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid ' + (s.cancelled_at?'rgba(255,77,94,0.25)':'var(--border)') + ';font-size:13px';
+    div.innerHTML = '<div><div style="font-weight:700">' + email + '</div>' +
+      '<div style="font-size:11px;color:var(--mute);margin-top:3px">' + (p.name || p.slug || '') + ' · <span style="color:' + stColor + ';font-weight:700">' + stText + '</span> · ' + new Date(s.created_at).toLocaleDateString('sr') + '</div></div>' +
+      '<div style="text-align:right"><div style="font-weight:800;color:' + (s.cancelled_at?'#ffb0b8':'var(--gold)') + '">' + (s.cancelled_at?'':'+') + myCom + ' €</div><div style="font-size:10.5px;color:var(--mute)">tvoja provizija</div></div>';
+    list.appendChild(div);
+  });
+}
+async function loadAthCustomers(){
   try {
-    const { data } = await supabase.from('sales').select('*, products(name,slug)').eq('athlete_id', athlete.id).order('created_at',{ ascending: false }).limit(50);
-    const list = document.getElementById('customersList');
-    const badge = document.getElementById('customersBadge');
-    if (!data || !data.length) { list.innerHTML = '<div style="text-align:center;padding:18px;color:var(--mute);font-size:12.5px">Jos nemas klijenata. Deli svoj QR kod / link!</div>'; badge.textContent = '0'; return; }
-    badge.textContent = data.length;
-    list.innerHTML = '';
-    data.forEach(function(s){
-      const p = s.products || {};
-      const email = s.customer_email || '—';
-      const myCom = ((s.commission_cents || 0)/100).toFixed(2);
-      const statusColor = s.status === 'confirmed' ? 'var(--lime)' : s.status === 'pending' ? 'var(--gold)' : '#ffb0b8';
-      const statusText = s.status === 'confirmed' ? '✓ aktivan' : s.status === 'pending' ? '⏳ na trial-u' : s.status;
-      const div = document.createElement('div');
-      div.style.cssText = 'display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border-radius:11px;background:rgba(255,255,255,0.03);border:1px solid var(--border);font-size:13px';
-      div.innerHTML = '<div><div style="font-weight:700">' + email + '</div>' +
-        '<div style="font-size:11px;color:var(--mute);margin-top:3px">' + (p.name || p.slug || '') + ' · <span style="color:' + statusColor + '">' + statusText + '</span> · ' + new Date(s.created_at).toLocaleDateString('sr') + '</div></div>' +
-        '<div style="text-align:right"><div style="font-weight:800;color:var(--gold)">+' + myCom + ' €</div><div style="font-size:10.5px;color:var(--mute)">tvoja provizija</div></div>';
-      list.appendChild(div);
-    });
+    const { data } = await supabase.from('sales').select('*, products(name,slug)').eq('athlete_id', athlete.id).order('created_at',{ ascending: false }).limit(200);
+    window.allAthSales = data || [];
+    // Inject filter buttons ako jos nisu
+    if (!document.getElementById('afAll')) {
+      const list = document.getElementById('customersList');
+      if (list && list.parentNode) {
+        const filt = document.createElement('div');
+        filt.style.cssText = 'display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap';
+        filt.innerHTML = '<button class="btn" id="afAll" onclick="setAthFilter(\'all\',this)" style="background:rgba(0,240,255,0.15);color:#00f0ff;border-color:rgba(0,240,255,0.4)">Sve</button><button class="btn" id="afActive" onclick="setAthFilter(\'active\',this)">Aktivni</button><button class="btn" id="afTrial" onclick="setAthFilter(\'trial\',this)">Trial</button><button class="btn" id="afCancel" onclick="setAthFilter(\'cancelled\',this)">Otkazali</button>';
+        list.parentNode.insertBefore(filt, list);
+      }
+    }
+    renderAthCustomers();
   } catch(e){ console.error('customers', e); }
-})();
+}
+loadAthCustomers();
+setInterval(loadAthCustomers, 10000);
+
+// REALTIME — sales za ovog atletu
+try {
+  const chAth = supabase.channel('ath-sales-' + athlete.id)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'athlete_id=eq.' + athlete.id }, function(payload){
+      console.log('[realtime ath] sales:', payload.eventType);
+      loadKPIs(); loadAthCustomers();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'team_referrer_id=eq.' + athlete.id }, function(payload){
+      console.log('[realtime ath team] sales:', payload.eventType);
+      loadKPIs();
+    })
+    .subscribe(function(status){ console.log('[realtime ath] status:', status); });
+  window.addEventListener('beforeunload', function(){ try { chAth.unsubscribe(); } catch(e){} });
+} catch(e){ console.error('[realtime ath] failed:', e); }
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
