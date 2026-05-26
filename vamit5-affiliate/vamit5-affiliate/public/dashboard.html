@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png">
 <link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
 <link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -204,8 +204,9 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 
 <div class="app" id="app" style="display:none">
   <div class="topbar">
-    <div class="brand"><div class="mark"><span>V5</span></div><div><b>VAMIT-5</b><small>Athletes</small></div></div>
-    <div class="streak"><span class="flame">🔥</span> <b id="streakDays">0</b> <span id="streakLabel">dana</span></div>
+    <div class="brand"><img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" style="width:42px;height:42px;object-fit:contain"><div><b>VAMIT-5</b><small>Athletes</small></div></div>
+    <!-- Streak indicator uklonjen — bila je prazna ili lažna vrednost -->
+    <div style="margin-left:auto"></div>
     <div class="user-chip"><div class="avatar" id="userAvatar">??</div><div class="meta"><div class="name" id="userName">...</div><div class="role" id="userRole">REGRUT</div></div></div>
     <button class="btn red" onclick="logout()">Logout</button>
   </div>
@@ -213,8 +214,8 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
   <div id="pushBanner" style="margin-bottom:14px"></div>
   <div id="announce" style="margin-bottom:14px"></div>
 
-  <div class="grid">
-    <div class="hero">
+  <div class="grid" style="display:flex;flex-direction:column;gap:16px">
+    <div class="hero" style="order:1">
       <div class="hero-grid">
         <div>
           <h1 id="greeting">Zdravo!</h1>
@@ -232,22 +233,22 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       </div>
     </div>
 
-    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
+    <div style="order:2;display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:flex-end">
       <span style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;font-weight:700;margin-right:auto">Period:</span>
       <button class="period-btn" data-days="1" onclick="setPeriod(1, this)">Danas</button>
       <button class="period-btn" data-days="7" onclick="setPeriod(7, this)">7 dana</button>
       <button class="period-btn active" data-days="30" onclick="setPeriod(30, this)">30 dana</button>
       <button class="period-btn" data-days="0" onclick="setPeriod(0, this)">Sve</button>
     </div>
-    <div class="kpi-row">
+    <div class="kpi-row" style="order:3">
       <div class="kpi"><div class="ic">✅</div><div class="l" id="kpiL1">Aktivni</div><div class="v" id="kpiSales" style="color:var(--lime)">0</div></div>
       <div class="kpi"><div class="ic">⏳</div><div class="l" id="kpiL2">Trial</div><div class="v" id="kpiTrial" style="color:var(--gold)">0</div></div>
       <div class="kpi"><div class="ic">❌</div><div class="l" id="kpiL3">Otkazali</div><div class="v" id="kpiCancel" style="color:var(--red)">0</div></div>
       <div class="kpi"><div class="ic">💸</div><div class="l" id="kpiL4">Zarada (€)</div><div class="v" id="kpiCommission" style="color:var(--gold)">0</div></div>
     </div>
-    <div style="display:flex;gap:10px;align-items:center;font-size:11px;color:var(--mute);margin-top:-8px;margin-bottom:8px"><span class="live-dot-ath"></span>Live · klikovi: <b style="color:var(--text)" id="kpiClicks">0</b> · poeni: <b style="color:var(--text)" id="kpiXP">0</b><span id="lastRefreshAth" style="margin-left:auto"></span></div>
+    <div style="order:4;display:flex;gap:10px;align-items:center;font-size:11px;color:var(--mute);margin-top:-8px;margin-bottom:8px"><span class="live-dot-ath"></span>Live · klikovi: <b style="color:var(--text)" id="kpiClicks">0</b> · poeni: <b style="color:var(--text)" id="kpiXP">0</b><span id="lastRefreshAth" style="margin-left:auto"></span></div>
 
-    <div class="row2">
+    <div class="row2" style="order:7">
       <div class="card">
         <div class="card-head"><h2><span class="em">🎯</span><span id="chTitle">Dnevni izazovi</span></h2><span class="badge" id="chBadge">0/0</span></div>
         <div class="ch-list" id="chList"><div style="text-align:center;padding:20px;color:var(--mute);font-size:12px">Ucitavanje...</div></div>
@@ -258,17 +259,17 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" style="order:8">
       <div class="card-head"><h2><span class="em">🔗</span><span id="linksTitle">Tvoji affiliate linkovi</span></h2><span class="badge" id="linksSubtitle">DELI ODMAH</span></div>
       <div class="link-grid" id="linkGrid"></div>
     </div>
 
-    <div class="card">
+    <div class="card" style="order:9">
       <div class="card-head"><h2><span class="em">👤</span>Moji klijenti</h2><span class="badge" id="customersBadge">0</span></div>
       <div id="customersList" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
 
-    <div class="card" id="payout-card" style="border:2px solid rgba(255,194,75,0.4);background:linear-gradient(135deg,rgba(255,194,75,0.04),rgba(20,24,42,0.6))">
+    <div class="card" id="payout-card" style="order:5;border:2px solid rgba(255,194,75,0.4);background:linear-gradient(135deg,rgba(255,194,75,0.04),rgba(20,24,42,0.6))">
       <div class="card-head"><h2><span class="em">💸</span>Isplata <span id="ath_lastRefresh" style="color:var(--mute);font-weight:400;font-size:11px"></span></h2><button class="btn" onclick="loadAthletePayoutInfo()" style="padding:6px 12px;font-size:11px;background:rgba(0,240,255,0.15);border:1px solid rgba(0,240,255,0.3);color:var(--brand)">🔄 Refresh</button></div>
       <div style="text-align:center;padding:18px 14px 14px;border-radius:11px;background:rgba(166,255,59,0.06);border:1px solid rgba(166,255,59,0.25);margin-bottom:14px">
         <div style="font-size:11px;color:var(--mute);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px">Neisplaceno trenutno</div>
@@ -292,12 +293,12 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
       </div>
     </div>
 
-    <div class="card">
+    <div class="card" style="order:10">
       <div class="card-head"><h2><span class="em">🏆</span><span id="achTitle">Dostignuca</span></h2><span class="badge" id="achBadge">0/0</span></div>
       <div class="ach-grid" id="achGrid"></div>
     </div>
 
-    <div class="card">
+    <div class="card" style="order:6">
       <div class="card-head"><h2><span class="em">👥</span>Moj tim</h2><span class="badge" id="teamBadge">0 atleta · €0</span></div>
       <div style="padding:16px;border-radius:11px;background:linear-gradient(135deg,rgba(122,91,255,0.12),rgba(0,240,255,0.06));border:1px solid rgba(122,91,255,0.3);margin-bottom:14px;font-size:13px;line-height:1.55">
         <b style="color:var(--brand2);font-size:14px">💰 15% provizija od tvog tima — dozivotno</b>
