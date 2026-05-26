@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VAMIT-5 · Admin</title>
-<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png">
 <style>
 :root{--bg:#05060a;--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--border:rgba(255,255,255,0.08);--brand:#00f0ff;--gold:#ffc24b;--red:#ff4d5e;--green:#a6ff3b}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -54,14 +54,37 @@ input,select,textarea{background:#0a0c14;color:var(--text);border:1px solid var(
 .debt-card{padding:14px;border-radius:12px;background:rgba(10,12,20,0.5);border:1.5px solid;margin-bottom:12px}
 .bank-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin:10px 0;font-size:11.5px}
 code{cursor:pointer;color:var(--brand)}
-@media(max-width:780px){.app{grid-template-columns:1fr}aside nav{display:flex;overflow-x:auto;gap:6px}aside nav button{flex:0 0 auto}aside .meta,aside .logo{display:none}.bank-info{grid-template-columns:1fr}}
+@media(max-width:780px){
+  .app{grid-template-columns:1fr}
+  aside{position:sticky;top:0;z-index:50;background:rgba(10,12,20,0.96);backdrop-filter:blur(20px);padding:10px;border-right:0;border-bottom:1px solid var(--border)}
+  aside .logo{display:flex;margin-bottom:8px;justify-content:space-between;align-items:center}
+  aside .logo b{font-size:13px}
+  aside nav{display:flex;flex-wrap:wrap;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  aside nav button{flex:0 0 auto;padding:7px 11px;font-size:11.5px;min-height:36px;white-space:nowrap;border-radius:7px}
+  aside .meta{display:none}
+  aside .logout-btn{position:absolute;top:8px;right:8px;width:auto;padding:6px 10px;font-size:11px;margin:0}
+  main{padding:14px 12px}
+  h1{font-size:18px;margin-bottom:12px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi{padding:10px}
+  .kpi .value{font-size:18px}
+  .kpi .label{font-size:9.5px}
+  .card{padding:12px;margin-bottom:10px}
+  .card-head h2{font-size:13px}
+  .bank-info{grid-template-columns:1fr}
+  table{font-size:11.5px}
+  th{padding:6px 5px;font-size:9.5px}
+  td{padding:7px 5px}
+  .btn{padding:7px 11px;font-size:11px;min-height:34px}
+  input,select,textarea{font-size:13px;padding:9px 11px}
+}
 </style>
 </head>
 <body>
 <div class="loading" id="loading"><div><div class="spinner"></div><div id="loadStatus">Učitavanje...</div><div id="loadErr" style="color:#ffb0b8;margin-top:10px;font-size:12px"></div></div></div>
 <div class="app">
 <aside>
-<div class="logo"><div class="mark">V5</div><b>ADMIN</b></div>
+<div class="logo"><img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" style="width:36px;height:36px;object-fit:contain"><b>VAMIT-5 · ADMIN</b></div>
 <nav>
 <button class="active" data-section="overview">Overview</button>
 <button data-section="applications">Aplikacije <span class="badge" id="appBadge" style="display:none">0</span></button>
