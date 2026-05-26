@@ -2,7 +2,7 @@
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778337005/VAMIT-5_k3xlfh.jpg">
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png">
 <link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>VAMIT-5 · Organizer Dashboard</title>
@@ -72,8 +72,35 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
 .payout-cta .amount{font-size:36px;font-weight:900;color:var(--gold);letter-spacing:-0.02em;margin:14px 0}
 .payout-cta .btn-payout{padding:14px 32px;font-size:14px;font-weight:900}
 
-@media(max-width:768px){.kpi-row{grid-template-columns:repeat(2,1fr)}.card{padding:16px}}
-@media(max-width:480px){.kpi-row{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:768px){
+  .app{padding:12px 10px 60px}
+  .topbar{gap:8px;padding:8px 0}
+  .brand img{width:34px!important;height:34px!important}
+  .brand b{font-size:13px}
+  .brand small{font-size:9.5px}
+  .user-chip{padding:4px 9px;font-size:11px}
+  .hero{padding:16px}
+  .hero h1{font-size:18px}
+  .hero p{font-size:12.5px}
+  .kpi-row{grid-template-columns:repeat(2,1fr);gap:8px}
+  .kpi{padding:11px}
+  .kpi .v{font-size:18px}
+  .kpi .l{font-size:9.5px}
+  .card{padding:14px}
+  .card-head h2{font-size:13px}
+  .payout-cta{padding:16px}
+  .payout-cta .amount{font-size:28px}
+  .payout-cta h3{font-size:15px}
+  table{font-size:11.5px;min-width:0}
+  th{padding:6px 5px;font-size:9.5px}
+  td{padding:7px 5px}
+  .btn{padding:8px 12px;font-size:11.5px}
+  .po-i{font-size:13px;padding:9px 11px}
+}
+@media(max-width:480px){
+  .kpi-row{grid-template-columns:repeat(2,1fr)}
+  .kpi:nth-child(5){grid-column:span 2}
+}
 </style>
 </head>
 <body>
@@ -89,7 +116,7 @@ td{padding:11px 12px;border-bottom:1px solid rgba(255,255,255,0.04)}
 
 <div class="app" id="app" style="display:none">
   <div class="topbar">
-    <div class="brand"><div class="mark">EVENT</div><div><b>VAMIT-5 ORGANIZER</b><small>Dashboard</small></div></div>
+    <div class="brand"><img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" style="width:42px;height:42px;object-fit:contain"><div><b id="brandOrgPromo">VAMIT-5</b><small id="brandOrgName">Organizer Dashboard</small></div></div>
     <div class="user-chip"><span class="name" id="orgName">...</span></div>
     <button class="btn red" onclick="logout()">Logout</button>
   </div>
@@ -195,6 +222,9 @@ const firstName = (organizer.full_name || '').split(' ')[0];
 document.getElementById('orgName').textContent = organizer.full_name;
 document.getElementById('orgFirstName').textContent = firstName || 'organizer';
 document.getElementById('orgPromo').textContent = organizer.promo_code;
+// Brand u topbaru — pokazuje promo kod + ime
+if (document.getElementById('brandOrgPromo')) document.getElementById('brandOrgPromo').textContent = organizer.promo_code;
+if (document.getElementById('brandOrgName')) document.getElementById('brandOrgName').textContent = organizer.full_name;
 document.getElementById('orgPct').textContent = (organizer.commission_pct * 100).toFixed(0) + '%';
 
 // Pre-fill payout fields
