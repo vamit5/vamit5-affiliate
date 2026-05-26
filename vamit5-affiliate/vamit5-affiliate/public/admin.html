@@ -54,15 +54,20 @@ input,select,textarea{background:#0a0c14;color:var(--text);border:1px solid var(
 .debt-card{padding:14px;border-radius:12px;background:rgba(10,12,20,0.5);border:1.5px solid;margin-bottom:12px}
 .bank-info{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin:10px 0;font-size:11.5px}
 code{cursor:pointer;color:var(--brand)}
+.mobile-bar{display:none;position:sticky;top:0;z-index:100;background:rgba(10,12,20,0.95);backdrop-filter:blur(20px);padding:10px 14px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)}
+.mobile-bar .mobile-brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:14px}
+.mobile-bar .mobile-brand img{width:30px;height:30px;object-fit:contain}
+.hamburger{width:42px;height:42px;border-radius:10px;background:rgba(0,240,255,0.1);border:1px solid rgba(0,240,255,0.3);color:var(--brand);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:20px;padding:0}
+.mobile-menu{display:none;position:fixed;inset:0;z-index:99;background:rgba(5,6,10,0.96);backdrop-filter:blur(16px);padding:70px 18px 18px;overflow-y:auto}
+.mobile-menu.open{display:block}
+.mobile-menu button{display:block;width:100%;padding:14px 16px;margin-bottom:6px;border-radius:11px;background:rgba(255,255,255,0.04);color:var(--text);border:1px solid var(--border);font-family:inherit;font-size:14px;font-weight:600;text-align:left;cursor:pointer}
+.mobile-menu button.active{background:rgba(0,240,255,0.15);color:var(--brand);border-color:rgba(0,240,255,0.4)}
+.mobile-menu .close-x{position:absolute;top:14px;right:14px;width:42px;height:42px;border-radius:10px;background:rgba(255,77,94,0.15);border:1px solid rgba(255,77,94,0.3);color:#ffb0b8;font-size:22px;cursor:pointer}
+.mobile-menu .logout-mobile{margin-top:14px;background:rgba(255,77,94,0.12);border-color:rgba(255,77,94,0.3);color:#ffb0b8}
 @media(max-width:780px){
-  .app{grid-template-columns:1fr}
-  aside{position:sticky;top:0;z-index:50;background:rgba(10,12,20,0.96);backdrop-filter:blur(20px);padding:10px;border-right:0;border-bottom:1px solid var(--border)}
-  aside .logo{display:flex;margin-bottom:8px;justify-content:space-between;align-items:center}
-  aside .logo b{font-size:13px}
-  aside nav{display:flex;flex-wrap:wrap;gap:5px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-  aside nav button{flex:0 0 auto;padding:7px 11px;font-size:11.5px;min-height:36px;white-space:nowrap;border-radius:7px}
-  aside .meta{display:none}
-  aside .logout-btn{position:absolute;top:8px;right:8px;width:auto;padding:6px 10px;font-size:11px;margin:0}
+  .app{display:block}
+  aside{display:none}
+  .mobile-bar{display:flex}
   main{padding:14px 12px}
   h1{font-size:18px;margin-bottom:12px}
   .kpi-grid{grid-template-columns:repeat(2,1fr);gap:8px}
@@ -75,13 +80,37 @@ code{cursor:pointer;color:var(--brand)}
   table{font-size:11.5px}
   th{padding:6px 5px;font-size:9.5px}
   td{padding:7px 5px}
-  .btn{padding:7px 11px;font-size:11px;min-height:34px}
-  input,select,textarea{font-size:13px;padding:9px 11px}
+  .btn{padding:8px 12px;font-size:12px;min-height:36px}
+  input,select,textarea{font-size:14px;padding:10px 12px}
 }
 </style>
 </head>
 <body>
 <div class="loading" id="loading"><div><div class="spinner"></div><div id="loadStatus">Učitavanje...</div><div id="loadErr" style="color:#ffb0b8;margin-top:10px;font-size:12px"></div></div></div>
+
+<!-- Mobile top bar — vidljiv samo na <780px -->
+<div class="mobile-bar">
+  <div class="mobile-brand"><img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5">VAMIT-5 Admin</div>
+  <button class="hamburger" onclick="toggleMobileMenu()" aria-label="Menu">☰</button>
+</div>
+
+<!-- Mobile menu overlay -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="close-x" onclick="toggleMobileMenu()" aria-label="Close">✕</button>
+  <button data-section-mobile="overview">Overview</button>
+  <button data-section-mobile="applications">Aplikacije <span class="badge" id="appBadgeMobile" style="display:none">0</span></button>
+  <button data-section-mobile="athletes">Atlete</button>
+  <button data-section-mobile="organizers">Organizatori</button>
+  <button data-section-mobile="customers">Klijenti</button>
+  <button data-section-mobile="sales">Prodaje</button>
+  <button data-section-mobile="debts">💰 Dugovanja <span class="badge" id="debtsBadgeMobile" style="display:none;background:var(--gold);color:#0a0c14">0</span></button>
+  <button data-section-mobile="reports">📊 Izvestaji</button>
+  <button data-section-mobile="events">📅 Eventi</button>
+  <button data-section-mobile="payouts">Zahtevi <span class="badge" id="payoutBadgeMobile" style="display:none">0</span></button>
+  <button data-section-mobile="notify">🔔 Notifikacije</button>
+  <button class="logout-mobile" onclick="logout()">Logout</button>
+</div>
+
 <div class="app">
 <aside>
 <div class="logo"><img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" style="width:36px;height:36px;object-fit:contain"><b>VAMIT-5 · ADMIN</b></div>
@@ -251,25 +280,46 @@ try{const r=await supabase.from('admins').select('*').eq('email',session.user.em
 if(!adminData){alert('Nisi admin');location.replace('/dashboard.html');throw new Error('Not admin');}
 $('adminEmail').textContent=adminData.email;hide();
 
-// NAV
-document.querySelectorAll('aside nav button').forEach(function(b){b.addEventListener('click',function(){
-  const sec=b.getAttribute('data-section');
-  document.querySelectorAll('aside nav button').forEach(function(x){x.classList.remove('active');});
-  b.classList.add('active');
+// NAV — radi i za sidebar (desktop) i za mobile menu
+window.switchSection = function(sec){
+  document.querySelectorAll('aside nav button, .mobile-menu button[data-section-mobile]').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('aside nav button[data-section="'+sec+'"], .mobile-menu button[data-section-mobile="'+sec+'"]').forEach(function(x){x.classList.add('active');});
   document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
-  $('sec-'+sec).classList.add('active');
-  $('sectionTitle').textContent=b.textContent.trim().replace(/\s+\d+$/,'');
-  if(sec==='applications')loadApplications();
-  if(sec==='athletes')loadAthletes();
-  if(sec==='organizers')loadOrganizers();
-  if(sec==='customers')loadCustomers();
-  if(sec==='sales'){initSalesFilters();loadSales();}
-  if(sec==='debts')loadDebts();
-  if(sec==='reports')initReportFilters();
-  if(sec==='events')loadEvents();
-  if(sec==='payouts'){loadOrgPayouts();loadAthPayouts();}
-  if(sec==='notify'){loadNotifHistory();}
-});});
+  var t = $('sec-'+sec); if (t) t.classList.add('active');
+  var btn = document.querySelector('aside nav button[data-section="'+sec+'"]');
+  if (btn) $('sectionTitle').textContent = btn.textContent.trim().replace(/\s+\d+$/,'');
+  if (sec==='applications')loadApplications();
+  if (sec==='athletes')loadAthletes();
+  if (sec==='organizers')loadOrganizers();
+  if (sec==='customers')loadCustomers();
+  if (sec==='sales'){initSalesFilters();loadSales();}
+  if (sec==='debts')loadDebts();
+  if (sec==='reports')initReportFilters();
+  if (sec==='events')loadEvents();
+  if (sec==='payouts'){loadOrgPayouts();loadAthPayouts();}
+  if (sec==='notify'){loadNotifHistory();}
+  // zatvori mobile menu
+  var mm = document.getElementById('mobileMenu');
+  if (mm) mm.classList.remove('open');
+};
+document.querySelectorAll('aside nav button').forEach(function(b){
+  b.addEventListener('click', function(){ switchSection(b.getAttribute('data-section')); });
+});
+document.querySelectorAll('.mobile-menu button[data-section-mobile]').forEach(function(b){
+  b.addEventListener('click', function(){ switchSection(b.getAttribute('data-section-mobile')); });
+});
+window.toggleMobileMenu = function(){
+  var mm = document.getElementById('mobileMenu');
+  if (mm) mm.classList.toggle('open');
+};
+function syncMobileBadges(){
+  ['app','debts','payout'].forEach(function(k){
+    var src = document.getElementById(k+'Badge');
+    var dst = document.getElementById(k+'BadgeMobile');
+    if (src && dst) { dst.textContent = src.textContent; dst.style.display = src.style.display; }
+  });
+}
+setInterval(syncMobileBadges, 2000);
 
 window.sendNotif=async function(){
   const t=$('notifTitle').value.trim(), b=$('notifBody').value.trim(), u=$('notifUrl').value.trim(), tier=$('notifTier').value;
