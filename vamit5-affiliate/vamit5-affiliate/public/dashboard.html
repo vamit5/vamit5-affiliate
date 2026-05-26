@@ -416,7 +416,11 @@ const tier = TIER[athlete.tier] || TIER.recruit;
 document.getElementById('userName').textContent = athlete.full_name || athlete.email;
 document.getElementById('userRole').textContent = tier.name;
 document.getElementById('userAvatar').textContent = (athlete.full_name || '??').split(' ').map(function(s){ return s[0]; }).slice(0,2).join('').toUpperCase();
-document.getElementById('streakDays').textContent = athlete.current_streak || 0;
+// Streak indicator je uklonjen iz HTML-a — null-safe check
+(function(){
+  var _sd = document.getElementById('streakDays');
+  if (_sd) _sd.textContent = athlete.current_streak || 0;
+})();
 const firstName = (athlete.full_name || '').split(' ')[0];
 
 // Editable: motivational quote (random)
