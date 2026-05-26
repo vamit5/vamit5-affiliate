@@ -201,6 +201,18 @@ body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;bac
 </head>
 <body>
 <div class="loading" id="loading"><div class="lbox"><div class="spinner"></div><div class="status" id="loadStatus">Ucitavanje...</div><div class="err" id="loadErr"></div><button class="reset-btn" id="resetBtn" onclick="localStorage.clear();sessionStorage.clear();location.href='/login.html'">Resetuj sesiju</button></div></div>
+<script>
+// Failsafe — sakrij spinner posle 7s i prikazi app
+setTimeout(function(){
+  var el = document.getElementById('loading');
+  var app = document.getElementById('app');
+  if (el && !el.classList.contains('hidden')) { el.classList.add('hidden'); if (app) app.style.display='block'; }
+}, 7000);
+window.addEventListener('error', function(e){
+  var le = document.getElementById('loadErr');
+  if (le) { le.textContent = 'JS: ' + (e.message||'err'); le.classList.add('show'); }
+});
+</script>
 
 <div class="app" id="app" style="display:none">
   <div class="topbar">
@@ -487,9 +499,15 @@ async function loadKPIs(){
   try {
     const myPromo = (athlete.promo_code || '').toUpperCase();
     let clicksQ = supabase.from('clicks').select('id', { count:'exact', head:true }).eq('athlete_id', athlete.id);
-    // FILTER PO PROMO CODE — vidim sve prijave sa mojim promo, bez obzira sto je u athlete_id polju
-    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,cancelled_at,created_at,athlete_id,promo_code')
-      .or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id);
+    // FILTER PO PROMO CODE + athlete_id — safe even ako je promo prazan
+    let salesQ = supabase.from('sales').select('commission_cents,team_commission_cents,status,cancelled_at,created_at,athlete_id,promo_code');
+    if (myPromo && athlete.id) {
+      salesQ = salesQ.or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id);
+    } else if (myPromo) {
+      salesQ = salesQ.eq('promo_code', myPromo);
+    } else if (athlete.id) {
+      salesQ = salesQ.eq('athlete_id', athlete.id);
+    }
     if (window.currentPeriodDays > 0) {
       const since = new Date(Date.now() - window.currentPeriodDays * 86400000).toISOString();
       clicksQ = clicksQ.gte('created_at', since);
@@ -989,9 +1007,17 @@ function renderAthCustomers(){
 async function loadAthCustomers(){
   try {
     const myPromo = (athlete.promo_code || '').toUpperCase();
-    const { data } = await supabase.from('sales').select('*, products(name,slug)')
-      .or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id)
-      .order('created_at',{ ascending: false }).limit(200);
+    let q = supabase.from('sales').select('*, products(name,slug)');
+    if (myPromo && athlete.id) {
+      q = q.or('promo_code.eq.' + myPromo + ',athlete_id.eq.' + athlete.id);
+    } else if (myPromo) {
+      q = q.eq('promo_code', myPromo);
+    } else if (athlete.id) {
+      q = q.eq('athlete_id', athlete.id);
+    } else {
+      q = q.eq('id', '00000000-0000-0000-0000-000000000000'); // ne vraca nista
+    }
+    const { data } = await q.order('created_at',{ ascending: false }).limit(200);
     window.allAthSales = data || [];
     // Inject filter buttons ako jos nisu
     if (!document.getElementById('afAll')) {
@@ -1009,25 +1035,27 @@ async function loadAthCustomers(){
 loadAthCustomers();
 setInterval(loadAthCustomers, 10000);
 
-// REALTIME — sales sa mojim promo kodom ILI athlete_id
-try {
-  const myPromo = (athlete.promo_code || '').toUpperCase();
-  const chAth = supabase.channel('ath-sales-' + athlete.id)
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'promo_code=eq.' + myPromo }, function(payload){
-      console.log('[realtime ath promo] sales:', payload.eventType);
-      loadKPIs(); loadAthCustomers();
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'athlete_id=eq.' + athlete.id }, function(payload){
-      console.log('[realtime ath id] sales:', payload.eventType);
-      loadKPIs(); loadAthCustomers();
+// REALTIME — sales sa mojim promo kodom ILI athlete_id (safe)
+(function setupRealtime(){
+  try {
+    const myPromo = (athlete.promo_code || '').toUpperCase();
+    if (!athlete.id) return;
+    let ch = supabase.channel('ath-sales-' + athlete.id);
+    if (myPromo) {
+      ch = ch.on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'promo_code=eq.' + myPromo }, function(payload){
+        try { loadKPIs(); loadAthCustomers(); } catch(e){}
+      });
+    }
+    ch = ch.on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'athlete_id=eq.' + athlete.id }, function(payload){
+      try { loadKPIs(); loadAthCustomers(); } catch(e){}
     })
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sales', filter: 'team_referrer_id=eq.' + athlete.id }, function(payload){
-      console.log('[realtime ath team] sales:', payload.eventType);
-      loadKPIs();
+      try { loadKPIs(); } catch(e){}
     })
-    .subscribe(function(status){ console.log('[realtime ath] status:', status); });
-  window.addEventListener('beforeunload', function(){ try { chAth.unsubscribe(); } catch(e){} });
-} catch(e){ console.error('[realtime ath] failed:', e); }
+    .subscribe(function(status){ console.log('[realtime ath]', status); });
+    window.addEventListener('beforeunload', function(){ try { ch.unsubscribe(); } catch(e){} });
+  } catch(e){ console.error('[realtime ath] failed:', e); }
+})();
 
 document.getElementById('loading').classList.add('hidden');
 document.getElementById('app').style.display = 'block';
