@@ -225,6 +225,18 @@ code{cursor:pointer;color:var(--brand)}
 </div>
 
 <div class="section" id="sec-notify">
+
+<!-- BACKFILL PROMO CODES -->
+<div class="card" style="border-color:rgba(255,194,75,0.4);background:linear-gradient(135deg,rgba(255,194,75,0.05),rgba(20,24,42,0.6))">
+<div class="card-head"><h2>🔄 Backfill Promo Codes</h2></div>
+<div style="padding:10px;background:rgba(255,194,75,0.07);border:1px solid rgba(255,194,75,0.25);border-radius:8px;font-size:12.5px;color:var(--dim);margin-bottom:12px;line-height:1.55">
+Pokreni ovo da bi sve postojeće <b>sales</b> sa pogrešnim promo kodom (npr. sve "VAMIT" iz TOURDEFRUSKA test-a) <b>ponovo pitao Stripe</b> za stvarni promo kod koji je customer koristio. Trajanje: 30-90 sekundi.
+</div>
+<button class="btn gold" id="backfillBtn" onclick="runBackfill()" style="padding:12px 24px;font-size:14px;font-weight:800">🔄 Pokreni backfill (cita Stripe za svaku prijavu)</button>
+<div id="backfillMsg" style="margin-top:12px;font-size:13px;line-height:1.5"></div>
+<pre id="backfillDetails" style="margin-top:10px;padding:10px;background:#0a0c14;border-radius:8px;font-size:11px;color:var(--dim);max-height:300px;overflow:auto;display:none"></pre>
+</div>
+
 <div class="card" style="border-color:rgba(0,240,255,0.35)">
 <div class="card-head"><h2>🔔 Pošalji push notifikaciju atletama</h2></div>
 <div style="padding:10px;background:rgba(0,240,255,0.06);border:1px solid rgba(0,240,255,0.2);border-radius:8px;font-size:12px;color:var(--dim);margin-bottom:12px;line-height:1.5">Stiže na sve atlete koji su uključili notifikacije u svom dashboardu (klik na 🔔 banner).</div>
@@ -320,6 +332,34 @@ function syncMobileBadges(){
   });
 }
 setInterval(syncMobileBadges, 2000);
+
+window.runBackfill=async function(){
+  const btn=$('backfillBtn'), msg=$('backfillMsg'), det=$('backfillDetails');
+  if(!confirm('Pokreni backfill? Ovo cita Stripe za sve postojece prijave i azurira promo kodove. Traje 30-90 sec.'))return;
+  btn.disabled=true; btn.style.opacity='0.5'; btn.textContent='⏳ Backfill u toku...';
+  msg.innerHTML='<span style="color:var(--brand)">Cita Stripe za svaki sale...</span>';
+  det.style.display='none';
+  try{
+    const{data,error}=await supabase.functions.invoke('backfill-promo-codes',{body:{}});
+    if(error){msg.innerHTML='<span style="color:#ffb0b8">Greška: '+(error.message||'unknown')+'</span>';btn.disabled=false;btn.style.opacity='1';btn.textContent='🔄 Pokreni backfill';return;}
+    const total=data&&data.total||0, updated=data&&data.updated||0, lost=data&&data.lost||0, errors=data&&data.errors||0;
+    msg.innerHTML='<span style="color:var(--green)">✓ Gotovo!</span><br>'+
+      '<b>Total proveren:</b> '+total+'<br>'+
+      '<b style="color:var(--green)">Popravljeno:</b> '+updated+'<br>'+
+      '<b style="color:#ffc24b">Ne moze recover (Stripe nije sacuvao kod):</b> '+lost+'<br>'+
+      '<b style="color:#ff4d5e">Greske:</b> '+errors;
+    if(data&&data.recovered&&data.recovered.length){
+      det.style.display='block';
+      det.textContent=JSON.stringify(data.recovered,null,2);
+    }
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔄 Pokreni ponovo';
+    // Refresh sve dashboard sekcije
+    try{loadOverview();loadSales();loadAthletes();}catch(e){}
+  }catch(e){
+    msg.innerHTML='<span style="color:#ffb0b8">Greška: '+e.message+'</span>';
+    btn.disabled=false;btn.style.opacity='1';btn.textContent='🔄 Pokreni backfill';
+  }
+};
 
 window.sendNotif=async function(){
   const t=$('notifTitle').value.trim(), b=$('notifBody').value.trim(), u=$('notifUrl').value.trim(), tier=$('notifTier').value;
