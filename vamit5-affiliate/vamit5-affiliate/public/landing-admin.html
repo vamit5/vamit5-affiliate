@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>VAMIT-5 · Landing Admin</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" />
+<style>
+:root{--bg:#05060a;--bg1:#0a0c14;--surface:rgba(20,24,42,0.65);--text:#e9ecff;--dim:#9aa0c4;--mute:#626890;--brand:#00f0ff;--brand2:#7a5bff;--gold:#ffc24b;--lime:#a6ff3b;--red:#ff4d5e;--border:rgba(255,255,255,0.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(900px 500px at 30% 20%,rgba(122,91,255,0.3),transparent 60%),radial-gradient(700px 400px at 70% 80%,rgba(0,240,255,0.2),transparent 60%)}
+.loading{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:9999;text-align:center;padding:20px}
+.loading.hidden{display:none}
+.spinner{width:36px;height:36px;border:3px solid rgba(255,255,255,0.1);border-top-color:var(--brand);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.wrap{max-width:1200px;margin:0 auto;padding:18px 20px 80px}
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:24px;padding:14px 0;border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px}
+.logo img{width:36px;height:36px;object-fit:contain}
+.logo b{font-size:15px;font-weight:900}
+.logo small{display:block;font-size:9.5px;color:var(--mute);text-transform:uppercase;letter-spacing:0.18em}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.btn{padding:9px 16px;border-radius:9px;border:none;cursor:pointer;font-family:inherit;font-weight:700;font-size:13px}
+.btn.brand{background:linear-gradient(135deg,#00f0ff,#7a5bff);color:#0a0c14}
+.btn.gold{background:linear-gradient(135deg,#ffc24b,#ff8a3b);color:#0a0c14}
+.btn.ghost{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid var(--border)}
+.btn.red{background:rgba(255,77,94,0.15);color:#ffb0b8;border:1px solid rgba(255,77,94,0.3)}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.savebar{position:sticky;top:0;z-index:50;background:rgba(10,12,20,0.96);backdrop-filter:blur(20px);padding:14px;border-radius:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;border:1px solid var(--border);box-shadow:0 12px 30px -10px rgba(0,0,0,0.5)}
+.savebar .status{font-size:12.5px;color:var(--dim)}
+.savebar .status.dirty{color:var(--gold)}
+.savebar .status.ok{color:var(--lime)}
+.savebar .status.err{color:#ffb0b8}
+.sections-nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px}
+.sections-nav button{padding:7px 13px;font-size:12px;border-radius:8px;background:rgba(255,255,255,0.04);color:var(--dim);border:1px solid var(--border);cursor:pointer;font-family:inherit;font-weight:700}
+.sections-nav button.active{background:rgba(0,240,255,0.15);color:var(--brand);border-color:rgba(0,240,255,0.4)}
+.section-block{background:var(--surface);backdrop-filter:blur(16px);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:18px}
+.section-block h2{font-size:14px;font-weight:900;color:var(--brand);text-transform:uppercase;letter-spacing:0.18em;margin-bottom:18px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.field{margin-bottom:18px}
+.field label{display:block;font-size:11.5px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.06em}
+.field input,.field textarea{width:100%;background:#0a0c14;color:var(--text);border:1px solid var(--border);padding:11px 14px;border-radius:9px;font-family:inherit;font-size:14px;outline:none;transition:border-color 0.2s}
+.field input:focus,.field textarea:focus{border-color:var(--brand)}
+.field textarea{min-height:80px;resize:vertical;font-family:inherit;line-height:1.5}
+.field .hint{font-size:11px;color:var(--mute);margin-top:4px;font-style:italic}
+.field.image{display:grid;grid-template-columns:1fr 110px;gap:10px;align-items:start}
+.field.image .preview{width:110px;height:90px;border-radius:9px;background:#0a0c14;border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.field.image .preview img{width:100%;height:100%;object-fit:cover}
+.field.image .preview .noimg{font-size:10px;color:var(--mute);text-align:center;padding:4px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:680px){.field.image{grid-template-columns:1fr}.field.image .preview{width:100%;height:140px}.field-row{grid-template-columns:1fr}}
+.empty{padding:30px;text-align:center;color:var(--mute);font-style:italic}
+</style>
+</head>
+<body>
+<div class="loading" id="loading"><div><div class="spinner"></div><div id="loadStatus">Učitavanje admina...</div><div id="loadErr" style="color:#ffb0b8;margin-top:10px;font-size:12px"></div><button onclick="document.getElementById('loading').classList.add('hidden')" style="margin-top:12px;padding:6px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#e9ecff;border-radius:8px;cursor:pointer;font-size:11px">Sakrij spinner</button></div></div>
+<script>
+// FAILSAFE — OVO uvek radi cak i ako module skript ne ucita
+setTimeout(function(){
+  var el = document.getElementById('loading');
+  if (el && !el.classList.contains('hidden')) {
+    el.classList.add('hidden');
+    console.warn('Failsafe triggered — loading hidden after 5s');
+  }
+}, 5000);
+window.addEventListener('error', function(e){
+  var le = document.getElementById('loadErr');
+  if (le) le.textContent = 'JS: ' + (e.message || 'error');
+  var el = document.getElementById('loading');
+  if (el) el.classList.add('hidden');
+});
+window.addEventListener('unhandledrejection', function(e){
+  var le = document.getElementById('loadErr');
+  if (le) le.textContent = 'Promise: ' + (e.reason && e.reason.message || e.reason || 'rejected');
+  var el = document.getElementById('loading');
+  if (el) el.classList.add('hidden');
+});
+</script>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="logo">
+      <img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" />
+      <div><b>VAMIT-5 · Landing Admin</b><small id="adminEmail">...</small></div>
+    </div>
+    <div class="actions">
+      <a href="/" target="_blank" class="btn ghost">↗ Preview sajt</a>
+      <a href="/admin.html" class="btn ghost">← Admin dashboard</a>
+      <button class="btn red" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="savebar">
+    <div class="status" id="saveStatus">✓ Sve sačuvano</div>
+    <button class="btn brand" id="saveAllBtn" onclick="saveAll()" disabled>💾 Sačuvaj promene</button>
+  </div>
+
+  <div class="sections-nav" id="sectionsNav"></div>
+
+  <div id="content"></div>
+</div>
+
+<script src="/config.js"></script>
+<script type="module">
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+const supabase = createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY, { auth: { flowType:'implicit', detectSessionInUrl:true, persistSession:true, autoRefreshToken:true } });
+const $ = id => document.getElementById(id);
+const hide = () => { var el = $('loading'); if (el) el.classList.add('hidden'); };
+window.logout = async function(){ try { await supabase.auth.signOut(); } catch(e){} location.replace('/login.html'); };
+
+// Failsafe — sakrij spinner posle 5s u svakom slučaju
+setTimeout(function(){ var el = $('loading'); if (el && !el.classList.contains('hidden')) { hide(); var le = $('loadErr'); if (le && !le.textContent) le.textContent = 'Timeout — proveri konzolu (F12)'; } }, 5000);
+window.addEventListener('error', function(e){ var le = $('loadErr'); if (le) le.textContent = 'JS: ' + (e.message || 'error'); hide(); });
+
+function showErr(msg){ var le = $('loadErr'); if (le) le.textContent = msg; hide(); }
+
+// Auth — ako zapne, sakrij i prikaži grešku
+let session = null;
+try {
+  const r = await Promise.race([
+    supabase.auth.getSession(),
+    new Promise(rs => setTimeout(() => rs({data:{session:null}}), 3500))
+  ]);
+  session = r.data && r.data.session;
+} catch(e) { showErr('Auth err: ' + e.message); throw e; }
+if (!session) { hide(); location.replace('/login.html'); throw new Error('No session'); }
+
+let admin = null;
+try {
+  const r = await supabase.from('admins').select('*').eq('email', session.user.email).maybeSingle();
+  if (r.error) throw r.error;
+  admin = r.data;
+} catch(e) { showErr('Admin lookup err: ' + e.message); throw e; }
+if (!admin) { showErr('Nisi admin'); alert('Nisi admin'); setTimeout(() => location.replace('/dashboard.html'), 500); throw new Error('Not admin'); }
+$('adminEmail').textContent = admin.email;
+
+// Load content
+let content = [];
+let dirty = {};
+try {
+  const r = await supabase.from('landing_content').select('*').order('section').order('ord');
+  if (r.error) throw r.error;
+  content = r.data || [];
+} catch(e) { showErr('Load content err: ' + e.message); throw e; }
+
+hide();
+
+if (!content.length) {
+  $('content').innerHTML = '<div class="empty">Nema sadržaja u bazi.<br><br>Pokreni <b>SQL-LANDING-CONTENT.sql</b> u Supabase pa osveži stranicu.</div>';
+} else {
+  renderAdmin();
+}
+
+function renderAdmin(){
+  // Group by section preserving order
+  const groups = {};
+  const sectionOrder = [];
+  content.forEach(c => {
+    if (!groups[c.section]) { groups[c.section] = []; sectionOrder.push(c.section); }
+    groups[c.section].push(c);
+  });
+
+  // Sections nav
+  $('sectionsNav').innerHTML = sectionOrder.map((s, i) =>
+    `<button onclick="jumpTo('${s.replace(/'/g,"\\'")}')" class="${i===0?'active':''}" data-sec="${s}">${s}</button>`
+  ).join('');
+
+  // Content
+  let html = '';
+  sectionOrder.forEach(sec => {
+    html += `<div class="section-block" id="sec-${sec.replace(/[^a-zA-Z0-9]/g,'-')}"><h2>${sec}</h2>`;
+    groups[sec].forEach(item => {
+      html += renderField(item);
+    });
+    html += `</div>`;
+  });
+  $('content').innerHTML = html;
+
+  // Attach change listeners
+  document.querySelectorAll('[data-key]').forEach(el => {
+    el.addEventListener('input', () => {
+      const key = el.getAttribute('data-key');
+      const newVal = el.value;
+      const original = content.find(c => c.key === key);
+      if (original && original.value !== newVal) { dirty[key] = newVal; }
+      else { delete dirty[key]; }
+      updateDirtyState();
+      // Live preview za image_url
+      if (el.dataset.type === 'image_url') updateImgPreview(key, newVal);
+    });
+  });
+  updateDirtyState();
+}
+
+function renderField(item){
+  const label = item.label || item.key;
+  const val = (item.value || '').replace(/"/g, '&quot;');
+  const type = item.type;
+  if (type === 'textarea') {
+    return `<div class="field"><label>${label}</label><textarea data-key="${item.key}" data-type="textarea">${item.value || ''}</textarea><div class="hint">key: <code>${item.key}</code></div></div>`;
+  }
+  if (type === 'image_url') {
+    return `<div class="field image">
+      <div><label>${label}</label>
+        <input type="text" data-key="${item.key}" data-type="image_url" value="${val}" placeholder="https://..." />
+        <div class="hint">key: <code>${item.key}</code> · Možeš upload na <a href="https://cloudinary.com/" target="_blank" style="color:var(--brand)">cloudinary.com</a> i copy URL</div>
+      </div>
+      <div class="preview" id="prev-${item.key}">${item.value ? `<img src="${val}" alt="" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=noimg>nije ucitano</div>'" />` : '<div class="noimg">nema</div>'}</div>
+    </div>`;
+  }
+  return `<div class="field"><label>${label}</label><input type="text" data-key="${item.key}" data-type="text" value="${val}" /><div class="hint">key: <code>${item.key}</code></div></div>`;
+}
+
+function updateImgPreview(key, url){
+  const prev = document.getElementById('prev-' + key);
+  if (!prev) return;
+  if (!url) { prev.innerHTML = '<div class="noimg">nema</div>'; return; }
+  prev.innerHTML = `<img src="${url}" alt="" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=noimg>nije ucitano</div>'" />`;
+}
+
+function updateDirtyState(){
+  const n = Object.keys(dirty).length;
+  const status = $('saveStatus');
+  const btn = $('saveAllBtn');
+  if (n === 0) {
+    status.textContent = '✓ Sve sačuvano';
+    status.className = 'status ok';
+    btn.disabled = true;
+    btn.textContent = '💾 Sačuvaj promene';
+  } else {
+    status.textContent = '● ' + n + ' polje(a) neasačuvano';
+    status.className = 'status dirty';
+    btn.disabled = false;
+    btn.textContent = '💾 Sačuvaj ' + n + ' promene';
+  }
+}
+
+window.saveAll = async function(){
+  const btn = $('saveAllBtn');
+  const status = $('saveStatus');
+  const keys = Object.keys(dirty);
+  if (!keys.length) return;
+  btn.disabled = true;
+  status.textContent = 'Snimanje ' + keys.length + ' promena...';
+  status.className = 'status';
+  let saved = 0, failed = 0;
+  for (const key of keys) {
+    try {
+      const { error } = await supabase.from('landing_content').update({ value: dirty[key] }).eq('key', key);
+      if (error) { failed++; console.error(key, error); }
+      else { saved++; const idx = content.findIndex(c => c.key === key); if (idx >= 0) content[idx].value = dirty[key]; }
+    } catch(e){ failed++; console.error(key, e); }
+  }
+  dirty = {};
+  if (failed > 0) {
+    status.textContent = '✗ ' + saved + ' sačuvano · ' + failed + ' greška';
+    status.className = 'status err';
+  } else {
+    status.textContent = '✓ ' + saved + ' polja sačuvano · landing će update u 1-2s';
+    status.className = 'status ok';
+  }
+  btn.disabled = true;
+  btn.textContent = '💾 Sačuvaj promene';
+};
+
+window.jumpTo = function(sec){
+  const el = document.getElementById('sec-' + sec.replace(/[^a-zA-Z0-9]/g,'-'));
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.sections-nav button').forEach(b => b.classList.toggle('active', b.dataset.sec === sec));
+};
+
+// Warn before unload if dirty
+window.addEventListener('beforeunload', function(e){
+  if (Object.keys(dirty).length > 0) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+</script>
+</body>
+</html>
