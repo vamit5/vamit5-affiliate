@@ -121,15 +121,18 @@ const RAW = {
   e: "v1781473688/IMG_1498_np3egl.jpg",
   f: "v1781473687/IMG_0788_w7qzng.jpg",
 };
-// FULL = nikad ne seče, prikazuje celu sliku (manja širina = manja slika)
-const full = (k) => `${BASE}/c_limit,w_900,q_auto,f_auto/${RAW[k]}`;
-// PORT = za grid kartice, koristi face-focus 3:4 (više tela vidljivo)
-const port = (k) => `${BASE}/c_fill,g_faces:center,ar_3:4,w_500,q_auto,f_auto/${RAW[k]}`;
+// 3 formata, svaki sa face-aware crop-om (Cloudinary garantuje da glave ostaju)
+// container i Cloudinary crop imaju ISTI aspect → bez praznog prostora oko slike
+const wide = (k) => `${BASE}/c_fill,g_auto:faces,ar_3:2,w_900,q_auto,f_auto/${RAW[k]}`; // 3:2 za banner-e
+const port = (k) => `${BASE}/c_fill,g_auto:faces,ar_3:4,w_500,q_auto,f_auto/${RAW[k]}`; // 3:4 za grid portrete
+const med = (k) => `${BASE}/c_fill,g_auto:faces,ar_4:3,w_700,q_auto,f_auto/${RAW[k]}`;  // 4:3 za ELITE i mid kartice
 const IMG = {
-  // natural-aspect verzije (ne sece)
-  aFull: full('a'), bFull: full('b'), cFull: full('c'), dFull: full('d'), eFull: full('e'), fFull: full('f'),
-  // portrait verzije za male grid kartice (face-focus, malo crop ali nema odsecenih glava)
+  // Wide 3:2 — za ImageBreak banner-e (popunjava ceo okvir)
+  aWide: wide('a'), bWide: wide('b'), cWide: wide('c'), dWide: wide('d'), eWide: wide('e'), fWide: wide('f'),
+  // Portrait 3:4 — za Section 1 grid (popunjava ceo okvir)
   aPort: port('a'), bPort: port('b'), cPort: port('c'), dPort: port('d'), ePort: port('e'), fPort: port('f'),
+  // Mid 4:3 — za ELITE karticu (popunjava ceo okvir)
+  aMed: med('a'), bMed: med('b'), cMed: med('c'), dMed: med('d'), eMed: med('e'), fMed: med('f'),
 };
 
 // === HOOKS ===
@@ -351,11 +354,11 @@ function Section1() {
               </p>
             </div>
             <div className="lg:col-span-2 grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-bg1 flex justify-center items-center" style={{maxHeight: '240px'}}>
-                <img src={IMG.bPort} alt="VAMIT-5 trening" className="w-auto object-contain block" style={{maxHeight: '240px', maxWidth: '100%'}} loading="lazy" />
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 aspect-[3/4]">
+                <img src={IMG.bPort} alt="VAMIT-5 trening" className="w-full h-full object-cover block" loading="lazy" />
               </div>
-              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 mt-6 sm:mt-10 bg-bg1 flex justify-center items-center" style={{maxHeight: '240px'}}>
-                <img src={IMG.cPort} alt="VAMIT-5 atleta" className="w-auto object-contain block" style={{maxHeight: '240px', maxWidth: '100%'}} loading="lazy" />
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] mt-6 sm:mt-10">
+                <img src={IMG.cPort} alt="VAMIT-5 atleta" className="w-full h-full object-cover block" loading="lazy" />
               </div>
             </div>
           </div>
@@ -518,8 +521,8 @@ function Section4() {
                 <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-5">
                   Maksimalan nivo programa. Pristup koji ima samo nekolicina.
                 </p>
-                <div className="hidden lg:flex justify-center items-center rounded-2xl overflow-hidden border border-gold/20 bg-bg1" style={{maxHeight: '300px'}}>
-                  <img src={IMG.eFull} alt="VAMIT-5 Elite Athlete" className="w-auto object-contain block" style={{maxHeight: '300px', maxWidth: '100%'}} loading="lazy" />
+                <div className="hidden lg:block rounded-2xl overflow-hidden border border-gold/20 aspect-[4/3]">
+                  <img src={IMG.eMed} alt="VAMIT-5 Elite Athlete" className="w-full h-full object-cover block" loading="lazy" />
                 </div>
               </div>
 
@@ -570,13 +573,13 @@ function Section5() {
   );
 }
 
-// === IMAGE BREAK — mala centrirana slika, BEZ secenja (natural aspect, max-visina) ===
+// === IMAGE BREAK — slika ispunjava ceo okvir, Cloudinary face-aware crop (glave ostaju) ===
 function ImageBreak({ src }) {
   return (
     <Reveal>
-      <section className="relative z-10 max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <div className="rounded-2xl overflow-hidden border border-white/10 bg-bg1 flex justify-center items-center" style={{maxHeight: '320px'}}>
-          <img src={src} alt="" aria-hidden="true" className="w-auto h-auto object-contain block" style={{maxHeight: '320px', maxWidth: '100%'}} loading="lazy" />
+      <section className="relative z-10 max-w-2xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="rounded-2xl overflow-hidden border border-white/10 aspect-[3/2]">
+          <img src={src} alt="" aria-hidden="true" className="w-full h-full object-cover block" loading="lazy" />
         </div>
       </section>
     </Reveal>
@@ -719,13 +722,13 @@ function App() {
     <div className="min-h-screen relative">
       <Nav />
       <Hero />
-      <ImageBreak src={IMG.aFull} />
+      <ImageBreak src={IMG.aWide} />
       <Section1 />
       <Section2 />
-      <ImageBreak src={IMG.dFull} />
+      <ImageBreak src={IMG.dWide} />
       <Section3 />
       <Section4 />
-      <ImageBreak src={IMG.fFull} />
+      <ImageBreak src={IMG.fWide} />
       <Section5 />
       <Section7 />
       <Section8 />
