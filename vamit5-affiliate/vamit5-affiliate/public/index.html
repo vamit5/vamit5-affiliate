@@ -100,15 +100,51 @@
 <script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
 <script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/@babel/standalone@7.24.5/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
 
 <script type="text/babel" data-presets="react">
 const { useState, useEffect, useRef } = React;
 
-// === LINKS / DATA ===
-const FORM_URL = "https://docs.google.com/forms/d/1eewguzZN9jrgMs4xnmaQpgGUBFE1kRijYtnn-AEs3yY/viewform";
-const LOGO = "https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png";
-// Hero — crop top/bottom, fokus na ljude u sredini (21:9)
-const HERO_IMG = "https://res.cloudinary.com/dqqljgtna/image/upload/c_fill,g_center,ar_21:9,w_2400,q_auto,f_auto/v1780925011/IMG_1025_gylvom.png";
+// === CMS — povlači sve tekstove i slike iz Supabase ===
+const supa = (window.SUPABASE_URL && window.SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(window.SUPABASE_URL, window.SUPABASE_ANON_KEY)
+  : null;
+
+let _content = {};
+async function loadContent(){
+  if (!supa) return {};
+  try {
+    const { data } = await supa.from('landing_content').select('key, value');
+    const map = {};
+    (data || []).forEach(r => { map[r.key] = r.value; });
+    return map;
+  } catch (e) { return {}; }
+}
+
+function useContent(){
+  const [c, setC] = useState(_content);
+  const [loaded, setLoaded] = useState(Object.keys(_content).length > 0);
+  useEffect(() => {
+    if (Object.keys(_content).length > 0) return;
+    loadContent().then(map => { _content = map; setC(map); setLoaded(true); });
+  }, []);
+  return { c, loaded, T: (key, def) => (c[key] !== undefined && c[key] !== null && c[key] !== '') ? c[key] : def };
+}
+
+// === DEFAULTS (fallback ako baza nije setovana) ===
+const FORM_URL_DEF = "https://docs.google.com/forms/d/1eewguzZN9jrgMs4xnmaQpgGUBFE1kRijYtnn-AEs3yY/viewform";
+const LOGO_DEF = "https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png";
+const HERO_IMG_DEF = "https://res.cloudinary.com/dqqljgtna/image/upload/c_fill,g_center,ar_21:9,w_2400,q_auto,f_auto/v1780925011/IMG_1025_gylvom.png";
+
+// Cesto koriscene reference (overrideuje useContent on first render)
+let FORM_URL = FORM_URL_DEF;
+let LOGO = LOGO_DEF;
+let HERO_IMG = HERO_IMG_DEF;
+
+// Context za prosledjivanje T() funkcije svim komponentama
+const TCtx = React.createContext((k, d) => d);
+const useT = () => React.useContext(TCtx);
 
 // Autentične slike — VAMIT-5 atlete
 // c_limit = NE seče, samo skalira sliku (cele glave + tela uvek vidljive)
@@ -226,6 +262,7 @@ function SectionHead({ eyebrow, title, sub, center = false }) {
 
 // === NAV ===
 function Nav() {
+  const T = useT();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -236,16 +273,16 @@ function Nav() {
     <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass-strong py-2 shadow-2xl' : 'py-3 sm:py-4'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
         <a href="#top" className="flex items-center gap-2 sm:gap-2.5 group min-w-0">
-          <img src={LOGO} alt="VAMIT-5" className="w-9 h-9 sm:w-11 sm:h-11 object-contain shrink-0 transition-transform group-hover:scale-110" />
+          <img src={T('logo_url', LOGO_DEF)} alt="VAMIT-5" className="w-9 h-9 sm:w-11 sm:h-11 object-contain shrink-0 transition-transform group-hover:scale-110" />
           <div className="leading-tight min-w-0">
-            <div className="font-black text-sm sm:text-lg tracking-tight">VAMIT-5</div>
-            <div className="text-[8px] sm:text-[10px] text-white/50 font-bold tracking-[0.18em] uppercase whitespace-nowrap">Athlete Program</div>
+            <div className="font-black text-sm sm:text-lg tracking-tight">{T('nav_brand_title','VAMIT-5')}</div>
+            <div className="text-[8px] sm:text-[10px] text-white/50 font-bold tracking-[0.18em] uppercase whitespace-nowrap">{T('nav_brand_subtitle','Athlete Program')}</div>
           </div>
         </a>
-        <a href={FORM_URL} target="_blank" rel="noopener noreferrer"
+        <a href={T('form_url', FORM_URL_DEF)} target="_blank" rel="noopener noreferrer"
            className="inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2.5 rounded-xl text-[11px] sm:text-sm font-bold whitespace-nowrap shrink-0
                       bg-gradient-to-r from-brand to-brand2 text-bg0 hover:scale-105 transition-transform shadow-lg">
-          Prijavi se
+          {T('nav_cta_text','Prijavi se')}
         </a>
       </div>
     </nav>
@@ -254,6 +291,7 @@ function Nav() {
 
 // === HERO ===
 function Hero() {
+  const T = useT();
   return (
     <header id="top" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-14 pb-12 sm:pb-20">
       <Reveal>
@@ -262,32 +300,32 @@ function Hero() {
             <span className="ping-dot absolute inline-flex h-full w-full rounded-full bg-gold"></span>
             <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-gold"></span>
           </span>
-          <span className="text-[10px] sm:text-[12px] font-bold text-gold tracking-[0.18em] uppercase">Prijave otvorene</span>
+          <span className="text-[10px] sm:text-[12px] font-bold text-gold tracking-[0.18em] uppercase">{T('hero_badge','Prijave otvorene')}</span>
         </div>
       </Reveal>
       <Reveal delay={1}>
         <h1 className="font-display font-black text-[34px] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[88px] tracking-[-0.03em] mb-5 sm:mb-6 max-w-5xl">
-          Jedini fitnes sistem koji <span className="grad-text-gold">isplaćuje već za manje od 24h.</span> <span className="text-white/40 text-sm sm:text-base align-middle font-bold tracking-normal whitespace-nowrap">(provereno)</span>
+          {T('hero_title_main','Jedini fitnes sistem koji')} <span className="grad-text-gold">{T('hero_title_accent','isplaćuje već za manje od 24h.')}</span> <span className="text-white/40 text-sm sm:text-base align-middle font-bold tracking-normal whitespace-nowrap">{T('hero_title_note','(provereno)')}</span>
         </h1>
       </Reveal>
       <Reveal delay={2}>
         <p className="text-sm sm:text-xl md:text-2xl text-white/70 max-w-2xl leading-relaxed mb-5 sm:mb-7 font-medium">
-          VAMIT-5 Athlete Program. Pravi sistem za ljude koji žele da rastu, grade lični brend i zarađuju od onoga što već rade — treninga i sadržaja.
+          {T('hero_subtitle','VAMIT-5 Athlete Program. Pravi sistem za ljude koji žele da rastu, grade lični brend i zarađuju od onoga što već rade — treninga i sadržaja.')}
         </p>
       </Reveal>
       <Reveal delay={2}>
         <div className="inline-flex items-start sm:items-center gap-3 mb-7 sm:mb-9 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl glass border border-lime/30 max-w-xl">
           <div className="text-2xl sm:text-3xl shrink-0">⚡</div>
           <div className="text-[12px] sm:text-base text-white/85 leading-snug font-medium">
-            <span className="grad-text font-extrabold">Direktna zarada</span> po svakom postavljenom reelsu — <b className="text-lime">za manje od 24h</b> stiže na tvoj nalog.
+            <span className="grad-text font-extrabold">{T('hero_reels_callout_main','Direktna zarada')}</span> {T('hero_reels_callout_rest','po svakom postavljenom reelsu — ')}<b className="text-lime">{T('hero_reels_callout_bold','za manje od 24h')}</b> {T('hero_reels_callout_end','stiže na tvoj nalog.')}
           </div>
         </div>
       </Reveal>
       <Reveal delay={3}>
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center mb-8 sm:mb-14">
-          <PrimaryButton href={FORM_URL} big className="w-full sm:w-auto">UĐI U VAMIT-5 ATHLETE PROGRAM</PrimaryButton>
+          <PrimaryButton href={T('form_url',FORM_URL_DEF)} big className="w-full sm:w-auto">{T('hero_cta_text','UĐI U VAMIT-5 ATHLETE PROGRAM')}</PrimaryButton>
           <div className="text-[11px] sm:text-sm text-white/60 sm:ml-2 font-medium text-center sm:text-left">
-            <span className="grad-text font-extrabold">POČNI ODMAH</span> · popunjavanje traje 2 minuta
+            <span className="grad-text font-extrabold">{T('hero_cta_subtext_main','POČNI ODMAH')}</span> · {T('hero_cta_subtext_rest','popunjavanje traje 2 minuta')}
           </div>
         </div>
       </Reveal>
@@ -295,17 +333,17 @@ function Hero() {
       {/* HERO IMAGE — manja, kompaktnija */}
       <Reveal delay={4}>
         <div className="hero-img-wrap relative rounded-[18px] sm:rounded-[28px] overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(0,240,255,0.35)] max-w-3xl mx-auto">
-          <img src={HERO_IMG} alt="VAMIT-5 zajednica atleta"
+          <img src={T('hero_image_url', HERO_IMG_DEF)} alt="VAMIT-5 zajednica atleta"
                className="w-full h-[180px] sm:h-[260px] md:h-[320px] object-cover object-center"
                loading="eager" />
           <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 flex items-end justify-between flex-wrap gap-2 sm:gap-3 z-10">
             <div>
-              <div className="text-[10px] sm:text-xs text-white/60 font-bold tracking-[0.18em] uppercase mb-0.5">Zajednica</div>
-              <div className="font-display text-lg sm:text-2xl font-black">VAMIT-5 Athletes</div>
+              <div className="text-[10px] sm:text-xs text-white/60 font-bold tracking-[0.18em] uppercase mb-0.5">{T('hero_zajednica_label','Zajednica')}</div>
+              <div className="font-display text-lg sm:text-2xl font-black">{T('hero_zajednica_title','VAMIT-5 Athletes')}</div>
             </div>
             <div className="hidden sm:flex items-center gap-2 glass px-3 py-1.5 rounded-lg border-white/15">
               <span className="flex h-2 w-2 rounded-full bg-lime shadow-[0_0_10px_#a6ff3b]"></span>
-              <span className="text-[11px] font-bold tracking-wider text-white/80">LIVE program</span>
+              <span className="text-[11px] font-bold tracking-wider text-white/80">{T('hero_live_label','LIVE program')}</span>
             </div>
           </div>
         </div>
@@ -314,10 +352,10 @@ function Hero() {
       {/* COUNTERS */}
       <Reveal delay={5}>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 mt-6 sm:mt-12">
-          <CounterCard target={24} suffix="h" label="DO PRVE ISPLATE" sublabel="Provereno" />
-          <CounterCard target={3} label="IZVORA ZARADE" sublabel="Reels · Prodaja · Tim" />
-          <CounterCard target={4} label="NIVOA PROGRAMA" sublabel="Regrut → Elite" />
-          <CounterCard target={100} suffix="%" label="REAL-TIME" sublabel="Sve transparentno" />
+          <CounterCard target={parseInt(T('counter1_value','24'))||24} suffix={T('counter1_suffix','h')} label={T('counter1_label','DO PRVE ISPLATE')} sublabel={T('counter1_sublabel','Provereno')} />
+          <CounterCard target={parseInt(T('counter2_value','3'))||3} suffix={T('counter2_suffix','')} label={T('counter2_label','IZVORA ZARADE')} sublabel={T('counter2_sublabel','Reels · Prodaja · Tim')} />
+          <CounterCard target={parseInt(T('counter3_value','4'))||4} suffix={T('counter3_suffix','')} label={T('counter3_label','NIVOA PROGRAMA')} sublabel={T('counter3_sublabel','Regrut → Elite')} />
+          <CounterCard target={parseInt(T('counter4_value','100'))||100} suffix={T('counter4_suffix','%')} label={T('counter4_label','REAL-TIME')} sublabel={T('counter4_sublabel','Sve transparentno')} />
         </div>
       </Reveal>
     </header>
@@ -337,6 +375,7 @@ function CounterCard({ target, label, sublabel, suffix = '' }) {
 
 // === SECTION 1 ===
 function Section1() {
+  const T = useT();
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
       <Reveal>
@@ -344,21 +383,20 @@ function Section1() {
           <div className="absolute -top-32 -right-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-brand2/20 blur-3xl pointer-events-none"></div>
           <div className="relative grid lg:grid-cols-5 gap-6 lg:gap-10 items-center">
             <div className="lg:col-span-3">
-              <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-brand uppercase mb-3 sm:mb-4">O programu</div>
+              <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-brand uppercase mb-3 sm:mb-4">{T('s1_eyebrow','O programu')}</div>
               <h2 className="font-display text-2xl leading-[1.1] sm:text-4xl md:text-5xl font-black tracking-[-0.02em] mb-5 sm:mb-6">
-                Ne tražimo influensere već <span className="grad-text">ljude koji žele da rastu uz nas.</span>
+                {T('s1_title_main','Ne tražimo influensere već')} <span className="grad-text">{T('s1_title_accent','ljude koji žele da rastu uz nas.')}</span>
               </h2>
               <p className="text-sm sm:text-lg text-white/70 leading-relaxed font-medium">
-                VAMIT-5 Athlete Program je globalni partnerski program namenjen ljudima koji žele da grade lični brend, šire VAMIT-5 metodologiju i zarađuju
-                po svakom snimljenom sadržaju na društvenim mrežama, prodaju VAMIT-5 app i razvoj svog tima.
+                {T('s1_text','VAMIT-5 Athlete Program je globalni partnerski program namenjen ljudima koji žele da grade lični brend, šire VAMIT-5 metodologiju i zarađuju po svakom snimljenom sadržaju na društvenim mrežama, prodaju VAMIT-5 app i razvoj svog tima.')}
               </p>
             </div>
             <div className="lg:col-span-2 grid grid-cols-2 gap-2 sm:gap-3">
               <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 aspect-[3/4]">
-                <img src={IMG.bPort} alt="VAMIT-5 trening" className="w-full h-full object-cover block" loading="lazy" />
+                <img src={T('s1_image1_url', IMG.bPort)} alt="VAMIT-5 trening" className="w-full h-full object-cover block" loading="lazy" />
               </div>
               <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 aspect-[3/4] mt-6 sm:mt-10">
-                <img src={IMG.cPort} alt="VAMIT-5 atleta" className="w-full h-full object-cover block" loading="lazy" />
+                <img src={T('s1_image2_url', IMG.cPort)} alt="VAMIT-5 atleta" className="w-full h-full object-cover block" loading="lazy" />
               </div>
             </div>
           </div>
@@ -370,14 +408,15 @@ function Section1() {
 
 // === SECTION 2 — Kako funkcioniše ===
 function Section2() {
+  const T = useT();
   const steps = [
-    { n: '01', emoji: '📝', title: 'Prijavi se', text: 'Popuni formular (klik na dugme). Traje 2 minuta.' },
-    { n: '02', emoji: '🔑', title: 'Dobijaš svoj kod', text: 'Dobijaš svoj kod i pristup Athlete programu.' },
-    { n: '03', emoji: '💸', title: 'Zarađuješ', text: 'Zarađuješ po svakom postavljenom Reelsu, prodaji VAMIT-5 app i kroz svoj tim.' },
+    { n: '01', emoji: T('s2_step1_emoji','📝'), title: T('s2_step1_title','Prijavi se'), text: T('s2_step1_text','Popuni formular (klik na dugme). Traje 2 minuta.') },
+    { n: '02', emoji: T('s2_step2_emoji','🔑'), title: T('s2_step2_title','Dobijaš svoj kod'), text: T('s2_step2_text','Dobijaš svoj kod i pristup Athlete programu.') },
+    { n: '03', emoji: T('s2_step3_emoji','💸'), title: T('s2_step3_title','Zarađuješ'), text: T('s2_step3_text','Zarađuješ po svakom postavljenom Reelsu, prodaji VAMIT-5 app i kroz svoj tim.') },
   ];
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
-      <SectionHead eyebrow="PROCES" title={<>Kako <span className="grad-text">funkcioniše</span>?</>} center />
+      <SectionHead eyebrow={T('s2_eyebrow','PROCES')} title={<>{T('s2_title_main','Kako')} <span className="grad-text">{T('s2_title_accent','funkcioniše')}</span>{T('s2_title_end','?')}</>} center />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
         {steps.map((s, i) => (
           <Reveal key={s.n} delay={i+1}>
@@ -399,21 +438,26 @@ function Section2() {
   );
 }
 
+// === Helper za "emoji|text" ili "emoji|title|text" stringove ===
+function pipeParts(s){ return (s||'').split('|'); }
+
 // === SECTION 3 — Šta dobija svaki Athlete ===
 function Section3() {
-  const benefits = [
-    { emoji: '⚡', title: 'Instant zarada za svaki postavljeni reels' },
-    { emoji: '💎', title: 'TOP provizije od prodaje aplikacije' },
-    { emoji: '👥', title: 'Provizija od svog tima' },
-    { emoji: '🎓', title: 'Pristup Athlete edukaciji' },
-    { emoji: '🔗', title: 'Jedinstveni affiliate link' },
-    { emoji: '🤝', title: 'Svakodnevnu podršku VAMIT-5 tima' },
-    { emoji: '✈️', title: 'VAMIT-5 putovanja i eventsi' },
-    { emoji: '🔥', title: 'Brutalne mogućnosti za rast i razvoj' },
+  const T = useT();
+  const items = [
+    T('s3_benefit1','⚡|Instant zarada za svaki postavljeni reels'),
+    T('s3_benefit2','💎|TOP provizije od prodaje aplikacije'),
+    T('s3_benefit3','👥|Provizija od svog tima'),
+    T('s3_benefit4','🎓|Pristup Athlete edukaciji'),
+    T('s3_benefit5','🔗|Jedinstveni affiliate link'),
+    T('s3_benefit6','🤝|Svakodnevnu podršku VAMIT-5 tima'),
+    T('s3_benefit7','✈️|VAMIT-5 putovanja i eventsi'),
+    T('s3_benefit8','🔥|Brutalne mogućnosti za rast i razvoj'),
   ];
+  const benefits = items.filter(s => s && s.trim()).map(s => { const p = pipeParts(s); return { emoji: p[0]||'', title: p[1]||'' }; });
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
-      <SectionHead eyebrow="BENEFITI" title={<>Šta dobija svaki <span className="grad-text">Athlete</span>?</>} />
+      <SectionHead eyebrow={T('s3_eyebrow','BENEFITI')} title={<>{T('s3_title_main','Šta dobija svaki')} <span className="grad-text">{T('s3_title_accent','Athlete')}</span>{T('s3_title_end','?')}</>} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
         {benefits.map((b, i) => (
           <Reveal key={b.title} delay={(i % 3) + 1}>
@@ -441,38 +485,29 @@ function CheckLi({ children, gold = false }) {
 }
 
 function Section4() {
+  const T = useT();
+  const linesArr = s => (s||'').split('\n').map(x=>x.trim()).filter(Boolean);
   const tiers = [
     {
-      name: 'REGRUT ATHLETE', stars: '⭐', emoji: '🎯', color: 'from-blue-400 to-cyan-400',
-      bullets: [
-        'Pristup VAMIT-5 Athlete programu',
-        'Direktna zarada po svakom postavljenom reelsu',
-        'TOP provizija po prodaji VAMIT-5 app',
-        'Provizija od tvog tima',
-        'Svakodnevna podrška tima',
-      ]
+      name: T('s4_regrut_name','REGRUT ATHLETE'), stars: T('s4_regrut_stars','⭐'), emoji: T('s4_regrut_emoji','🎯'), color: 'from-blue-400 to-cyan-400',
+      bullets: linesArr(T('s4_regrut_bullets','Pristup VAMIT-5 Athlete programu\nDirektna zarada po svakom postavljenom reelsu\nTOP provizija po prodaji VAMIT-5 app\nProvizija od tvog tima\nSvakodnevna podrška tima'))
     },
     {
-      name: 'PRO ATHLETE', stars: '⭐⭐', emoji: '⚡', color: 'from-purple-400 to-pink-400',
-      bullets: [
-        'Sve kao kod REGRUT',
-        'Još veća provizija od prodaje app',
-      ]
+      name: T('s4_pro_name','PRO ATHLETE'), stars: T('s4_pro_stars','⭐⭐'), emoji: T('s4_pro_emoji','⚡'), color: 'from-purple-400 to-pink-400',
+      bullets: linesArr(T('s4_pro_bullets','Sve kao kod REGRUT\nJoš veća provizija od prodaje app'))
     },
     {
-      name: 'COMMANDO ATHLETE', stars: '⭐⭐⭐', emoji: '🚀', color: 'from-pink-400 to-red-400',
-      bullets: [
-        'Sve kao kod PRO',
-        'Još veća provizija od prodaje app',
-      ]
+      name: T('s4_commando_name','COMMANDO ATHLETE'), stars: T('s4_commando_stars','⭐⭐⭐'), emoji: T('s4_commando_emoji','🚀'), color: 'from-pink-400 to-red-400',
+      bullets: linesArr(T('s4_commando_bullets','Sve kao kod PRO\nJoš veća provizija od prodaje app'))
     },
   ];
+  const elitePerks = linesArr(T('s4_elite_perks','Najveća provizija\nPovećana zarada za postavljanje sadržaja\nBesplatan VAMIT-5 merchandise\nProvizija od prodaje u online shopu\nPristup posebnim pogodnostima koje nisu dostupne ostalim nivoima'));
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
       <SectionHead
-        eyebrow="PROGRES"
-        title={<>Četiri nivoa <span className="grad-text">napredovanja</span>.</>}
-        sub="Svi dobijaju pristup VAMIT-5 Athlete programu. Iz nivoa u nivo provizija je veća — napredak ide kroz konstantnost, redovan sadržaj, prodaju i rezultate."
+        eyebrow={T('s4_eyebrow','PROGRES')}
+        title={<>{T('s4_title_main','Četiri nivoa')} <span className="grad-text">{T('s4_title_accent','napredovanja')}</span>.</>}
+        sub={T('s4_subtitle','Svi dobijaju pristup VAMIT-5 Athlete programu. Iz nivoa u nivo provizija je veća — napredak ide kroz konstantnost, redovan sadržaj, prodaju i rezultate.')}
         center
       />
 
@@ -509,32 +544,28 @@ function Section4() {
               {/* LEFT — naslov + foto */}
               <div className="lg:col-span-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold/15 border border-gold/40 mb-4">
-                  <span className="text-[9px] sm:text-[10px] font-black tracking-[0.2em] text-gold">TOP TIER</span>
+                  <span className="text-[9px] sm:text-[10px] font-black tracking-[0.2em] text-gold">{T('s4_elite_badge','TOP TIER')}</span>
                 </div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="text-4xl sm:text-5xl">👑</div>
-                  <div className="text-xs sm:text-sm tracking-wider text-gold/80">⭐⭐⭐⭐</div>
+                  <div className="text-4xl sm:text-5xl">{T('s4_elite_emoji','👑')}</div>
+                  <div className="text-xs sm:text-sm tracking-wider text-gold/80">{T('s4_elite_stars','⭐⭐⭐⭐')}</div>
                 </div>
                 <h3 className="font-display font-black text-[30px] sm:text-5xl md:text-6xl mb-4 sm:mb-5 grad-text-gold tracking-[-0.02em] leading-[1.02]">
-                  ELITE ATHLETE
+                  {T('s4_elite_name','ELITE ATHLETE')}
                 </h3>
                 <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-5">
-                  Maksimalan nivo programa. Pristup koji ima samo nekolicina.
+                  {T('s4_elite_subtitle','Maksimalan nivo programa. Pristup koji ima samo nekolicina.')}
                 </p>
                 <div className="hidden lg:block rounded-2xl overflow-hidden border border-gold/20 aspect-[4/3]">
-                  <img src={IMG.eMed} alt="VAMIT-5 Elite Athlete" className="w-full h-full object-cover block" loading="lazy" />
+                  <img src={T('s4_elite_image_url', IMG.eMed)} alt="VAMIT-5 Elite Athlete" className="w-full h-full object-cover block" loading="lazy" />
                 </div>
               </div>
 
               {/* RIGHT — sve ELITE prednosti */}
               <div className="lg:col-span-3">
-                <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-gold uppercase mb-3 sm:mb-4">Šta dobija ELITE Athlete</div>
+                <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-gold uppercase mb-3 sm:mb-4">{T('s4_elite_perks_title','Šta dobija ELITE Athlete')}</div>
                 <ul className="space-y-3 sm:space-y-3.5">
-                  <CheckLi gold>Najveća provizija</CheckLi>
-                  <CheckLi gold>Povećana zarada za postavljanje sadržaja</CheckLi>
-                  <CheckLi gold>Besplatan VAMIT-5 merchandise</CheckLi>
-                  <CheckLi gold>Provizija od prodaje u online shopu</CheckLi>
-                  <CheckLi gold>Pristup posebnim pogodnostima koje nisu dostupne ostalim nivoima</CheckLi>
+                  {elitePerks.map((p,i)=><CheckLi key={i} gold>{p}</CheckLi>)}
                 </ul>
               </div>
             </div>
@@ -547,17 +578,19 @@ function Section4() {
 
 // === SECTION 5 — Zašto je VAMIT-5 drugačiji ===
 function Section5() {
-  const reasons = [
-    { emoji: '⚡', title: 'Brza isplata', text: 'Odmah nakon postavljanja reelsa.' },
-    { emoji: '🌍', title: 'Globalna zajednica', text: 'Ekipa atleta sa svih strana.' },
-    { emoji: '🎯', title: 'Nemaš iskustva? Pokazujemo ti kako.', text: 'Sve što ti treba — od početka.' },
-    { emoji: '💸', title: '3 izvora zarade', text: 'Reels, prodaja, tim.' },
-    { emoji: '📈', title: 'Jasan sistem napredovanja', text: 'Tačno znaš gde si i kako da napreduješ.' },
-    { emoji: '🤝', title: 'Pravi tim iza tebe', text: 'Bez kalkulacija. Bez praznih obećanja.' },
+  const T = useT();
+  const items = [
+    T('s5_reason1','⚡|Brza isplata|Odmah nakon postavljanja reelsa.'),
+    T('s5_reason2','🌍|Globalna zajednica|Ekipa atleta sa svih strana.'),
+    T('s5_reason3','🎯|Nemaš iskustva? Pokazujemo ti kako.|Sve što ti treba — od početka.'),
+    T('s5_reason4','💸|3 izvora zarade|Reels, prodaja, tim.'),
+    T('s5_reason5','📈|Jasan sistem napredovanja|Tačno znaš gde si i kako da napreduješ.'),
+    T('s5_reason6','🤝|Pravi tim iza tebe|Bez kalkulacija. Bez praznih obećanja.'),
   ];
+  const reasons = items.filter(s=>s&&s.trim()).map(s=>{const p=pipeParts(s);return{emoji:p[0]||'',title:p[1]||'',text:p[2]||''};});
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
-      <SectionHead eyebrow="PREDNOSTI" title={<>Zašto je VAMIT-5 <span className="grad-text">drugačiji</span>?</>} />
+      <SectionHead eyebrow={T('s5_eyebrow','PREDNOSTI')} title={<>{T('s5_title_main','Zašto je VAMIT-5')} <span className="grad-text">{T('s5_title_accent','drugačiji')}</span>{T('s5_title_end','?')}</>} />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
         {reasons.map((r, i) => (
           <Reveal key={r.title} delay={(i % 3) + 1}>
@@ -588,14 +621,12 @@ function ImageBreak({ src }) {
 
 // === SECTION 7 — Ko može da se prijavi ===
 function Section7() {
-  const reqs = [
-    { emoji: '🔞', title: '18+ godina' },
-    { emoji: '🔥', title: 'Spremnost na konstantnost' },
-    { emoji: '📚', title: 'Želja za učenjem i napredovanjem' },
-  ];
+  const T = useT();
+  const items = [T('s7_req1','🔞|18+ godina'), T('s7_req2','🔥|Spremnost na konstantnost'), T('s7_req3','📚|Želja za učenjem i napredovanjem')];
+  const reqs = items.filter(s=>s&&s.trim()).map(s=>{const p=pipeParts(s);return{emoji:p[0]||'',title:p[1]||''};});
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
-      <SectionHead eyebrow="PRIJAVA" title={<>Ko može da se <span className="grad-text">prijavi</span>?</>} center />
+      <SectionHead eyebrow={T('s7_eyebrow','PRIJAVA')} title={<>{T('s7_title_main','Ko može da se')} <span className="grad-text">{T('s7_title_accent','prijavi')}</span>{T('s7_title_end','?')}</>} center />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 max-w-5xl mx-auto">
         {reqs.map((r, i) => (
           <Reveal key={r.title} delay={i+1}>
@@ -626,31 +657,18 @@ function FAQItem({ q, a, defaultOpen = false }) {
 }
 
 function Section8() {
-  const faq = [
-    {
-      q: 'Da li moram imati Instagram pre početka?',
-      a: 'Bilo bi odlično da već imaš iskustva sa Instagramom i snimanjem, ali ako nemaš, ne brini — zato te čekamo u VAMIT-5 Athlete programu, da ti pokažemo koliko je to zapravo jednostavno.'
-    },
-    {
-      q: 'Koliko brzo mogu početi?',
-      a: 'Odmah danas. Ako si spreman na konstantnost i hoćeš rast i napredak, klikni na dugme, popuni formular i počinješ kao REGRUT athlete. Dobijaš pristup ATHLETE PROGRAMU i krećemo u akciju.'
-    },
-    {
-      q: 'Da li dobijam svoj affiliate link?',
-      a: 'Da, svaki atleta ima svoj link koji prati njegovu aktivnost.'
-    },
-    {
-      q: 'Kako funkcioniše napredovanje?',
-      a: 'Kroz četiri nivoa — REGRUT, PRO, COMMANDO i ELITE. Napreduje se kroz konstantnost, redovan sadržaj, prodaju i rezultate.'
-    },
-    {
-      q: 'Kako funkcionišu isplate?',
-      a: 'Dobićeš nalog gde ćeš moći pratiti svaki zarađeni evro u stvarnom vremenu.'
-    },
+  const T = useT();
+  const faqRaw = [
+    { q: T('s8_q1','Da li moram imati Instagram pre početka?'), a: T('s8_a1','Bilo bi odlično da već imaš iskustva sa Instagramom i snimanjem, ali ako nemaš, ne brini — zato te čekamo u VAMIT-5 Athlete programu, da ti pokažemo koliko je to zapravo jednostavno.') },
+    { q: T('s8_q2','Koliko brzo mogu početi?'), a: T('s8_a2','Odmah danas. Ako si spreman na konstantnost i hoćeš rast i napredak, klikni na dugme, popuni formular i počinješ kao REGRUT athlete. Dobijaš pristup ATHLETE PROGRAMU i krećemo u akciju.') },
+    { q: T('s8_q3','Da li dobijam svoj affiliate link?'), a: T('s8_a3','Da, svaki atleta ima svoj link koji prati njegovu aktivnost.') },
+    { q: T('s8_q4','Kako funkcioniše napredovanje?'), a: T('s8_a4','Kroz četiri nivoa — REGRUT, PRO, COMMANDO i ELITE. Napreduje se kroz konstantnost, redovan sadržaj, prodaju i rezultate.') },
+    { q: T('s8_q5','Kako funkcionišu isplate?'), a: T('s8_a5','Dobićeš nalog gde ćeš moći pratiti svaki zarađeni evro u stvarnom vremenu.') },
   ];
+  const faq = faqRaw.filter(f => f.q && f.q.trim());
   return (
     <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
-      <SectionHead eyebrow="FAQ" title={<>Najčešća <span className="grad-text">pitanja</span></>} center />
+      <SectionHead eyebrow={T('s8_eyebrow','FAQ')} title={<>{T('s8_title_main','Najčešća')} <span className="grad-text">{T('s8_title_accent','pitanja')}</span></>} center />
       <div className="space-y-2.5 sm:space-y-4">
         {faq.map((f, i) => (
           <Reveal key={f.q} delay={Math.min(i+1, 4)}>
@@ -664,6 +682,7 @@ function Section8() {
 
 // === BOTTOM CTA ===
 function BottomCTA() {
+  const T = useT();
   return (
     <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
       <Reveal>
@@ -672,18 +691,18 @@ function BottomCTA() {
           <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gold/10 to-transparent pointer-events-none"></div>
           <div className="relative">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/40 mb-5 sm:mb-6">
-              <span className="text-[10px] sm:text-xs font-black tracking-[0.2em] text-gold">FINALNI KORAK</span>
+              <span className="text-[10px] sm:text-xs font-black tracking-[0.2em] text-gold">{T('cta_badge','FINALNI KORAK')}</span>
             </div>
             <h2 className="font-display text-[32px] leading-[1.05] sm:text-6xl md:text-7xl font-black tracking-[-0.03em] mb-5 sm:mb-6">
-              Pridruži se <span className="grad-text-gold">VAMIT-5</span><br/> Athlete Programu.
+              {T('cta_title_main','Pridruži se')} <span className="grad-text-gold">{T('cta_title_accent','VAMIT-5')}</span><br/> {T('cta_title_end','Athlete Programu.')}
             </h2>
             <p className="text-sm sm:text-xl text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
-              Počni danas. Razvij svoj tim. Napreduj kroz nivoe. Zarađuj kroz jedini sistem koji nagrađuje konstantnost.
+              {T('cta_subtitle','Počni danas. Razvij svoj tim. Napreduj kroz nivoe. Zarađuj kroz jedini sistem koji nagrađuje konstantnost.')}
             </p>
             <div className="flex flex-col items-center gap-3 sm:gap-4">
-              <GoldButton href={FORM_URL} className="w-full sm:w-auto">POSTANI VAMIT-5 ATHLETE</GoldButton>
+              <GoldButton href={T('form_url', FORM_URL_DEF)} className="w-full sm:w-auto">{T('cta_button','POSTANI VAMIT-5 ATHLETE')}</GoldButton>
               <div className="text-[11px] sm:text-sm text-white/55">
-                <span className="grad-text font-extrabold">POČNI ODMAH</span>
+                <span className="grad-text font-extrabold">{T('cta_subtext','POČNI ODMAH')}</span>
               </div>
             </div>
           </div>
@@ -695,19 +714,20 @@ function BottomCTA() {
 
 // === FOOTER ===
 function Footer() {
+  const T = useT();
   return (
     <footer className="relative z-10 border-t border-white/5 mt-4 sm:mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6">
         <div className="flex items-center gap-3">
-          <img src={LOGO} alt="VAMIT-5" className="w-10 h-10 object-contain" />
+          <img src={T('logo_url', LOGO_DEF)} alt="VAMIT-5" className="w-10 h-10 object-contain" />
           <div>
-            <div className="font-black tracking-tight text-base">VAMIT-5</div>
-            <div className="text-[10px] tracking-[0.2em] text-white/40 uppercase font-bold">Athlete Program</div>
+            <div className="font-black tracking-tight text-base">{T('footer_brand','VAMIT-5')}</div>
+            <div className="text-[10px] tracking-[0.2em] text-white/40 uppercase font-bold">{T('footer_subtitle','Athlete Program')}</div>
           </div>
         </div>
         <div className="text-[11px] sm:text-sm text-white/45 text-center sm:text-right">
-          Kontakt: <a href="mailto:vamit5.team@gmail.com" className="text-brand hover:underline">vamit5.team@gmail.com</a>
-          <div className="mt-1">© {new Date().getFullYear()} VAMIT-5. Sva prava zadržana.</div>
+          {T('footer_contact_label','Kontakt:')} <a href={`mailto:${T('footer_contact_email','vamit5.team@gmail.com')}`} className="text-brand hover:underline">{T('footer_contact_email','vamit5.team@gmail.com')}</a>
+          <div className="mt-1">© {new Date().getFullYear()} {T('footer_brand','VAMIT-5')}. {T('footer_copyright','Sva prava zadržana.')}</div>
         </div>
       </div>
     </footer>
@@ -715,26 +735,31 @@ function Footer() {
 }
 
 // === APP ===
-// Distribucija 6 slika: Hero (group photo), a, b+c, d, e (ELITE), f
-// Svaka koriscena 1 put. Nista odsečeno, sve prikazano u prirodnoj proporciji.
 function App() {
+  const { loaded, T } = useContent();
+  // Override globals once content je ucitan
+  FORM_URL = T('form_url', FORM_URL_DEF);
+  LOGO = T('logo_url', LOGO_DEF);
+  HERO_IMG = T('hero_image_url', HERO_IMG_DEF);
   return (
-    <div className="min-h-screen relative">
-      <Nav />
-      <Hero />
-      <ImageBreak src={IMG.aWide} />
-      <Section1 />
-      <Section2 />
-      <ImageBreak src={IMG.dWide} />
-      <Section3 />
-      <Section4 />
-      <ImageBreak src={IMG.fWide} />
-      <Section5 />
-      <Section7 />
-      <Section8 />
-      <BottomCTA />
-      <Footer />
-    </div>
+    <TCtx.Provider value={T}>
+      <div className="min-h-screen relative">
+        <Nav />
+        <Hero />
+        <ImageBreak src={T('imagebreak1_url', IMG.aWide)} />
+        <Section1 />
+        <Section2 />
+        <ImageBreak src={T('imagebreak2_url', IMG.dWide)} />
+        <Section3 />
+        <Section4 />
+        <ImageBreak src={T('imagebreak3_url', IMG.fWide)} />
+        <Section5 />
+        <Section7 />
+        <Section8 />
+        <BottomCTA />
+        <Footer />
+      </div>
+    </TCtx.Provider>
   );
 }
 
