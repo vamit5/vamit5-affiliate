@@ -1,554 +1,741 @@
 <!DOCTYPE html>
-<html lang="sr">
+<html lang="sr-Latn">
 <head>
 <meta charset="UTF-8" />
-<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png">
-<link rel="apple-touch-icon" sizes="180x180" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
-<link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778337005/VAMIT-5_k3xlfh.jpg">
-<meta name="viewport" content="width=device-width,initial-scale=1.0" />
-<title>VAMIT-5 Athletes · Postani deo elite</title>
-<meta name="description" content="VAMIT-5 Athlete Affiliate Program — 4 nivoa, do 50% provizije, gamifikacija koja ne staje. Prijavi se danas." />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5" />
+<title>VAMIT-5 Athlete Program — Počni odmah</title>
+<meta name="description" content="VAMIT-5 Athlete Program — jedini fitnes sistem koji isplaćuje već za manje od 24h. Pridruži se programu, gradi lični brend, zarađuj kroz Reelse, prodaju app-a i svoj tim." />
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" />
+<link rel="apple-touch-icon" href="https://res.cloudinary.com/dqqljgtna/image/upload/w_180,h_180,c_fill,q_auto,f_png/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          brand: '#00f0ff',
+          brand2: '#7a5bff',
+          brand3: '#ff3b9a',
+          gold: '#ffc24b',
+          lime: '#a6ff3b',
+          bg0: '#05060a',
+          bg1: '#0a0c14',
+        },
+        fontFamily: {
+          sans: ['Inter','system-ui','sans-serif'],
+          display: ['"Space Grotesk"','Inter','sans-serif'],
+        },
+      }
+    }
+  }
+</script>
 <style>
-:root{
-  --bg-0:#05060a;--bg-1:#0a0c14;--bg-2:#0f1220;
-  --text:#e9ecff;--dim:#9aa0c4;--mute:#626890;
-  --brand:#00f0ff;--brand-2:#7a5bff;--brand-3:#ff3b9a;
-  --gold:#ffc24b;--lime:#a6ff3b;--red:#ff4d5e;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:'Inter',system-ui,sans-serif;background:var(--bg-0);color:var(--text);
-  min-height:100vh;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em;overflow-x:hidden;
-}
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(1200px 700px at 10% -10%, rgba(122,91,255,0.4), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(0,240,255,0.25), transparent 60%),
-    radial-gradient(800px 400px at 50% 110%, rgba(255,59,154,0.22), transparent 60%);
-  animation:aurora 18s ease-in-out infinite alternate;
-}
-body::after{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px);
-  background-size:64px 64px;mask-image:radial-gradient(ellipse at 50% 0%,black 0%,transparent 70%);
-}
-@keyframes aurora{0%{filter:hue-rotate(0deg) saturate(1)}100%{filter:hue-rotate(25deg) saturate(1.15)}}
-
-.wrap{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:24px}
-
-/* Nav */
-nav{display:flex;align-items:center;justify-content:space-between;padding:18px 0}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:0.02em;font-size:18px}
-.logo .mark{
-  width:36px;height:36px;border-radius:10px;
-  background:conic-gradient(from 180deg,var(--brand),var(--brand-2),var(--brand-3),var(--brand));
-  position:relative;display:grid;place-items:center;
-  box-shadow:0 8px 24px -6px rgba(122,91,255,0.7);
-}
-.logo .mark::after{content:"";position:absolute;inset:3px;border-radius:8px;background:#0a0c14}
-.logo .mark span{position:relative;z-index:1;font-size:14px;font-weight:900;color:#fff}
-.logo small{color:var(--dim);font-weight:500;font-size:11px;letter-spacing:0.18em;margin-left:4px;text-transform:uppercase}
-nav .actions{display:flex;gap:10px;align-items:center}
-.btn{
-  padding:10px 18px;border-radius:10px;border:none;cursor:pointer;
-  font-family:inherit;font-weight:700;font-size:13px;letter-spacing:0.01em;
-  text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:all .2s ease;
-}
-.btn.ghost{background:rgba(255,255,255,0.05);color:var(--text);border:1px solid rgba(255,255,255,0.12)}
-.btn.ghost:hover{background:rgba(255,255,255,0.1)}
-.btn.primary{background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#0a0c14;box-shadow:0 8px 24px -8px rgba(0,240,255,0.6)}
-.btn.primary:hover{transform:translateY(-1px);box-shadow:0 12px 28px -8px rgba(0,240,255,0.8)}
-
-/* Hero */
-.hero{padding:80px 0 60px;text-align:center}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:8px 16px;border-radius:999px;
-  background:rgba(255,194,75,0.1);border:1px solid rgba(255,194,75,0.35);
-  color:var(--gold);font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
-  margin-bottom:24px;
-}
-.eyebrow .dot{width:6px;height:6px;background:var(--gold);border-radius:50%;box-shadow:0 0 8px var(--gold);animation:pulse 1.4s infinite}
-@keyframes pulse{50%{opacity:.4;transform:scale(1.5)}}
-h1{
-  font-size:clamp(44px,7vw,84px);font-weight:900;line-height:1.05;letter-spacing:-0.04em;
-  background:linear-gradient(180deg,#fff,#9aa0c4);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  margin-bottom:20px;
-}
-h1 .grad{
-  background:linear-gradient(135deg,var(--brand),var(--brand-3) 70%);
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-  font-style:italic;
-}
-.lede{font-size:clamp(16px,1.4vw,20px);color:var(--dim);max-width:640px;margin:0 auto 36px;line-height:1.5}
-.cta-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
-.btn.big{padding:16px 28px;font-size:15px;border-radius:14px}
-
-/* Stats strip */
-.stats-strip{
-  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
-  margin:60px 0 80px;
-  background:rgba(255,255,255,0.06);border-radius:20px;overflow:hidden;
-  border:1px solid rgba(255,255,255,0.08);
-}
-@media(max-width:780px){.stats-strip{grid-template-columns:repeat(2,1fr)}}
-.stat-item{
-  background:rgba(10,12,20,0.7);backdrop-filter:blur(14px);
-  padding:30px;text-align:center;
-}
-.stat-item .num{
-  font-family:'Space Grotesk',sans-serif;font-size:42px;font-weight:900;
-  background:linear-gradient(180deg,#fff,#7fd9ff);-webkit-background-clip:text;background-clip:text;color:transparent;
-  letter-spacing:-0.03em;
-}
-.stat-item .lbl{color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:0.15em;font-weight:700;margin-top:6px}
-
-/* Tier cards */
-section{padding:60px 0}
-.section-eyebrow{font-size:11px;color:var(--brand);text-transform:uppercase;letter-spacing:0.25em;font-weight:800;text-align:center;margin-bottom:12px}
-h2{font-size:clamp(32px,4vw,48px);font-weight:900;text-align:center;letter-spacing:-0.03em;margin-bottom:14px}
-h2 .grad{background:linear-gradient(135deg,var(--brand),var(--brand-3));-webkit-background-clip:text;background-clip:text;color:transparent}
-.section-sub{color:var(--dim);text-align:center;max-width:600px;margin:0 auto 50px;font-size:15px;line-height:1.5}
-
-.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-@media(max-width:980px){.tier-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:560px){.tier-grid{grid-template-columns:1fr}}
-
-.t-card{
-  position:relative;padding:28px 22px;border-radius:22px;
-  background:linear-gradient(180deg,rgba(20,24,42,0.85),rgba(10,12,20,0.95));
-  border:1px solid rgba(255,255,255,0.08);
-  transition:all .3s ease;
-  overflow:hidden;
-}
-.t-card::before{
-  content:"";position:absolute;inset:-1px;border-radius:inherit;z-index:-1;
-  background:var(--gl,linear-gradient(135deg,var(--brand-2),var(--brand)));
-  opacity:0;transition:opacity .3s ease;
-  filter:blur(16px);
-}
-.t-card:hover{transform:translateY(-6px);border-color:rgba(255,255,255,0.18)}
-.t-card:hover::before{opacity:.4}
-.t-card .stars{font-size:14px;letter-spacing:6px;color:var(--c,var(--brand));margin-bottom:10px}
-.t-card .nm{font-size:22px;font-weight:900;letter-spacing:-0.02em}
-.t-card .pct{
-  font-family:'Space Grotesk',sans-serif;font-size:48px;font-weight:900;margin-top:14px;letter-spacing:-0.03em;
-  color:var(--c,var(--text));
-}
-.t-card .pct small{font-size:14px;color:var(--mute);font-weight:600;margin-left:4px;letter-spacing:0}
-.t-card ul{list-style:none;margin-top:18px;display:flex;flex-direction:column;gap:9px}
-.t-card li{font-size:13px;color:var(--dim);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
-.t-card li::before{content:"→";color:var(--c,var(--brand));font-weight:800;flex-shrink:0;margin-top:1px}
-
-.t-card.recruit{--c:#a6ff3b;--gl:linear-gradient(135deg,#7a5bff,#a6ff3b)}
-.t-card.pro{--c:#00f0ff;--gl:linear-gradient(135deg,#00f0ff,#7a5bff)}
-.t-card.commando{--c:#ffc24b;--gl:linear-gradient(135deg,#ffc24b,#ff3b9a)}
-.t-card.elite{--c:#ff3b9a;--gl:linear-gradient(135deg,#ff3b9a,#7a5bff)}
-.t-card.elite{border-color:rgba(255,59,154,0.4)}
-.t-card.elite .featured{
-  position:absolute;top:14px;right:14px;
-  font-size:9px;letter-spacing:0.2em;font-weight:900;
-  padding:4px 10px;border-radius:6px;
-  background:linear-gradient(135deg,var(--brand-3),var(--brand-2));color:#fff;
-}
-
-/* Why join section */
-.why{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-@media(max-width:880px){.why{grid-template-columns:1fr}}
-.why-card{
-  padding:28px;border-radius:20px;
-  background:rgba(20,24,42,0.6);border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter:blur(14px);
-}
-.why-card .ico{width:50px;height:50px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,rgba(0,240,255,0.15),rgba(122,91,255,0.15));border:1px solid rgba(0,240,255,0.3);margin-bottom:18px}
-.why-card h3{font-size:18px;font-weight:800;margin-bottom:8px}
-.why-card p{font-size:13.5px;color:var(--dim);line-height:1.6}
-
-/* Apply form */
-.apply-card{
-  max-width:680px;margin:0 auto;
-  padding:40px;border-radius:24px;
-  background:
-    radial-gradient(600px 300px at 0% 0%,rgba(122,91,255,0.15),transparent 70%),
-    radial-gradient(600px 300px at 100% 100%,rgba(0,240,255,0.15),transparent 70%),
-    linear-gradient(180deg,rgba(20,24,42,0.85),rgba(10,12,20,0.9));
-  border:1px solid rgba(0,240,255,0.25);
-  backdrop-filter:blur(20px);
-}
-.apply-card h3{font-size:24px;font-weight:800;margin-bottom:6px}
-.apply-card .form-sub{color:var(--dim);font-size:14px;margin-bottom:28px}
-.field{display:flex;flex-direction:column;gap:6px;margin-bottom:18px}
-.field label{font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:0.12em}
-.field input,.field textarea,.field select{
-  padding:13px 14px;border-radius:11px;border:1px solid rgba(255,255,255,0.1);
-  background:rgba(255,255,255,0.03);color:var(--text);
-  font-family:inherit;font-size:14px;outline:none;transition:all .2s ease;
-}
-.field input:focus,.field textarea:focus,.field select:focus{
-  border-color:var(--brand);box-shadow:0 0 0 4px rgba(0,240,255,0.12);
-  background:rgba(255,255,255,0.05);
-}
-.field textarea{min-height:90px;resize:vertical;font-family:inherit}
-.field .hint{font-size:12px;color:var(--mute);margin-top:4px}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-@media(max-width:540px){.row{grid-template-columns:1fr}}
-
-.upload-box{
-  padding:30px 18px;border-radius:14px;text-align:center;
-  border:2px dashed rgba(0,240,255,0.35);background:rgba(0,240,255,0.04);
-  cursor:pointer;transition:all .2s ease;
-}
-.upload-box:hover{background:rgba(0,240,255,0.08);border-color:var(--brand)}
-.upload-box .ico{font-size:36px;margin-bottom:8px}
-.upload-box .t{font-weight:700;font-size:14px}
-.upload-box .s{font-size:12px;color:var(--mute);margin-top:4px}
-.upload-box.has-file{border-style:solid;border-color:var(--lime);background:rgba(166,255,59,0.06)}
-.upload-box.has-file .ico::before{content:"✅"}
-
-.consent{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--dim);margin:10px 0 24px;line-height:1.5}
-.consent input{margin-top:3px;flex-shrink:0;accent-color:var(--brand)}
-.consent a{color:var(--brand);text-decoration:none}
-
-.success-box{
-  padding:30px;border-radius:18px;text-align:center;
-  background:linear-gradient(135deg,rgba(166,255,59,0.15),rgba(0,240,255,0.1));
-  border:1px solid rgba(166,255,59,0.4);
-  display:none;
-}
-.success-box.show{display:block;animation:fadeUp .5s cubic-bezier(.2,.8,.2,1)}
-.success-box .big-ico{font-size:54px;margin-bottom:12px}
-.success-box h4{font-size:22px;font-weight:800;margin-bottom:8px}
-.success-box p{color:var(--dim);font-size:14px;line-height:1.6}
-@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-
-/* Footer */
-footer{
-  padding:40px 0 30px;border-top:1px solid rgba(255,255,255,0.06);margin-top:80px;
-  text-align:center;color:var(--mute);font-size:12px;
-}
-footer a{color:var(--brand);text-decoration:none;margin:0 8px}
-
-/* Loading */
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;margin-right:8px}
-@keyframes spin{to{transform:rotate(360deg)}}
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #05060a; color: #e9ecff; overflow-x: hidden; letter-spacing: -0.005em; }
+  body::before {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(1000px 600px at 10% -10%, rgba(122,91,255,0.35), transparent 60%),
+      radial-gradient(800px 500px at 100% 0%, rgba(0,240,255,0.22), transparent 60%),
+      radial-gradient(700px 400px at 50% 110%, rgba(255,59,154,0.2), transparent 60%);
+    animation: aurora 18s ease-in-out infinite alternate;
+  }
+  body::after {
+    content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+    mask-image: radial-gradient(ellipse at 50% 0%, black 0%, transparent 70%);
+  }
+  @keyframes aurora { 0% { filter: hue-rotate(0deg) saturate(1); } 100% { filter: hue-rotate(25deg) saturate(1.15); } }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  @keyframes glow { 0% { box-shadow: 0 0 20px rgba(255,194,75,0.3), 0 0 40px rgba(255,59,154,0.2); } 100% { box-shadow: 0 0 50px rgba(255,194,75,0.6), 0 0 80px rgba(255,59,154,0.4); } }
+  @keyframes pingSlow { 0% { transform: scale(1); opacity: 1; } 75%, 100% { transform: scale(2.5); opacity: 0; } }
+  .grad-text { background: linear-gradient(135deg, #00f0ff, #7a5bff, #ff3b9a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .grad-text-gold { background: linear-gradient(135deg, #ffc24b, #ff8a3b, #ff3b9a); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .glass { background: rgba(20,24,42,0.55); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
+  .glass-strong { background: rgba(20,24,42,0.75); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255,255,255,0.12); }
+  .shimmer-bg { background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.05) 50%, transparent 70%); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
+  .elite-glow { box-shadow: 0 0 60px -10px rgba(255,194,75,0.5), 0 0 100px -20px rgba(255,59,154,0.4); animation: glow 3s ease-in-out infinite alternate; }
+  .elite-border { background: linear-gradient(135deg, rgba(255,194,75,0.55), rgba(255,59,154,0.5), rgba(0,240,255,0.3)); padding: 2px; border-radius: 22px; }
+  .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+  .reveal-d1 { transition-delay: 0.08s; }
+  .reveal-d2 { transition-delay: 0.16s; }
+  .reveal-d3 { transition-delay: 0.24s; }
+  .reveal-d4 { transition-delay: 0.32s; }
+  .reveal-d5 { transition-delay: 0.4s; }
+  .card-hover { transition: transform 0.35s cubic-bezier(0.16,1,0.3,1), border-color 0.3s, box-shadow 0.3s; }
+  .card-hover:hover { transform: translateY(-4px); border-color: rgba(0,240,255,0.4); box-shadow: 0 18px 40px -18px rgba(0,240,255,0.25); }
+  .btn-glow { transition: transform 0.25s, box-shadow 0.3s; }
+  .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 20px 50px -10px rgba(0,240,255,0.6), 0 0 0 4px rgba(0,240,255,0.15); }
+  .btn-gold-glow { transition: transform 0.25s, box-shadow 0.3s; }
+  .btn-gold-glow:hover { transform: translateY(-2px); box-shadow: 0 20px 50px -10px rgba(255,194,75,0.6), 0 0 0 4px rgba(255,194,75,0.15); }
+  .ribbon-shine { background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%); background-size: 200% 100%; animation: shimmer 2.5s linear infinite; }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary svg { transform: rotate(180deg); }
+  details summary svg { transition: transform 0.25s; }
+  .hero-img-wrap::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(5,6,10,0.45) 0%, transparent 30%, transparent 65%, rgba(5,6,10,0.95) 100%);
+    pointer-events: none;
+  }
+  .ping-dot { animation: pingSlow 1.6s cubic-bezier(0,0,0.2,1) infinite; }
+  /* Mobile tweaks */
+  @media (max-width: 640px) {
+    h1, h2, h3 { letter-spacing: -0.02em; }
+    body::before { background-size: 100% 100%; }
+    .card-hover:hover { transform: none; }
+  }
+  /* Smooth focus for buttons */
+  a:focus-visible { outline: 2px solid #00f0ff; outline-offset: 3px; border-radius: 12px; }
 </style>
 </head>
 <body>
+<div id="root"></div>
 
-<div class="wrap">
-  <nav>
-    <div class="logo">
-      <img src="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" alt="VAMIT-5" style="width:44px;height:44px;object-fit:contain">
-      <span>VAMIT-5</span>
-      <small>Athletes</small>
+<script crossorigin src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.24.5/babel.min.js"></script>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef } = React;
+
+// === LINKS / DATA ===
+const FORM_URL = "https://docs.google.com/forms/d/1eewguzZN9jrgMs4xnmaQpgGUBFE1kRijYtnn-AEs3yY/viewform";
+const LOGO = "https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png";
+// Hero — crop top/bottom, fokus na ljude u sredini (21:9)
+const HERO_IMG = "https://res.cloudinary.com/dqqljgtna/image/upload/c_fill,g_center,ar_21:9,w_2400,q_auto,f_auto/v1780925011/IMG_1025_gylvom.png";
+
+// Autentične slike — VAMIT-5 atlete
+// c_limit = NE seče, samo skalira sliku (cele glave + tela uvek vidljive)
+const BASE = "https://res.cloudinary.com/dqqljgtna/image/upload";
+const RAW = {
+  a: "v1781473695/IMG_1276_lgawzf.jpg",
+  b: "v1781473692/IMG_1493_kymcxx.jpg",
+  c: "v1781473692/790AD42C-DB7A-444C-93A8-C8336CB8FD4D_p6d3wn.jpg",
+  d: "v1781473689/IMG_0405_t9c0zt.jpg",
+  e: "v1781473688/IMG_1498_np3egl.jpg",
+  f: "v1781473687/IMG_0788_w7qzng.jpg",
+};
+// FULL = nikad ne seče, prikazuje celu sliku (manja širina = manja slika)
+const full = (k) => `${BASE}/c_limit,w_900,q_auto,f_auto/${RAW[k]}`;
+// PORT = za grid kartice, koristi face-focus 3:4 (više tela vidljivo)
+const port = (k) => `${BASE}/c_fill,g_faces:center,ar_3:4,w_500,q_auto,f_auto/${RAW[k]}`;
+const IMG = {
+  // natural-aspect verzije (ne sece)
+  aFull: full('a'), bFull: full('b'), cFull: full('c'), dFull: full('d'), eFull: full('e'), fFull: full('f'),
+  // portrait verzije za male grid kartice (face-focus, malo crop ali nema odsecenih glava)
+  aPort: port('a'), bPort: port('b'), cPort: port('c'), dPort: port('d'), ePort: port('e'), fPort: port('f'),
+};
+
+// === HOOKS ===
+function useReveal() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { el.classList.add('in'); io.disconnect(); }
+    }, { threshold: 0.1, rootMargin: '0px 0px -60px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return ref;
+}
+
+function useCountUp(target, duration = 1800) {
+  const [val, setVal] = useState(0);
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    let started = false;
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting && !started) {
+        started = true;
+        const start = performance.now();
+        const tick = (now) => {
+          const t = Math.min(1, (now - start) / duration);
+          const ease = 1 - Math.pow(1 - t, 3);
+          setVal(Math.round(target * ease));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      }
+    }, { threshold: 0.4 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [target, duration]);
+  return [ref, val];
+}
+
+// === HELPERS ===
+function Reveal({ children, delay = 0, className = '', as: As = 'div' }) {
+  const ref = useReveal();
+  const dc = ['', 'reveal-d1','reveal-d2','reveal-d3','reveal-d4','reveal-d5'][delay] || '';
+  return <As ref={ref} className={`reveal ${dc} ${className}`}>{children}</As>;
+}
+
+function PrimaryButton({ href, children, big = false, className = '' }) {
+  const size = big ? 'px-6 py-4 sm:px-8 sm:py-5 text-sm sm:text-lg' : 'px-5 py-3 sm:px-6 sm:py-3.5 text-xs sm:text-base';
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+       className={`btn-glow inline-flex items-center justify-center gap-2 sm:gap-3 ${size} rounded-2xl font-extrabold tracking-wide text-bg0
+                  bg-gradient-to-r from-brand via-brand2 to-brand3 shadow-[0_15px_45px_-12px_rgba(0,240,255,0.6)]
+                  active:scale-[0.98] min-h-[52px] ${className}`}>
+      <span className="text-center leading-tight">{children}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 sm:w-[18px] sm:h-[18px]"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    </a>
+  );
+}
+
+function GoldButton({ href, children, className = '' }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+       className={`btn-gold-glow inline-flex items-center justify-center gap-2 sm:gap-3 px-6 py-4 sm:px-8 sm:py-5 text-sm sm:text-lg rounded-2xl font-extrabold tracking-wide text-bg0
+                  bg-gradient-to-r from-gold via-[#ff8a3b] to-brand3 shadow-[0_15px_45px_-12px_rgba(255,194,75,0.7)]
+                  active:scale-[0.98] min-h-[56px] ${className}`}>
+      <span className="text-center leading-tight">{children}</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0 sm:w-5 sm:h-5"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+    </a>
+  );
+}
+
+function SectionHead({ eyebrow, title, sub, center = false }) {
+  return (
+    <div className={`mb-10 sm:mb-14 ${center ? 'text-center' : ''}`}>
+      <Reveal>
+        <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-brand uppercase mb-3">{eyebrow}</div>
+      </Reveal>
+      <Reveal delay={1}>
+        <h2 className="font-display text-[28px] leading-[1.08] sm:text-5xl md:text-6xl font-black tracking-[-0.02em] max-w-4xl mx-auto">{title}</h2>
+      </Reveal>
+      {sub && (
+        <Reveal delay={2}>
+          <p className="mt-4 text-sm sm:text-base text-white/55 max-w-2xl mx-auto leading-relaxed">{sub}</p>
+        </Reveal>
+      )}
     </div>
-    <div class="actions">
-      <a href="/dashboard.html" class="btn ghost">Login</a>
-      <a href="#apply" class="btn primary">Prijavi se</a>
-    </div>
-  </nav>
+  );
+}
 
-  <!-- HERO -->
-  <header class="hero">
-    <div class="eyebrow"><span class="dot"></span>Prijave otvorene · Tour de Fruska klasa</div>
-    <h1>Treniraj. Inspiriši.<br/><span class="grad">Zaradi 35–50%</span><br/>po svakoj prodaji.</h1>
-    <p class="lede">VAMIT-5 Athletes je tim sportista koji žive od treninga i grade pasivni prihod od svake prodaje koja dođe preko njih. Radimo uzak rad sa osnivačima, jasan vodič, team eventi, zarada bilo gde, bilo kad.</p>
-    <div class="cta-row">
-      <a href="#apply" class="btn primary big">Prijavi se → Audicija</a>
-      <a href="#tiers" class="btn ghost big">Vidi nivoe i provizije</a>
-    </div>
-  </header>
+// === NAV ===
+function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <nav className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass-strong py-2 shadow-2xl' : 'py-3 sm:py-4'}`}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-3">
+        <a href="#top" className="flex items-center gap-2 sm:gap-2.5 group min-w-0">
+          <img src={LOGO} alt="VAMIT-5" className="w-9 h-9 sm:w-11 sm:h-11 object-contain shrink-0 transition-transform group-hover:scale-110" />
+          <div className="leading-tight min-w-0">
+            <div className="font-black text-sm sm:text-lg tracking-tight">VAMIT-5</div>
+            <div className="text-[8px] sm:text-[10px] text-white/50 font-bold tracking-[0.18em] uppercase whitespace-nowrap">Athlete Program</div>
+          </div>
+        </a>
+        <a href={FORM_URL} target="_blank" rel="noopener noreferrer"
+           className="inline-flex items-center gap-1.5 px-3.5 sm:px-5 py-2.5 rounded-xl text-[11px] sm:text-sm font-bold whitespace-nowrap shrink-0
+                      bg-gradient-to-r from-brand to-brand2 text-bg0 hover:scale-105 transition-transform shadow-lg">
+          Prijavi se
+        </a>
+      </div>
+    </nav>
+  );
+}
 
-  <!-- ZASTO VAMIT-5 -->
-  <div class="stats-strip">
-    <div class="stat-item"><div class="num">35–50%</div><div class="lbl">provizija po prodaji</div></div>
-    <div class="stat-item"><div class="num">🤝</div><div class="lbl">uzak rad sa osnivačima</div></div>
-    <div class="stat-item"><div class="num">📈</div><div class="lbl">pasivni prihod dugoročno</div></div>
-    <div class="stat-item"><div class="num">🌍</div><div class="lbl">zarađuj odakle god, kad god</div></div>
-  </div>
+// === HERO ===
+function Hero() {
+  return (
+    <header id="top" className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-6 sm:pt-14 pb-12 sm:pb-20">
+      <Reveal>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass border-gold/40 mb-5 sm:mb-7">
+          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+            <span className="ping-dot absolute inline-flex h-full w-full rounded-full bg-gold"></span>
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-gold"></span>
+          </span>
+          <span className="text-[10px] sm:text-[12px] font-bold text-gold tracking-[0.18em] uppercase">Prijave otvorene</span>
+        </div>
+      </Reveal>
+      <Reveal delay={1}>
+        <h1 className="font-display font-black text-[34px] leading-[1.05] sm:text-6xl md:text-7xl lg:text-[88px] tracking-[-0.03em] mb-5 sm:mb-6 max-w-5xl">
+          Jedini fitnes sistem koji <span className="grad-text-gold">isplaćuje već za manje od 24h.</span> <span className="text-white/40 text-sm sm:text-base align-middle font-bold tracking-normal whitespace-nowrap">(provereno)</span>
+        </h1>
+      </Reveal>
+      <Reveal delay={2}>
+        <p className="text-sm sm:text-xl md:text-2xl text-white/70 max-w-2xl leading-relaxed mb-5 sm:mb-7 font-medium">
+          VAMIT-5 Athlete Program. Pravi sistem za ljude koji žele da rastu, grade lični brend i zarađuju od onoga što već rade — treninga i sadržaja.
+        </p>
+      </Reveal>
+      <Reveal delay={2}>
+        <div className="inline-flex items-start sm:items-center gap-3 mb-7 sm:mb-9 px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl glass border border-lime/30 max-w-xl">
+          <div className="text-2xl sm:text-3xl shrink-0">⚡</div>
+          <div className="text-[12px] sm:text-base text-white/85 leading-snug font-medium">
+            <span className="grad-text font-extrabold">Direktna zarada</span> po svakom postavljenom reelsu — <b className="text-lime">za manje od 24h</b> stiže na tvoj nalog.
+          </div>
+        </div>
+      </Reveal>
+      <Reveal delay={3}>
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center mb-8 sm:mb-14">
+          <PrimaryButton href={FORM_URL} big className="w-full sm:w-auto">UĐI U VAMIT-5 ATHLETE PROGRAM</PrimaryButton>
+          <div className="text-[11px] sm:text-sm text-white/60 sm:ml-2 font-medium text-center sm:text-left">
+            <span className="grad-text font-extrabold">POČNI ODMAH</span> · popunjavanje traje 2 minuta
+          </div>
+        </div>
+      </Reveal>
 
-  <!-- TIERS -->
-  <section id="tiers">
-    <div class="section-eyebrow">4 nivoa programa</div>
-    <h2>Od <span class="grad">REGRUTA</span> do ELITE</h2>
-    <p class="section-sub">Tier ne kupujes — zaradjujes. Sto duze ides i sto vise gradnje, to viša provizija. Trajno.</p>
-
-    <div class="tier-grid">
-      <div class="t-card recruit">
-        <div class="stars">⭐</div>
-        <div class="nm">REGRUT</div>
-        <div class="pct">35%<small>/ prodaja</small></div>
-        <ul>
-          <li>Prijavi se preko formulara</li>
-          <li>Snimi & posalji video sa KB + BW vežbama</li>
-          <li>Posle odobrenja — krećes odmah</li>
-          <li>Welcome bonus + materijali</li>
-        </ul>
-      </div>
-      <div class="t-card pro">
-        <div class="stars">⭐⭐</div>
-        <div class="nm">PRO ATHLETE</div>
-        <div class="pct">40%<small>/ prodaja</small></div>
-        <ul>
-          <li>Min. 2 meseca kao REGRUT</li>
-          <li>Min. 1 Reel dnevno + 4 Story dnevno</li>
-          <li>Min. 10 prodaja</li>
-          <li>Sertifikat + veci bonusi</li>
-        </ul>
-      </div>
-      <div class="t-card commando">
-        <div class="stars">⭐⭐⭐</div>
-        <div class="nm">COMMANDO</div>
-        <div class="pct">45%<small>/ prodaja</small></div>
-        <ul>
-          <li>Min. 3 meseca kao PRO</li>
-          <li>Min. 2 Reels dnevno + 5–10 Story</li>
-          <li>Min. 20 dodatnih prodaja</li>
-          <li>Mentor 1:1, oprema, event</li>
-        </ul>
-      </div>
-      <div class="t-card elite">
-        <div class="featured">TOP TIER</div>
-        <div class="stars">⭐⭐⭐⭐</div>
-        <div class="nm">ELITE ATHLETE</div>
-        <div class="pct">50%<small>/ prodaja</small></div>
-        <ul>
-          <li>Min. 3 meseca kao COMMANDO</li>
-          <li>10–20 Reels + 10–20 Story dnevno</li>
-          <li>Min. 15 prodaja / 30 dana</li>
-          <li>Maksimalni status i benefiti</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY -->
-  <section>
-    <div class="section-eyebrow">Zasto baš ovaj program</div>
-    <h2>Sve što gradi <span class="grad">stvarnu motivaciju</span></h2>
-    <p class="section-sub">Nije "podeli i nadaj se". Ovo je sportski sistem koji svaki dan placa rezultate.</p>
-
-    <div class="why">
-      <div class="why-card">
-        <div class="ico">🔥</div>
-        <h3>Streak koji ne sme da pukne</h3>
-        <p>Sto duze postavljas i prodajes — to vise dnevnih, nedeljnih i mesecnih bonusa. Streak od 100 dana = 15.000 XP + ekskluzivna oprema.</p>
-      </div>
-      <div class="why-card">
-        <div class="ico">📊</div>
-        <h3>Live leaderboard</h3>
-        <p>Vidis svoje mesto u realnom vremenu. Top 3 svake nedelje dobija dodatne procente. Top 10 — feature u VAMIT-5 kanalima.</p>
-      </div>
-      <div class="why-card">
-        <div class="ico">🏆</div>
-        <h3>32 bedza za otkljucati</h3>
-        <p>Common, Rare, Epic, Legendary — i 7 skrivenih koje cak ni mi necemo da otkrijemo. Kolekcionarski hard mode.</p>
-      </div>
-      <div class="why-card">
-        <div class="ico">📱</div>
-        <h3>Auto IG tracking</h3>
-        <p>Povezi Instagram Business jednom — sistem automatski broji Reels i Story-je za napredovanje. Bez screenshot-a, bez manuelnog prijavljivanja.</p>
-      </div>
-      <div class="why-card">
-        <div class="ico">💰</div>
-        <h3>Auto isplate svakog 20.</h3>
-        <p>Stripe Connect Express. Upises IBAN jednom, pare ti dolaze direktno na racun. Nema "jurnjanja za novcem".</p>
-      </div>
-      <div class="why-card">
-        <div class="ico">🎯</div>
-        <h3>Dnevni izazovi</h3>
-        <p>Svako jutro 3–5 novih izazova. Brza pobeda, brz XP, brz dopamin. Najjaci atlete navlacenju ekipu na ovo.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- APPLY -->
-  <section id="apply">
-    <div class="section-eyebrow">Ulazak u program</div>
-    <h2>Audicija. <span class="grad">Bez kompromisa.</span></h2>
-    <p class="section-sub">Ne uzimamo svakog. Cuvamo standard. Popuni formular, posalji video — odgovor u roku od 48h.</p>
-
-    <div class="apply-card">
-      <div id="formBox">
-        <h3>Prijavi se za REGRUT poziciju</h3>
-        <p class="form-sub">Sve polja su obavezna osim onih oznacenih (opciono).</p>
-
-        <form id="applyForm">
-          <div class="row">
-            <div class="field">
-              <label for="full_name">Ime i prezime</label>
-              <input id="full_name" name="full_name" required placeholder="npr. Marko Nikolic" />
+      {/* HERO IMAGE — manja, kompaktnija */}
+      <Reveal delay={4}>
+        <div className="hero-img-wrap relative rounded-[18px] sm:rounded-[28px] overflow-hidden border border-white/10 shadow-[0_30px_80px_-30px_rgba(0,240,255,0.35)] max-w-3xl mx-auto">
+          <img src={HERO_IMG} alt="VAMIT-5 zajednica atleta"
+               className="w-full h-[180px] sm:h-[260px] md:h-[320px] object-cover object-center"
+               loading="eager" />
+          <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 flex items-end justify-between flex-wrap gap-2 sm:gap-3 z-10">
+            <div>
+              <div className="text-[10px] sm:text-xs text-white/60 font-bold tracking-[0.18em] uppercase mb-0.5">Zajednica</div>
+              <div className="font-display text-lg sm:text-2xl font-black">VAMIT-5 Athletes</div>
             </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" required placeholder="ti@gmail.com" />
+            <div className="hidden sm:flex items-center gap-2 glass px-3 py-1.5 rounded-lg border-white/15">
+              <span className="flex h-2 w-2 rounded-full bg-lime shadow-[0_0_10px_#a6ff3b]"></span>
+              <span className="text-[11px] font-bold tracking-wider text-white/80">LIVE program</span>
             </div>
           </div>
+        </div>
+      </Reveal>
 
-          <div class="row">
-            <div class="field">
-              <label for="phone">Broj telefona</label>
-              <input id="phone" name="phone" type="tel" required placeholder="+381 64 123 4567" />
+      {/* COUNTERS */}
+      <Reveal delay={5}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 mt-6 sm:mt-12">
+          <CounterCard target={24} suffix="h" label="DO PRVE ISPLATE" sublabel="Provereno" />
+          <CounterCard target={3} label="IZVORA ZARADE" sublabel="Reels · Prodaja · Tim" />
+          <CounterCard target={4} label="NIVOA PROGRAMA" sublabel="Regrut → Elite" />
+          <CounterCard target={100} suffix="%" label="REAL-TIME" sublabel="Sve transparentno" />
+        </div>
+      </Reveal>
+    </header>
+  );
+}
+
+function CounterCard({ target, label, sublabel, suffix = '' }) {
+  const [ref, val] = useCountUp(target);
+  return (
+    <div ref={ref} className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 border border-white/10 card-hover">
+      <div className="font-display text-2xl sm:text-4xl font-black grad-text leading-none mb-1.5 sm:mb-2">{val}{suffix}</div>
+      <div className="text-[9px] sm:text-xs font-extrabold tracking-[0.14em] text-white/80 mb-0.5 sm:mb-1 leading-tight">{label}</div>
+      <div className="text-[9px] sm:text-xs text-white/45 font-medium leading-tight">{sublabel}</div>
+    </div>
+  );
+}
+
+// === SECTION 1 ===
+function Section1() {
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <Reveal>
+        <div className="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10 lg:p-14 border border-white/10 relative overflow-hidden">
+          <div className="absolute -top-32 -right-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-brand2/20 blur-3xl pointer-events-none"></div>
+          <div className="relative grid lg:grid-cols-5 gap-6 lg:gap-10 items-center">
+            <div className="lg:col-span-3">
+              <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-brand uppercase mb-3 sm:mb-4">O programu</div>
+              <h2 className="font-display text-2xl leading-[1.1] sm:text-4xl md:text-5xl font-black tracking-[-0.02em] mb-5 sm:mb-6">
+                Ne tražimo influensere već <span className="grad-text">ljude koji žele da rastu uz nas.</span>
+              </h2>
+              <p className="text-sm sm:text-lg text-white/70 leading-relaxed font-medium">
+                VAMIT-5 Athlete Program je globalni partnerski program namenjen ljudima koji žele da grade lični brend, šire VAMIT-5 metodologiju i zarađuju
+                po svakom snimljenom sadržaju na društvenim mrežama, prodaju VAMIT-5 app i razvoj svog tima.
+              </p>
             </div>
-            <div class="field">
-              <label for="country">Drzava</label>
-              <select id="country" name="country" required>
-                <option value="">Izaberi...</option>
-                <option value="RS">Srbija</option>
-                <option value="ME">Crna Gora</option>
-                <option value="HR">Hrvatska</option>
-                <option value="BA">BiH</option>
-                <option value="SI">Slovenija</option>
-                <option value="MK">Severna Makedonija</option>
-                <option value="DE">Nemacka</option>
-                <option value="AT">Austrija</option>
-                <option value="CH">Svajcarska</option>
-                <option value="OTHER">Drugo</option>
-              </select>
+            <div className="lg:col-span-2 grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 bg-bg1 flex justify-center items-center" style={{maxHeight: '240px'}}>
+                <img src={IMG.bPort} alt="VAMIT-5 trening" className="w-auto object-contain block" style={{maxHeight: '240px', maxWidth: '100%'}} loading="lazy" />
+              </div>
+              <div className="rounded-xl sm:rounded-2xl overflow-hidden border border-white/10 mt-6 sm:mt-10 bg-bg1 flex justify-center items-center" style={{maxHeight: '240px'}}>
+                <img src={IMG.cPort} alt="VAMIT-5 atleta" className="w-auto object-contain block" style={{maxHeight: '240px', maxWidth: '100%'}} loading="lazy" />
+              </div>
             </div>
           </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
 
-          <div class="field">
-            <label for="instagram">Instagram handle (bez @)</label>
-            <input id="instagram" name="instagram_handle" required placeholder="marko_nikolic" />
-            <div class="hint">Mora biti Business ili Creator nalog. Konvertuje se u IG Settings za 30 sec, besplatno.</div>
-          </div>
+// === SECTION 2 — Kako funkcioniše ===
+function Section2() {
+  const steps = [
+    { n: '01', emoji: '📝', title: 'Prijavi se', text: 'Popuni formular (klik na dugme). Traje 2 minuta.' },
+    { n: '02', emoji: '🔑', title: 'Dobijaš svoj kod', text: 'Dobijaš svoj kod i pristup Athlete programu.' },
+    { n: '03', emoji: '💸', title: 'Zarađuješ', text: 'Zarađuješ po svakom postavljenom Reelsu, prodaji VAMIT-5 app i kroz svoj tim.' },
+  ];
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead eyebrow="PROCES" title={<>Kako <span className="grad-text">funkcioniše</span>?</>} center />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5">
+        {steps.map((s, i) => (
+          <Reveal key={s.n} delay={i+1}>
+            <div className="card-hover glass rounded-2xl p-5 sm:p-7 border border-white/10 h-full relative overflow-hidden group">
+              <div className="absolute -top-10 -right-10 w-28 sm:w-32 h-28 sm:h-32 rounded-full bg-gradient-to-br from-brand/20 to-brand3/10 blur-2xl"></div>
+              <div className="relative">
+                <div className="flex items-start justify-between mb-4 sm:mb-5">
+                  <div className="text-4xl sm:text-5xl">{s.emoji}</div>
+                  <div className="font-display text-2xl sm:text-4xl font-black text-white/15 leading-none">{s.n}</div>
+                </div>
+                <div className="font-display font-black text-lg sm:text-xl mb-1.5 sm:mb-2 tracking-tight">{s.title}</div>
+                <div className="text-[13px] sm:text-sm text-white/65 leading-relaxed">{s.text}</div>
+              </div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-          <div class="field">
-            <label for="why">Zasto želiš biti VAMIT-5 atleta?</label>
-            <textarea id="why" name="why_join" required placeholder="2–3 recenice — ko si, sta radis, sta hoces da postignes."></textarea>
-          </div>
+// === SECTION 3 — Šta dobija svaki Athlete ===
+function Section3() {
+  const benefits = [
+    { emoji: '⚡', title: 'Instant zarada za svaki postavljeni reels' },
+    { emoji: '💎', title: 'TOP provizije od prodaje aplikacije' },
+    { emoji: '👥', title: 'Provizija od svog tima' },
+    { emoji: '🎓', title: 'Pristup Athlete edukaciji' },
+    { emoji: '🔗', title: 'Jedinstveni affiliate link' },
+    { emoji: '🤝', title: 'Svakodnevnu podršku VAMIT-5 tima' },
+    { emoji: '✈️', title: 'VAMIT-5 putovanja i eventsi' },
+    { emoji: '🔥', title: 'Brutalne mogućnosti za rast i razvoj' },
+  ];
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead eyebrow="BENEFITI" title={<>Šta dobija svaki <span className="grad-text">Athlete</span>?</>} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+        {benefits.map((b, i) => (
+          <Reveal key={b.title} delay={(i % 3) + 1}>
+            <div className="card-hover glass rounded-2xl p-5 sm:p-7 border border-white/10 h-full flex items-start gap-4">
+              <div className="text-3xl sm:text-4xl shrink-0">{b.emoji}</div>
+              <div className="font-display font-black text-base sm:text-lg tracking-tight leading-snug pt-1">{b.title}</div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
 
-          <div class="field">
-            <label>Audition video — Kettlebell + bodyweight kombinacija (max 60s)</label>
-            <label class="upload-box" for="video" id="uploadBox">
-              <div class="ico">🎥</div>
-              <div class="t" id="uploadTitle">Kliknite da odaberete video</div>
-              <div class="s" id="uploadSub">MP4, MOV — max 100 MB</div>
-            </label>
-            <input id="video" name="video" type="file" accept="video/mp4,video/quicktime" required style="display:none" />
-            <div class="hint">Tip: 30 sec dovoljno. Nakacite na Google Drive/WeTransfer ako vam je vise.</div>
-          </div>
+// === SECTION 4 — Četiri nivoa napredovanja ===
+function CheckLi({ children, gold = false }) {
+  return (
+    <li className="flex items-start gap-2.5 text-[13px] sm:text-sm text-white/80 leading-snug">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className={`mt-0.5 shrink-0 ${gold ? 'text-gold' : 'text-brand'}`}>
+        <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      </svg>
+      <span>{children}</span>
+    </li>
+  );
+}
 
-          <div class="consent">
-            <input type="checkbox" id="consent" required />
-            <label for="consent">Saglasan sam sa <a href="#">Pravilima programa</a> i <a href="#">Politikom privatnosti</a>. Razumem da je VAMIT-5 partnerski program a ne radni odnos, i da mi je odgovornost prijava prihoda u svojoj drzavi.</label>
-          </div>
+function Section4() {
+  const tiers = [
+    {
+      name: 'REGRUT ATHLETE', stars: '⭐', emoji: '🎯', color: 'from-blue-400 to-cyan-400',
+      bullets: [
+        'Pristup VAMIT-5 Athlete programu',
+        'Direktna zarada po svakom postavljenom reelsu',
+        'TOP provizija po prodaji VAMIT-5 app',
+        'Provizija od tvog tima',
+        'Svakodnevna podrška tima',
+      ]
+    },
+    {
+      name: 'PRO ATHLETE', stars: '⭐⭐', emoji: '⚡', color: 'from-purple-400 to-pink-400',
+      bullets: [
+        'Sve kao kod REGRUT',
+        'Još veća provizija od prodaje app',
+      ]
+    },
+    {
+      name: 'COMMANDO ATHLETE', stars: '⭐⭐⭐', emoji: '🚀', color: 'from-pink-400 to-red-400',
+      bullets: [
+        'Sve kao kod PRO',
+        'Još veća provizija od prodaje app',
+      ]
+    },
+  ];
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead
+        eyebrow="PROGRES"
+        title={<>Četiri nivoa <span className="grad-text">napredovanja</span>.</>}
+        sub="Svi dobijaju pristup VAMIT-5 Athlete programu. Iz nivoa u nivo provizija je veća — napredak ide kroz konstantnost, redovan sadržaj, prodaju i rezultate."
+        center
+      />
 
-          <button type="submit" class="btn primary big" id="submitBtn" style="width:100%">
-            <span id="btnText">Posalji prijavu →</span>
-          </button>
-        </form>
+      {/* First 3 tiers */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 mb-4 sm:mb-6">
+        {tiers.map((t, i) => (
+          <Reveal key={t.name} delay={i+1}>
+            <div className="card-hover glass rounded-2xl p-5 sm:p-7 border border-white/10 h-full relative overflow-hidden">
+              <div className={`absolute -top-20 -right-20 w-44 sm:w-48 h-44 sm:h-48 rounded-full bg-gradient-to-br ${t.color} opacity-10 blur-3xl`}></div>
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-3 sm:mb-5">
+                  <div className="text-3xl sm:text-4xl">{t.emoji}</div>
+                  <div className="text-xs tracking-wider text-white/60">{t.stars}</div>
+                </div>
+                <div className="font-display font-black text-lg sm:text-2xl tracking-tight mb-4 sm:mb-5">{t.name}</div>
+                <ul className="space-y-2 sm:space-y-2.5">
+                  {t.bullets.map(b => <CheckLi key={b}>{b}</CheckLi>)}
+                </ul>
+              </div>
+            </div>
+          </Reveal>
+        ))}
       </div>
 
-      <div class="success-box" id="successBox">
-        <div class="big-ico">✅</div>
-        <h4>Prijava primljena!</h4>
-        <p>Pregledamo prijave 7 dana u nedelji. Odgovor stiže na tvoj email u roku od <b style="color:var(--text)">48h</b>. Ako budeš odobren — dobijas link za login i krećes odmah.</p>
-        <p style="margin-top:14px"><b style="color:var(--lime)">Dok cekas:</b> Pridruži se Telegram grupi VAMIT-5 atletа i upoznaj druge.</p>
-        <a href="https://t.me/vamit5athletes" class="btn primary" style="margin-top:16px">Pridruzi se Telegram grupi</a>
+      {/* ELITE — dominantna kartica, SVE prednosti tu */}
+      <Reveal delay={4}>
+        <div className="elite-border rounded-[24px] relative">
+          <div className="elite-glow rounded-[22px] bg-gradient-to-br from-bg1 via-[#1a1228] to-bg1 p-6 sm:p-10 lg:p-12 relative overflow-hidden">
+            <div className="absolute inset-0 ribbon-shine opacity-25 pointer-events-none"></div>
+            <div className="absolute -top-32 -right-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-gold/30 blur-3xl pointer-events-none"></div>
+            <div className="absolute -bottom-32 -left-32 w-72 sm:w-96 h-72 sm:h-96 rounded-full bg-brand3/30 blur-3xl pointer-events-none"></div>
+
+            <div className="relative grid lg:grid-cols-5 gap-8 lg:gap-12 items-center">
+              {/* LEFT — naslov + foto */}
+              <div className="lg:col-span-2">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-gold/15 border border-gold/40 mb-4">
+                  <span className="text-[9px] sm:text-[10px] font-black tracking-[0.2em] text-gold">TOP TIER</span>
+                </div>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="text-4xl sm:text-5xl">👑</div>
+                  <div className="text-xs sm:text-sm tracking-wider text-gold/80">⭐⭐⭐⭐</div>
+                </div>
+                <h3 className="font-display font-black text-[30px] sm:text-5xl md:text-6xl mb-4 sm:mb-5 grad-text-gold tracking-[-0.02em] leading-[1.02]">
+                  ELITE ATHLETE
+                </h3>
+                <p className="text-sm sm:text-base text-white/80 leading-relaxed mb-5">
+                  Maksimalan nivo programa. Pristup koji ima samo nekolicina.
+                </p>
+                <div className="hidden lg:flex justify-center items-center rounded-2xl overflow-hidden border border-gold/20 bg-bg1" style={{maxHeight: '300px'}}>
+                  <img src={IMG.eFull} alt="VAMIT-5 Elite Athlete" className="w-auto object-contain block" style={{maxHeight: '300px', maxWidth: '100%'}} loading="lazy" />
+                </div>
+              </div>
+
+              {/* RIGHT — sve ELITE prednosti */}
+              <div className="lg:col-span-3">
+                <div className="text-[10px] sm:text-xs font-extrabold tracking-[0.24em] text-gold uppercase mb-3 sm:mb-4">Šta dobija ELITE Athlete</div>
+                <ul className="space-y-3 sm:space-y-3.5">
+                  <CheckLi gold>Najveća provizija</CheckLi>
+                  <CheckLi gold>Povećana zarada za postavljanje sadržaja</CheckLi>
+                  <CheckLi gold>Besplatan VAMIT-5 merchandise</CheckLi>
+                  <CheckLi gold>Provizija od prodaje u online shopu</CheckLi>
+                  <CheckLi gold>Pristup posebnim pogodnostima koje nisu dostupne ostalim nivoima</CheckLi>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+// === SECTION 5 — Zašto je VAMIT-5 drugačiji ===
+function Section5() {
+  const reasons = [
+    { emoji: '⚡', title: 'Brza isplata', text: 'Odmah nakon postavljanja reelsa.' },
+    { emoji: '🌍', title: 'Globalna zajednica', text: 'Ekipa atleta sa svih strana.' },
+    { emoji: '🎯', title: 'Nemaš iskustva? Pokazujemo ti kako.', text: 'Sve što ti treba — od početka.' },
+    { emoji: '💸', title: '3 izvora zarade', text: 'Reels, prodaja, tim.' },
+    { emoji: '📈', title: 'Jasan sistem napredovanja', text: 'Tačno znaš gde si i kako da napreduješ.' },
+    { emoji: '🤝', title: 'Pravi tim iza tebe', text: 'Bez kalkulacija. Bez praznih obećanja.' },
+  ];
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead eyebrow="PREDNOSTI" title={<>Zašto je VAMIT-5 <span className="grad-text">drugačiji</span>?</>} />
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+        {reasons.map((r, i) => (
+          <Reveal key={r.title} delay={(i % 3) + 1}>
+            <div className="card-hover glass rounded-2xl p-5 sm:p-7 border border-white/10 h-full">
+              <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{r.emoji}</div>
+              <div className="font-display font-black text-base sm:text-xl mb-1.5 sm:mb-2 tracking-tight">{r.title}</div>
+              <div className="text-[13px] sm:text-sm text-white/65 leading-relaxed">{r.text}</div>
+            </div>
+          </Reveal>
+        ))}
       </div>
+    </section>
+  );
+}
+
+// === IMAGE BREAK — mala centrirana slika, BEZ secenja (natural aspect, max-visina) ===
+function ImageBreak({ src }) {
+  return (
+    <Reveal>
+      <section className="relative z-10 max-w-md mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <div className="rounded-2xl overflow-hidden border border-white/10 bg-bg1 flex justify-center items-center" style={{maxHeight: '320px'}}>
+          <img src={src} alt="" aria-hidden="true" className="w-auto h-auto object-contain block" style={{maxHeight: '320px', maxWidth: '100%'}} loading="lazy" />
+        </div>
+      </section>
+    </Reveal>
+  );
+}
+
+// === SECTION 7 — Ko može da se prijavi ===
+function Section7() {
+  const reqs = [
+    { emoji: '🔞', title: '18+ godina' },
+    { emoji: '🔥', title: 'Spremnost na konstantnost' },
+    { emoji: '📚', title: 'Želja za učenjem i napredovanjem' },
+  ];
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead eyebrow="PRIJAVA" title={<>Ko može da se <span className="grad-text">prijavi</span>?</>} center />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-5 max-w-5xl mx-auto">
+        {reqs.map((r, i) => (
+          <Reveal key={r.title} delay={i+1}>
+            <div className="card-hover glass rounded-2xl p-6 sm:p-8 border border-white/10 h-full text-center">
+              <div className="text-5xl sm:text-6xl mb-4 sm:mb-5">{r.emoji}</div>
+              <div className="font-display font-black text-lg sm:text-xl tracking-tight">{r.title}</div>
+            </div>
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// === SECTION 8 — FAQ ===
+function FAQItem({ q, a, defaultOpen = false }) {
+  return (
+    <details className="glass rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-white/10" {...(defaultOpen ? {open: true} : {})}>
+      <summary className="cursor-pointer flex items-center justify-between gap-3 list-none">
+        <span className="font-display font-bold text-sm sm:text-lg pr-2 leading-snug">{q}</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="shrink-0 text-brand sm:w-[22px] sm:h-[22px]">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </summary>
+      <div className="text-[13px] sm:text-base text-white/70 leading-relaxed mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-white/10">{a}</div>
+    </details>
+  );
+}
+
+function Section8() {
+  const faq = [
+    {
+      q: 'Da li moram imati Instagram pre početka?',
+      a: 'Bilo bi odlično da već imaš iskustva sa Instagramom i snimanjem, ali ako nemaš, ne brini — zato te čekamo u VAMIT-5 Athlete programu, da ti pokažemo koliko je to zapravo jednostavno.'
+    },
+    {
+      q: 'Koliko brzo mogu početi?',
+      a: 'Odmah danas. Ako si spreman na konstantnost i hoćeš rast i napredak, klikni na dugme, popuni formular i počinješ kao REGRUT athlete. Dobijaš pristup ATHLETE PROGRAMU i krećemo u akciju.'
+    },
+    {
+      q: 'Da li dobijam svoj affiliate link?',
+      a: 'Da, svaki atleta ima svoj link koji prati njegovu aktivnost.'
+    },
+    {
+      q: 'Kako funkcioniše napredovanje?',
+      a: 'Kroz četiri nivoa — REGRUT, PRO, COMMANDO i ELITE. Napreduje se kroz konstantnost, redovan sadržaj, prodaju i rezultate.'
+    },
+    {
+      q: 'Kako funkcionišu isplate?',
+      a: 'Dobićeš nalog gde ćeš moći pratiti svaki zarađeni evro u stvarnom vremenu.'
+    },
+  ];
+  return (
+    <section className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <SectionHead eyebrow="FAQ" title={<>Najčešća <span className="grad-text">pitanja</span></>} center />
+      <div className="space-y-2.5 sm:space-y-4">
+        {faq.map((f, i) => (
+          <Reveal key={f.q} delay={Math.min(i+1, 4)}>
+            <FAQItem q={f.q} a={f.a} defaultOpen={i === 0} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// === BOTTOM CTA ===
+function BottomCTA() {
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-24">
+      <Reveal>
+        <div className="relative rounded-[24px] sm:rounded-[40px] overflow-hidden glass-strong border border-white/10 p-6 sm:p-14 lg:p-20 text-center">
+          <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[500px] sm:w-[700px] h-[500px] sm:h-[700px] rounded-full bg-gradient-to-br from-brand/20 via-brand2/15 to-brand3/20 blur-3xl pointer-events-none"></div>
+          <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-gold/10 to-transparent pointer-events-none"></div>
+          <div className="relative">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold/15 border border-gold/40 mb-5 sm:mb-6">
+              <span className="text-[10px] sm:text-xs font-black tracking-[0.2em] text-gold">FINALNI KORAK</span>
+            </div>
+            <h2 className="font-display text-[32px] leading-[1.05] sm:text-6xl md:text-7xl font-black tracking-[-0.03em] mb-5 sm:mb-6">
+              Pridruži se <span className="grad-text-gold">VAMIT-5</span><br/> Athlete Programu.
+            </h2>
+            <p className="text-sm sm:text-xl text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
+              Počni danas. Razvij svoj tim. Napreduj kroz nivoe. Zarađuj kroz jedini sistem koji nagrađuje konstantnost.
+            </p>
+            <div className="flex flex-col items-center gap-3 sm:gap-4">
+              <GoldButton href={FORM_URL} className="w-full sm:w-auto">POSTANI VAMIT-5 ATHLETE</GoldButton>
+              <div className="text-[11px] sm:text-sm text-white/55">
+                <span className="grad-text font-extrabold">POČNI ODMAH</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </section>
+  );
+}
+
+// === FOOTER ===
+function Footer() {
+  return (
+    <footer className="relative z-10 border-t border-white/5 mt-4 sm:mt-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-6">
+        <div className="flex items-center gap-3">
+          <img src={LOGO} alt="VAMIT-5" className="w-10 h-10 object-contain" />
+          <div>
+            <div className="font-black tracking-tight text-base">VAMIT-5</div>
+            <div className="text-[10px] tracking-[0.2em] text-white/40 uppercase font-bold">Athlete Program</div>
+          </div>
+        </div>
+        <div className="text-[11px] sm:text-sm text-white/45 text-center sm:text-right">
+          Kontakt: <a href="mailto:vamit5.team@gmail.com" className="text-brand hover:underline">vamit5.team@gmail.com</a>
+          <div className="mt-1">© {new Date().getFullYear()} VAMIT-5. Sva prava zadržana.</div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+// === APP ===
+// Distribucija 6 slika: Hero (group photo), a, b+c, d, e (ELITE), f
+// Svaka koriscena 1 put. Nista odsečeno, sve prikazano u prirodnoj proporciji.
+function App() {
+  return (
+    <div className="min-h-screen relative">
+      <Nav />
+      <Hero />
+      <ImageBreak src={IMG.aFull} />
+      <Section1 />
+      <Section2 />
+      <ImageBreak src={IMG.dFull} />
+      <Section3 />
+      <Section4 />
+      <ImageBreak src={IMG.fFull} />
+      <Section5 />
+      <Section7 />
+      <Section8 />
+      <BottomCTA />
+      <Footer />
     </div>
-  </section>
+  );
+}
 
-  <footer>
-    <div>VAMIT-5 · Athlete Affiliate Program · 2026</div>
-    <div style="margin-top:8px">
-      <a href="#">Pravila programa</a>·
-      <a href="#">Politika privatnosti</a>·
-      <a href="#">Kontakt</a>·
-      <a href="https://t.me/vamit5athletes">Telegram</a>
-    </div>
-  </footer>
-</div>
-
-<script src="/config.js"></script>
-<script type="module">
-// Capture ref= from URL
-const urlParams = new URLSearchParams(window.location.search);
-const INVITE_CODE = urlParams.get("ref") || localStorage.getItem("v5_ref") || "";
-if (urlParams.get("ref")) localStorage.setItem("v5_ref", urlParams.get("ref"));
-
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const SUPABASE_URL = window.SUPABASE_URL || 'YOUR_SUPABASE_URL';
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || 'YOUR_SUPABASE_ANON_KEY';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-// Video upload handling
-const videoInput = document.getElementById('video');
-const uploadBox = document.getElementById('uploadBox');
-const uploadTitle = document.getElementById('uploadTitle');
-const uploadSub = document.getElementById('uploadSub');
-videoInput.addEventListener('change', (e) => {
-  const f = e.target.files[0];
-  if(!f) return;
-  if(f.size > 100 * 1024 * 1024){
-    alert('Video mora biti manji od 100 MB. Probaj kompresovan ili pošalji link.');
-    videoInput.value = '';
-    return;
-  }
-  uploadBox.classList.add('has-file');
-  uploadTitle.textContent = f.name;
-  uploadSub.textContent = (f.size/1024/1024).toFixed(1) + ' MB · spreman';
-});
-
-// Form submit
-document.getElementById('applyForm').addEventListener('submit', async (e)=>{
-  e.preventDefault();
-  const btn = document.getElementById('submitBtn');
-  const txt = document.getElementById('btnText');
-  btn.disabled = true;
-  txt.innerHTML = '<span class="spinner"></span>Slanje...';
-
-  const fd = new FormData(e.target);
-  // ?ref=INVITE_CODE u URL-u (od atlete koji poziva u tim) ide u referrer_invite_code
-  const urlRef = new URLSearchParams(window.location.search).get('ref');
-  const payload = {
-    full_name: fd.get('full_name'),
-    email: fd.get('email'),
-    phone: fd.get('phone'),
-    country: fd.get('country'),
-    instagram_handle: fd.get('instagram_handle').replace(/^@/, ''),
-    why_join: fd.get('why_join'),
-    referrer_invite_code: urlRef ? urlRef.toUpperCase().trim() : null,
-  };
-
-  try {
-    // 1. Upload video
-    const file = videoInput.files[0];
-    const ext = file.name.split('.').pop();
-    const filename = `${Date.now()}-${payload.email.replace(/[^a-z0-9]/gi,'_')}.${ext}`;
-    const { error: upErr } = await supabase.storage
-      .from('application-videos')
-      .upload(filename, file, { contentType: file.type });
-    if(upErr) throw upErr;
-
-    // Get a signed URL (private bucket, 7 days)
-    const { data: signed } = await supabase.storage
-      .from('application-videos')
-      .createSignedUrl(filename, 60*60*24*7);
-    payload.video_url = signed?.signedUrl || filename;
-
-    // 2. Insert application
-    const { error: insErr } = await supabase.from('applications').insert(payload);
-    if(insErr) throw insErr;
-
-    // 3. Show success
-    document.getElementById('formBox').style.display = 'none';
-    document.getElementById('successBox').classList.add('show');
-    document.getElementById('successBox').scrollIntoView({ behavior:'smooth', block:'center' });
-  } catch(err) {
-    alert('Greska pri slanju: ' + err.message + '\n\nPokušaj ponovo ili pošalji email na athletes@vamit5.app');
-    btn.disabled = false;
-    txt.textContent = 'Posalji prijavu →';
-  }
-});
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 </script>
 </body>
 </html>
