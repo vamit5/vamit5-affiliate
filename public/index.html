@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="sr-Latn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5" />
+<meta name="theme-color" content="#05060a" />
+<title>VAMIT-5 Athlete Program</title>
+<meta name="description" content="Pumpaj. Snimaj. Zaradi." id="meta-desc" />
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bg0:'#05060a', bg1:'#0a0c14',
+          recruit:'#a6ff3b', pro:'#3b82f6', commando:'#a855f7', elite:'#ffc24b',
+          brand:'#00f0ff', brand2:'#7a5bff', brand3:'#ff3b9a',
+          gold:'#ffc24b', lime:'#a6ff3b', danger:'#ff4d5e'
+        },
+        fontFamily: {
+          sans: ['Inter','system-ui','sans-serif'],
+          display: ['"Space Grotesk"','Inter','sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html, body { background:#05060a; color:#fff; font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body::before {
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      radial-gradient(900px 600px at 80% -10%, rgba(0,240,255,0.18), transparent 60%),
+      radial-gradient(900px 600px at 0% 100%, rgba(122,91,255,0.18), transparent 60%),
+      radial-gradient(700px 400px at 50% 110%, rgba(255,59,154,0.18), transparent 60%);
+    animation: aurora 18s ease-in-out infinite alternate;
+  }
+  @keyframes aurora { 0%{filter:hue-rotate(0deg)} 100%{filter:hue-rotate(25deg) saturate(1.15)} }
+  @keyframes fadeup { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  .animate-fadeup { animation: fadeup 0.8s ease-out backwards; }
+  .grad-text { background:linear-gradient(135deg,#00f0ff,#7a5bff,#ff3b9a); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .grad-text-gold { background:linear-gradient(135deg,#ffc24b,#ff8a3b,#ff3b9a); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .glass { background:rgba(20,24,42,0.55); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.08); }
+  .glass-strong { background:rgba(20,24,42,0.75); backdrop-filter:blur(24px); border:1px solid rgba(255,255,255,0.12); }
+  .glow-brand { box-shadow: 0 0 60px -10px rgba(0,240,255,0.4), 0 20px 60px -20px rgba(0,240,255,0.3); }
+  .glow-gold  { box-shadow: 0 0 60px -10px rgba(255,194,75,0.5), 0 20px 60px -20px rgba(255,194,75,0.3); }
+  details summary { cursor: pointer; list-style: none; }
+  details summary::-webkit-details-marker { display: none; }
+  details[open] summary .chev { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+
+<div class="relative z-10">
+
+  <!-- === NAV === -->
+  <header class="sticky top-0 z-30 glass-strong border-b border-white/5">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
+      <a href="/" class="flex items-center gap-2">
+        <img id="navLogo" src="" alt="VAMIT-5" class="h-9 w-9 object-contain"/>
+        <div class="font-display font-black tracking-tight text-base sm:text-lg">VAMIT-5</div>
+      </a>
+      <a id="navSecondary" href="#" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white/5 border border-white/10 hover:bg-white/10 transition">
+        <span data-cms="cta_secondary_text">Već sam atleta</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- === HERO === -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-20 pb-12 sm:pb-16">
+    <div class="text-center max-w-3xl mx-auto">
+      <div class="text-[11px] sm:text-xs uppercase tracking-[0.3em] text-brand font-black mb-4 animate-fadeup" style="animation-delay:0.05s" data-cms="hero_kicker">VAMIT-5 ATHLETE PROGRAM</div>
+      <h1 class="font-display font-black text-4xl sm:text-6xl lg:text-7xl leading-[1.05] tracking-tight mb-5 animate-fadeup" style="animation-delay:0.1s">
+        <span class="grad-text" data-cms="hero_title">Pumpaj. Snimaj. Zaradi.</span>
+      </h1>
+      <p class="text-base sm:text-lg text-white/70 mb-9 max-w-2xl mx-auto animate-fadeup" style="animation-delay:0.2s" data-cms="hero_subtitle">
+        Jedini fitness affiliate program u regionu koji isplaćuje već za 24h. Reels + prodaja app-a + tvoj tim — sve u jednom.
+      </p>
+
+      <!-- 2 BUTTONS -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 animate-fadeup" style="animation-delay:0.3s">
+        <a id="ctaPrimary" href="#" class="w-full sm:w-auto px-7 py-4 rounded-2xl font-extrabold text-bg0 text-base bg-gradient-to-r from-brand via-brand2 to-brand3 glow-brand hover:scale-[1.03] transition">
+          <span data-cms="cta_primary_text">🚀 Uđi u VAMIT-5 Athlete program</span>
+        </a>
+        <a id="ctaSecondary" href="#" class="w-full sm:w-auto px-7 py-4 rounded-2xl font-bold text-white text-sm bg-white/5 border border-white/15 hover:bg-white/10 transition">
+          <span data-cms="cta_secondary_text">Već sam atleta</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- HERO IMAGE (opciono) -->
+    <div id="heroImageWrap" class="mt-12 max-w-4xl mx-auto hidden">
+      <div class="glass-strong rounded-3xl p-2 overflow-hidden">
+        <img id="heroImage" src="" alt="" class="w-full h-auto rounded-2xl"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- === STATS === -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 pb-12 sm:pb-20">
+    <div class="grid grid-cols-3 gap-3 sm:gap-6">
+      <div class="glass rounded-2xl p-4 sm:p-6 text-center">
+        <div class="font-display font-black text-2xl sm:text-4xl grad-text" data-cms="stats_athletes">500+</div>
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-white/60 font-bold mt-1" data-cms="stats_label_1">Atleta</div>
+      </div>
+      <div class="glass rounded-2xl p-4 sm:p-6 text-center">
+        <div class="font-display font-black text-2xl sm:text-4xl grad-text-gold" data-cms="stats_paid">€50,000+</div>
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-white/60 font-bold mt-1" data-cms="stats_label_2">Isplaćeno</div>
+      </div>
+      <div class="glass rounded-2xl p-4 sm:p-6 text-center">
+        <div class="font-display font-black text-2xl sm:text-4xl grad-text" data-cms="stats_reels">10,000+</div>
+        <div class="text-[10px] sm:text-xs uppercase tracking-wider text-white/60 font-bold mt-1" data-cms="stats_label_3">Reels-ova</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- === HOW IT WORKS === -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+    <h2 class="text-center font-display font-black text-3xl sm:text-5xl mb-12" data-cms="how_title">Kako radi</h2>
+    <div class="grid sm:grid-cols-3 gap-4 sm:gap-6">
+      <div class="glass-strong rounded-3xl p-6 sm:p-8 hover:border-brand/40 transition">
+        <div class="text-5xl mb-4">📝</div>
+        <div class="font-display font-black text-xl mb-2 text-brand" data-cms="how_step1_title">1. Prijavi se</div>
+        <p class="text-sm text-white/70" data-cms="how_step1_text">Klikni dugme gore i registruj se kao affiliate.</p>
+      </div>
+      <div class="glass-strong rounded-3xl p-6 sm:p-8 hover:border-brand2/40 transition">
+        <div class="text-5xl mb-4">🔗</div>
+        <div class="font-display font-black text-xl mb-2 text-brand2" data-cms="how_step2_title">2. Dobij svoj link</div>
+        <p class="text-sm text-white/70" data-cms="how_step2_text">Dobijaš lični link za deljenje. Svaki klik se prati.</p>
+      </div>
+      <div class="glass-strong rounded-3xl p-6 sm:p-8 hover:border-brand3/40 transition">
+        <div class="text-5xl mb-4">💰</div>
+        <div class="font-display font-black text-xl mb-2 text-brand3" data-cms="how_step3_title">3. Zarađuj</div>
+        <p class="text-sm text-white/70" data-cms="how_step3_text">Deli, postavi Reels, gradi tim. Isplata za 24h.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- === LEVELS === -->
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+    <div class="text-center mb-12">
+      <h2 class="font-display font-black text-3xl sm:text-5xl mb-3" data-cms="levels_title">4 nivoa progresa</h2>
+      <p class="text-white/60 text-sm sm:text-base" data-cms="levels_subtitle">Što više vredan rad — veci % i veca nagrada.</p>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="glass-strong rounded-3xl p-5 border-2" style="border-color:rgba(166,255,59,0.3);">
+        <div class="text-4xl mb-2">🎯</div>
+        <div class="font-display font-black text-xl text-recruit mb-1">RECRUIT</div>
+        <p class="text-xs text-white/70" data-cms="level_recruit_desc">Početni nivo. 35% provizije + €0.30 po Reel-u.</p>
+      </div>
+      <div class="glass-strong rounded-3xl p-5 border-2" style="border-color:rgba(59,130,246,0.3);">
+        <div class="text-4xl mb-2">⚡</div>
+        <div class="font-display font-black text-xl text-pro mb-1">PRO</div>
+        <p class="text-xs text-white/70" data-cms="level_pro_desc">40% provizije + €0.40 po Reel-u.</p>
+      </div>
+      <div class="glass-strong rounded-3xl p-5 border-2" style="border-color:rgba(168,85,247,0.3);">
+        <div class="text-4xl mb-2">🚀</div>
+        <div class="font-display font-black text-xl text-commando mb-1">COMMANDO</div>
+        <p class="text-xs text-white/70" data-cms="level_commando_desc">45% provizije + €0.50 po Reel-u.</p>
+      </div>
+      <div class="glass-strong rounded-3xl p-5 border-2 glow-gold" style="border-color:rgba(255,194,75,0.4);">
+        <div class="text-4xl mb-2">👑</div>
+        <div class="font-display font-black text-xl text-elite mb-1">ELITE</div>
+        <p class="text-xs text-white/70" data-cms="level_elite_desc">50% provizije + €0.75 po Reel-u.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- === FAQ === -->
+  <section class="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+    <h2 class="text-center font-display font-black text-3xl sm:text-5xl mb-10" data-cms="faq_title">Najčešća pitanja</h2>
+    <div class="space-y-3">
+      <details class="glass rounded-2xl p-5 group">
+        <summary class="flex items-center justify-between gap-3">
+          <span class="font-display font-bold text-base" data-cms="faq_q1">Kako se isplaćuje?</span>
+          <span class="chev text-2xl transition-transform">⌄</span>
+        </summary>
+        <p class="text-sm text-white/70 mt-3" data-cms="faq_a1">Manuelni bank transfer na tvoj IBAN. Zatraziš isplatu iz portala — admin odobri u 24h.</p>
+      </details>
+      <details class="glass rounded-2xl p-5 group">
+        <summary class="flex items-center justify-between gap-3">
+          <span class="font-display font-bold text-base" data-cms="faq_q2">Koliko mogu da zaradim?</span>
+          <span class="chev text-2xl transition-transform">⌄</span>
+        </summary>
+        <p class="text-sm text-white/70 mt-3" data-cms="faq_a2">Bez limita. Top atlete zarađuju €1000+ mesečno.</p>
+      </details>
+      <details class="glass rounded-2xl p-5 group">
+        <summary class="flex items-center justify-between gap-3">
+          <span class="font-display font-bold text-base" data-cms="faq_q3">Mogu li da napustim?</span>
+          <span class="chev text-2xl transition-transform">⌄</span>
+        </summary>
+        <p class="text-sm text-white/70 mt-3" data-cms="faq_a3">Da. Bez ugovora, bez obaveza. Zatraziš isplatu, dobiješ, izadješ.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- === FINAL CTA === -->
+  <section class="max-w-4xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+    <div class="glass-strong rounded-3xl p-8 sm:p-12 text-center border-2 border-brand/30 glow-brand">
+      <div class="font-display font-black text-3xl sm:text-5xl mb-4 grad-text">Spreman?</div>
+      <p class="text-white/70 mb-7">Pridruži se VAMIT-5 atletama danas. Setup za 2 minuta.</p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a id="ctaPrimary2" href="#" class="w-full sm:w-auto px-7 py-4 rounded-2xl font-extrabold text-bg0 text-base bg-gradient-to-r from-brand via-brand2 to-brand3 glow-brand hover:scale-[1.03] transition">
+          <span data-cms="cta_primary_text">🚀 Postani Atleta</span>
+        </a>
+        <a id="ctaSecondary2" href="#" class="w-full sm:w-auto px-7 py-4 rounded-2xl font-bold text-white text-sm bg-white/5 border border-white/15 hover:bg-white/10 transition">
+          <span data-cms="cta_secondary_text">Već sam atleta</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- === FOOTER === -->
+  <footer class="border-t border-white/5 mt-10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="text-xs text-white/40" data-cms="footer_text">© 2026 VAMIT-5. All rights reserved.</div>
+      <div class="flex items-center gap-4 text-xl">
+        <a id="footIG" href="#" target="_blank" rel="noopener" class="hover:text-brand">📷</a>
+        <a id="footTT" href="#" target="_blank" rel="noopener" class="hover:text-brand">🎵</a>
+        <a id="footYT" href="#" target="_blank" rel="noopener" class="hover:text-brand">▶️</a>
+        <a id="footMail" href="#" class="hover:text-brand">✉️</a>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- === CMS BOOTSTRAP === -->
+<script type="module">
+  const SUPABASE_URL = 'https://bauuhowpbrqqmojqnqbr.supabase.co';
+  const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJhdXVob3dwYnJxcW1vanFucWJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjQwOTgsImV4cCI6MjA5MjcwMDA5OH0.dHkcP-BLwfXDVrugjwokQ1u4lUyahdQQG6uMbigl0ks';
+
+  async function loadSettings() {
+    try {
+      const res = await fetch(SUPABASE_URL + '/rest/v1/settings?key=like.landing_*&select=key,value', {
+        headers: { apikey: SUPABASE_ANON, Authorization: 'Bearer ' + SUPABASE_ANON }
+      });
+      if (!res.ok) return;
+      const rows = await res.json();
+      const settings = {};
+      rows.forEach(r => {
+        const k = r.key.replace(/^landing_/, '');
+        const v = typeof r.value === 'string' ? r.value : (r.value?.v ?? r.value);
+        settings[k] = v;
+      });
+      applySettings(settings);
+    } catch (e) { console.warn('Landing CMS load failed:', e); }
+  }
+
+  function applySettings(s) {
+    // Meta
+    if (s.meta_title) document.title = s.meta_title;
+    if (s.meta_description) { const m = document.getElementById('meta-desc'); if (m) m.setAttribute('content', s.meta_description); }
+    // Logo + hero image
+    const logo = document.getElementById('navLogo');
+    if (logo) logo.src = s.logo_url || 'https://res.cloudinary.com/dqqljgtna/image/upload/v1778767942/VAMIT-5-removebg-preview_2_uvii77.png';
+    const hi = document.getElementById('heroImage');
+    if (hi && s.hero_image && s.hero_image.trim()) {
+      hi.src = s.hero_image; document.getElementById('heroImageWrap').classList.remove('hidden');
+    }
+    // CTA buttons (4 instances)
+    if (s.cta_primary_url) {
+      ['ctaPrimary','ctaPrimary2'].forEach(id => { const el = document.getElementById(id); if (el) el.href = s.cta_primary_url; });
+    }
+    if (s.cta_secondary_url) {
+      ['navSecondary','ctaSecondary','ctaSecondary2'].forEach(id => { const el = document.getElementById(id); if (el) el.href = s.cta_secondary_url; });
+    }
+    // Footer socials
+    if (s.instagram_url) document.getElementById('footIG').href = s.instagram_url;
+    if (s.tiktok_url)    document.getElementById('footTT').href = s.tiktok_url;
+    if (s.youtube_url)   document.getElementById('footYT').href = s.youtube_url;
+    if (s.contact_email) document.getElementById('footMail').href = 'mailto:' + s.contact_email;
+    // Replace all [data-cms="key"] text
+    document.querySelectorAll('[data-cms]').forEach(el => {
+      const k = el.getAttribute('data-cms');
+      if (s[k] !== undefined && s[k] !== null && s[k] !== '') {
+        el.textContent = s[k];
+      }
+    });
+  }
+
+  loadSettings();
+</script>
+
+</body>
+</html>
